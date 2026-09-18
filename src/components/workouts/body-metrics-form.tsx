@@ -12,6 +12,7 @@ import { CheckCircle2 } from "lucide-react";
 export function BodyMetricsForm({ date, initial }: { date: string; initial: BodyMetric | null }) {
   const [weight, setWeight] = useState(initial?.weight_kg != null ? String(initial.weight_kg) : "");
   const [restingHr, setRestingHr] = useState(initial?.resting_hr != null ? String(initial.resting_hr) : "");
+  const [vo2max, setVo2max] = useState(initial?.vo2max != null ? String(initial.vo2max) : "");
   const [notes, setNotes] = useState(initial?.notes ?? "");
   const [pending, startTransition] = useTransition();
   const [saved, setSaved] = useState(false);
@@ -34,10 +35,18 @@ export function BodyMetricsForm({ date, initial }: { date: string; initial: Body
         return;
       }
 
+      const trimmedVo2max = vo2max.trim();
+      const vo2maxValue = trimmedVo2max === "" ? null : Number(trimmedVo2max);
+      if (vo2maxValue !== null && Number.isNaN(vo2maxValue)) {
+        setError("Enter a valid VO2max, or leave it blank.");
+        return;
+      }
+
       const result = await upsertBodyMetric({
         date,
         weightKg,
         restingHr: restingHrValue,
+        vo2max: vo2maxValue,
         notes: notes || null,
       });
       if (!result.ok) {
@@ -56,7 +65,7 @@ export function BodyMetricsForm({ date, initial }: { date: string; initial: Body
         <CardDescription>Optional — never required to use the app.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           <div className="space-y-1.5">
             <Label htmlFor="weight-kg">Weight (kg)</Label>
             <Input
@@ -75,6 +84,16 @@ export function BodyMetricsForm({ date, initial }: { date: string; initial: Body
               value={restingHr}
               onChange={(e) => setRestingHr(e.target.value)}
               placeholder="52"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="vo2max">VO2max</Label>
+            <Input
+              id="vo2max"
+              inputMode="decimal"
+              value={vo2max}
+              onChange={(e) => setVo2max(e.target.value)}
+              placeholder="52.0"
             />
           </div>
         </div>

@@ -211,6 +211,7 @@ export interface BodyMetricInput {
   date: string;
   weightKg?: number | null;
   restingHr?: number | null;
+  vo2max?: number | null;
   notes?: string | null;
 }
 
@@ -229,6 +230,7 @@ export async function upsertBodyMetric(input: BodyMetricInput): Promise<ActionRe
       date: input.date,
       weight_kg: input.weightKg ?? null,
       resting_hr: input.restingHr ?? null,
+      vo2max: input.vo2max ?? null,
       notes: input.notes ?? null,
     },
     { onConflict: "user_id,date" },

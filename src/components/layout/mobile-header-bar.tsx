@@ -7,7 +7,6 @@ const TITLES: [string, string][] = [
   ["/dashboard", "Cockpit"],
   ["/plan", "Training Plan"],
   ["/calendar", "Calendar"],
-  ["/log", "Workout Log"],
   ["/races/a-race", "A-Race"],
   ["/races/singapore", "Singapore Marathon"],
   ["/races", "Races"],

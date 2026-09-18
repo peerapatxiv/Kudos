@@ -51,7 +51,6 @@ export async function completeWorkout(input: CompleteWorkoutInput): Promise<Acti
 
   revalidatePath("/dashboard");
   revalidatePath("/calendar");
-  revalidatePath("/log");
   revalidatePath("/plan");
   revalidatePath("/progress");
   return { ok: true };
@@ -81,7 +80,6 @@ export async function skipWorkout(workoutId: string, note?: string): Promise<Act
 
   revalidatePath("/dashboard");
   revalidatePath("/calendar");
-  revalidatePath("/log");
   revalidatePath("/progress");
   return { ok: true };
 }
@@ -114,7 +112,6 @@ export async function resetWorkout(workoutId: string): Promise<ActionResult> {
 
   revalidatePath("/dashboard");
   revalidatePath("/calendar");
-  revalidatePath("/log");
   revalidatePath("/progress");
   return { ok: true };
 }
@@ -148,7 +145,6 @@ export async function modifyWorkout(input: ModifyWorkoutInput): Promise<ActionRe
 
   revalidatePath("/dashboard");
   revalidatePath("/calendar");
-  revalidatePath("/log");
   return { ok: true };
 }
 
@@ -185,7 +181,6 @@ export async function upsertDailyLog(input: DailyLogInput): Promise<ActionResult
 
   if (error) return { ok: false, error: error.message };
 
-  revalidatePath("/log");
   return { ok: true };
 }
 
@@ -248,7 +243,6 @@ export async function upsertBodyMetric(input: BodyMetricInput): Promise<ActionRe
 
   if (error) return { ok: false, error: error.message };
 
-  revalidatePath("/log");
   revalidatePath("/progress");
   return { ok: true };
 }
@@ -335,7 +329,6 @@ export async function editCompletedWorkout(input: EditCompletedWorkoutInput): Pr
 
   revalidatePath("/dashboard");
   revalidatePath("/calendar");
-  revalidatePath("/log");
   revalidatePath("/plan");
   revalidatePath("/progress");
   return { ok: true };

@@ -8,7 +8,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { RaceCountdownCard } from "@/components/dashboard/race-countdown";
 import { EditRaceDialog } from "@/components/races/edit-race-dialog";
 import { PaceCalculator } from "@/components/pace/pace-calculator";
-import { PaceZoneCard } from "@/components/pace/pace-zone-card";
 import { daysUntil } from "@/lib/training/dates";
 import { secondsToPaceText, formatDuration } from "@/lib/training/pace";
 import type { Race } from "@/lib/training/types";
@@ -70,8 +69,6 @@ export function RaceDetailDialog({ race }: { race: Race }) {
               defaultPaceText={race.goal_pace_seconds_per_km ? secondsToPaceText(race.goal_pace_seconds_per_km) : "4:30"}
               markers={[5, 10, 15, 20, race.distance_km]}
             />
-
-            <PaceZoneCard />
           </div>
         </DialogContent>
       </Dialog>
@@ -82,7 +79,7 @@ export function RaceDetailDialog({ race }: { race: Race }) {
 function Metric({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
     <div>
-      <p className={`text-lg font-bold tabular-nums sm:text-xl ${accent ? "text-a-race" : "text-foreground"}`}>{value}</p>
+      <p className={`text-lg font-bold tabular-nums ${accent ? "text-a-race" : "text-foreground"}`}>{value}</p>
       <p className="text-[11px] uppercase tracking-wide text-muted">{label}</p>
     </div>
   );

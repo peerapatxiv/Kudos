@@ -42,7 +42,8 @@ src/
     supabase/              browser/server/middleware Supabase clients + hand-typed Database
     training/               domain layer: types, pace math, date math, phases, aggregation,
                              Supabase queries (reads) and Server Actions (writes)
-    auth/actions.ts        sign-up/sign-in/magic-link/sign-out + per-user plan seeding
+    auth/actions.ts        sign-up/sign-in/magic-link/password-reset/sign-out + per-user plan seeding
+    offline/workout-queue.ts  localStorage-backed queue for workout completions made offline
   middleware.ts             refreshes the Supabase session cookie, guards authenticated routes
 supabase/migrations/0001_init.sql   full schema, indexes, RLS policies
 scripts/seed.ts             repeatable CLI seed script (service-role key)
@@ -222,9 +223,11 @@ Any Next.js host works (Vercel is the path of least resistance):
 
 ## 15. Known follow-ups (documented, not silently skipped)
 
-- Offline **writes** (queue + background sync for workout completions made while offline) — read-only
-  offline caching is implemented; mutation queuing is the natural next step, and `WorkoutLogger`'s single
-  `completeWorkout` call is the seam where it would be added.
 - True background push notifications (requires a scheduled server-side sender) — local/foreground
   notification preferences are implemented and documented as such in Settings.
 - A dedicated native Expo app — deliberately out of scope in favor of one polished PWA (see §2).
+
+Closed: offline writes (queued via `localStorage` in `src/lib/offline/workout-queue.ts` and flushed by
+`OfflineQueueSync` on reconnect), password reset (`/auth/reset-password`), an edit-workout UI wired to
+the existing `modifyWorkout` action, and an optional body-metrics log (weight/resting HR) with charts on
+the Progress page.

@@ -177,10 +177,10 @@ Any Next.js host works (Vercel is the path of least resistance):
 - `src/app/manifest.ts` — installable manifest (standalone display, brand icons in `public/icons/`).
 - `public/sw.js` — caches the app shell (`/dashboard`, `/calendar`, `/plan`, `/log`) so previously visited
   pages stay viewable offline; a small "Offline" badge (`ConnectionStatus`) appears when `navigator.onLine`
-  is false. This is **read-only** offline support, as scoped in the spec — workout completions made offline
-  are not queued for background sync in this version; the logging dialog surfaces a clear error if a save
-  fails while offline rather than pretending it succeeded. Extending this to a full mutation queue is a
-  clean follow-up (see the `WorkoutLogger` component for the single seam where that queue would plug in).
+  is false. Workout completions made offline are queued to `localStorage`
+  (`src/lib/offline/workout-queue.ts`) rather than dropped — the logging dialog saves normally, and
+  `<OfflineQueueSync />` automatically flushes the queue and syncs each entry to Supabase once the
+  connection returns, showing a small pending-count badge while items are waiting.
 - Bottom tab bar (Home/Plan/Calendar/Log/More) on mobile widths, a fixed sidebar (Dashboard/Training
   Plan/Calendar/Workout Log/Races/Progress/Settings) from `md:` up.
 - Marking a workout complete from the dashboard's "Start Workout" button is 2 taps (open the logger, tap

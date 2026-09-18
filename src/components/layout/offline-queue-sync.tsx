@@ -30,8 +30,11 @@ export function OfflineQueueSync() {
           athleteNotes: item.athleteNotes,
         };
         try {
-          const result = await completeWorkout(input);
-          if (result.ok) dequeueCompletion(item.workoutId);
+          // The server was reached either way — a rejection (result.ok === false) is a final
+          // answer for this exact input, not a "try again later" situation, so dequeue it too.
+          // Only a thrown exception (request never completed) should leave the item queued for retry.
+          await completeWorkout(input);
+          dequeueCompletion(item.workoutId);
         } catch {
           break; // still unreachable — stop and retry next time we come online
         }

@@ -15,15 +15,35 @@ export function BodyMetricsForm({ date, initial }: { date: string; initial: Body
   const [notes, setNotes] = useState(initial?.notes ?? "");
   const [pending, startTransition] = useTransition();
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   function handleSave() {
+    setError(null);
     startTransition(async () => {
-      await upsertBodyMetric({
+      const trimmedWeight = weight.trim();
+      const weightKg = trimmedWeight === "" ? null : Number(trimmedWeight);
+      if (weightKg !== null && Number.isNaN(weightKg)) {
+        setError("Enter a valid weight, or leave it blank.");
+        return;
+      }
+
+      const trimmedHr = restingHr.trim();
+      const restingHrValue = trimmedHr === "" ? null : Number(trimmedHr);
+      if (restingHrValue !== null && Number.isNaN(restingHrValue)) {
+        setError("Enter a valid resting HR, or leave it blank.");
+        return;
+      }
+
+      const result = await upsertBodyMetric({
         date,
-        weightKg: weight.trim() === "" ? null : Number(weight),
-        restingHr: restingHr.trim() === "" ? null : Number(restingHr),
+        weightKg,
+        restingHr: restingHrValue,
         notes: notes || null,
       });
+      if (!result.ok) {
+        setError(result.error ?? "Could not save body metrics.");
+        return;
+      }
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     });
@@ -66,6 +86,8 @@ export function BodyMetricsForm({ date, initial }: { date: string; initial: Body
           placeholder="Anything else worth noting?"
           className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-a-race/40"
         />
+
+        {error && <p className="text-xs text-danger">{error}</p>}
 
         <Button variant="outline" className="w-full" onClick={handleSave} disabled={pending}>
           {saved ? (

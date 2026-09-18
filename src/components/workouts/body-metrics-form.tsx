@@ -37,7 +37,7 @@ export function BodyMetricsForm({ date, initial }: { date: string; initial: Body
 
       const trimmedVo2max = vo2max.trim();
       const vo2maxValue = trimmedVo2max === "" ? null : Number(trimmedVo2max);
-      if (vo2maxValue !== null && Number.isNaN(vo2maxValue)) {
+      if (vo2maxValue !== null && (Number.isNaN(vo2maxValue) || vo2maxValue <= 0 || vo2maxValue >= 100)) {
         setError("Enter a valid VO2max, or leave it blank.");
         return;
       }

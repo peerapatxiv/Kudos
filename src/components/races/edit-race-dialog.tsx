@@ -46,11 +46,19 @@ export function EditRaceDialog({ race }: { race: Race }) {
         setError("Enter goal time as mm:ss or h:mm:ss.");
         return;
       }
+      if (goalTimeSeconds !== null && goalTimeSeconds <= 0) {
+        setError("Goal time must be greater than 0.");
+        return;
+      }
 
       const trimmedGoalPace = goalPace.trim();
       const goalPaceSecondsPerKm = trimmedGoalPace === "" ? null : paceTextToSeconds(trimmedGoalPace);
       if (trimmedGoalPace !== "" && goalPaceSecondsPerKm === null) {
         setError("Enter goal pace as m:ss.");
+        return;
+      }
+      if (goalPaceSecondsPerKm !== null && goalPaceSecondsPerKm <= 0) {
+        setError("Goal pace must be greater than 0.");
         return;
       }
 

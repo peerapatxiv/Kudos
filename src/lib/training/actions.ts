@@ -82,6 +82,7 @@ export async function skipWorkout(workoutId: string, note?: string): Promise<Act
   revalidatePath("/dashboard");
   revalidatePath("/calendar");
   revalidatePath("/log");
+  revalidatePath("/progress");
   return { ok: true };
 }
 
@@ -114,6 +115,7 @@ export async function resetWorkout(workoutId: string): Promise<ActionResult> {
   revalidatePath("/dashboard");
   revalidatePath("/calendar");
   revalidatePath("/log");
+  revalidatePath("/progress");
   return { ok: true };
 }
 

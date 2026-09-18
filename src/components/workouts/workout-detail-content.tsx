@@ -144,7 +144,12 @@ export function WorkoutDetailContent({
       {!workout.is_rest_day && (
         <>
           <WorkoutLogger workout={workout} open={loggerOpen} onOpenChange={setLoggerOpen} />
-          <EditWorkoutDialog workout={workout} open={editOpen} onOpenChange={setEditOpen} />
+          <EditWorkoutDialog
+            key={workout.completed ? "completed" : "planned"}
+            workout={workout}
+            open={editOpen}
+            onOpenChange={setEditOpen}
+          />
         </>
       )}
     </div>

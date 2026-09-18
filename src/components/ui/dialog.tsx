@@ -35,7 +35,7 @@ export function DialogContent({
 }
 
 export function DialogHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("mb-4 flex flex-col gap-1", className)} {...props} />;
+  return <div className={cn("mb-4 flex flex-col gap-1 pr-9", className)} {...props} />;
 }
 
 export function DialogTitle({ className, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>) {

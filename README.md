@@ -45,7 +45,7 @@ src/
     auth/actions.ts        sign-up/sign-in/magic-link/password-reset/sign-out + per-user plan seeding
     offline/workout-queue.ts  localStorage-backed queue for workout completions made offline
   middleware.ts             refreshes the Supabase session cookie, guards authenticated routes
-supabase/migrations/0001_init.sql   full schema, indexes, RLS policies
+supabase/migrations/   full schema, indexes, RLS policies (0001_init.sql + additive follow-ups)
 scripts/seed.ts             repeatable CLI seed script (service-role key)
 scripts/validate-plan.ts    validates plan-data.ts against the supplied spec
 tests/                      Vitest unit tests
@@ -80,12 +80,19 @@ the saved effort on UI polish and real Supabase wiring instead of on cross-platf
    - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Project Settings → API.
    - `SUPABASE_SERVICE_ROLE_KEY` — same page. **Never** prefix this with `NEXT_PUBLIC_` or import it from
      any file reachable by the browser bundle — it's only read by `scripts/seed.ts`, a standalone Node script.
-3. Run the migration (§5) and sign up in the app once (§7) — or seed directly via the CLI script (§6).
+3. Run the migrations (§5) **before** deploying a new build, then sign up in the app once (§7) — or seed
+   directly via the CLI script (§6). Ordering matters: `upsertBodyMetric` in `src/lib/training/actions.ts`
+   unconditionally sends a `vo2max` field on every body-metrics save, so if that code ships to a database
+   that hasn't had `0002_body_metrics_vo2max.sql` applied yet, PostgREST rejects the request for an unknown
+   column and breaks ALL body-metrics saves (not just VO2max) until the migration runs.
 
 ## 5. Database migrations
 
-Schema, indexes, constraints, and RLS policies all live in `supabase/migrations/0001_init.sql` — no table
-was created by hand through the dashboard.
+Schema, indexes, constraints, and RLS policies all live in `supabase/migrations/` — no table was created by
+hand through the dashboard. `supabase db push` / `supabase migration up` applies every migration file in
+that directory (currently `0001_init.sql` plus `0002_body_metrics_vo2max.sql`), not just one, so a project
+that's only had the first migration applied is missing columns (e.g. `body_metrics.vo2max`) that this app's
+code assumes exist.
 
 ```bash
 # with the Supabase CLI, linked to your project
@@ -169,7 +176,8 @@ Any Next.js host works (Vercel is the path of least resistance):
 2. Set the three `NEXT_PUBLIC_*`/`SUPABASE_SERVICE_ROLE_KEY` env vars from §4 in the project settings
    (the service-role key only needs to exist if you plan to run `scripts/seed.ts` from CI/locally against
    prod — it is never read by the deployed app itself).
-3. Run the migration against the production Supabase project (§5).
+3. Run the migrations against the production Supabase project (§5), **before** step 4 — see §5 for why
+   deploy ordering matters here.
 4. Deploy. Sign up once in the deployed app to seed your plan, or run `npm run seed` against prod.
 
 ## 12. PWA / mobile

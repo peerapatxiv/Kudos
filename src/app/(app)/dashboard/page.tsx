@@ -3,7 +3,7 @@ import { getAllWorkouts, getLatestBodyMetric, getProfile, getRaces, getTrainingW
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { SupabaseNotConfigured } from "@/components/shared/error-state";
 import { EmptyState } from "@/components/shared/empty-state";
-import { RaceCountdownCard } from "@/components/dashboard/race-countdown";
+import { RaceDetailDialog } from "@/components/races/race-detail-dialog";
 import { TodayWorkoutCard } from "@/components/dashboard/today-workout-card";
 import { WeeklySummary } from "@/components/dashboard/weekly-summary";
 import { UpcomingList } from "@/components/dashboard/upcoming-list";
@@ -84,8 +84,8 @@ export default async function DashboardPage() {
       <TodayWorkoutCard workout={todayWorkout} phase={phase} />
 
       <div className="grid gap-4 sm:grid-cols-2">
-        {aRace && <RaceCountdownCard race={aRace} href="/races/a-race" />}
-        {secondaryRace && <RaceCountdownCard race={secondaryRace} href="/races/singapore" />}
+        {aRace && <RaceDetailDialog race={aRace} workouts={workouts} />}
+        {secondaryRace && <RaceDetailDialog race={secondaryRace} workouts={workouts} aRaceDate={aRace?.date} />}
       </div>
 
       {currentWeek && <WeeklySummary week={currentWeek} stats={weekStats} />}

@@ -281,8 +281,6 @@ export async function updateRace(input: UpdateRaceInput): Promise<ActionResult> 
 
   if (error) return { ok: false, error: error.message };
 
-  revalidatePath("/races/a-race");
-  revalidatePath("/races/singapore");
   revalidatePath("/dashboard");
   revalidatePath("/calendar");
   return { ok: true };

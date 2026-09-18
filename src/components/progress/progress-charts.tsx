@@ -1,19 +1,6 @@
 "use client";
 
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Line,
-  LineChart,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { secondsToPaceText } from "@/lib/training/pace";
 
@@ -107,12 +94,20 @@ export function LongRunChart({ data }: { data: LongRunPoint[] }) {
       </CardHeader>
       <CardContent className="h-64">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ left: -20 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+          <LineChart data={data} margin={{ left: -20, right: 12, top: 8 }}>
+            <CartesianGrid stroke="var(--border)" vertical={false} />
             <XAxis dataKey="label" tick={AXIS_STYLE} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
             <YAxis tick={AXIS_STYLE} axisLine={false} tickLine={false} unit="km" />
-            <Tooltip contentStyle={TOOLTIP_STYLE} />
-            <Line type="monotone" dataKey="distanceKm" stroke="var(--long-run)" strokeWidth={2} dot={{ r: 3 }} />
+            <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v) => [`${v} km`, "Longest run"]} />
+            <Line
+              type="linear"
+              dataKey="distanceKm"
+              name="Longest run"
+              stroke="var(--long-run)"
+              strokeWidth={2}
+              dot={{ r: 4, strokeWidth: 2, stroke: "var(--surface)", fill: "var(--long-run)" }}
+              activeDot={{ r: 5, strokeWidth: 2, stroke: "var(--surface)" }}
+            />
           </LineChart>
         </ResponsiveContainer>
       </CardContent>
@@ -121,11 +116,14 @@ export function LongRunChart({ data }: { data: LongRunPoint[] }) {
 }
 
 export function CompletionChart({ completed, skipped, planned }: { completed: number; skipped: number; planned: number }) {
-  const data = [
+  const segments = [
     { name: "Completed", value: completed, color: "var(--completed)" },
     { name: "Skipped", value: skipped, color: "var(--skipped)" },
     { name: "Upcoming", value: planned, color: "var(--rest)" },
   ].filter((d) => d.value > 0);
+
+  const total = completed + skipped + planned;
+  const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
 
   return (
     <Card>
@@ -133,25 +131,28 @@ export function CompletionChart({ completed, skipped, planned }: { completed: nu
         <CardTitle>Workout Completion</CardTitle>
         <CardDescription>Completed vs skipped, plan to date.</CardDescription>
       </CardHeader>
-      <CardContent className="flex items-center gap-4">
-        <div className="h-40 w-40 shrink-0">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie data={data} dataKey="value" nameKey="name" innerRadius={45} outerRadius={70} paddingAngle={2}>
-                {data.map((entry) => (
-                  <Cell key={entry.name} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip contentStyle={TOOLTIP_STYLE} />
-            </PieChart>
-          </ResponsiveContainer>
+      <CardContent className="space-y-4">
+        <div className="flex items-baseline gap-2">
+          <span className="text-4xl font-semibold tabular-nums text-foreground">{completed}</span>
+          <span className="text-sm text-muted">of {total} workouts completed · {pct}%</span>
         </div>
-        <div className="space-y-1.5 text-sm">
-          {data.map((d) => (
-            <div key={d.name} className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: d.color }} />
-              <span className="text-muted">{d.name}</span>
-              <span className="font-semibold text-foreground">{d.value}</span>
+
+        <div className="flex h-2.5 w-full gap-0.5 overflow-hidden rounded-full bg-surface-2">
+          {segments.map((s) => (
+            <div
+              key={s.name}
+              className="h-full first:rounded-l-full last:rounded-r-full"
+              style={{ width: `${(s.value / total) * 100}%`, backgroundColor: s.color }}
+            />
+          ))}
+        </div>
+
+        <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-sm">
+          {segments.map((s) => (
+            <div key={s.name} className="flex items-center gap-2">
+              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: s.color }} />
+              <span className="text-muted">{s.name}</span>
+              <span className="font-semibold text-foreground">{s.value}</span>
             </div>
           ))}
         </div>

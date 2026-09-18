@@ -606,7 +606,7 @@ export const SEED_WORKOUTS: SeedWorkout[] = [
     paceText: "4:50-5:00/km (suggested, by feel)",
     paceSeconds: 290,
     notes:
-      "SECONDARY / RECOVERY EFFORT. Only 8 days after the A-race. Start conservative, run by feel, " +
+      "RACE — BYD Singapore Marathon. Only 8 days after the A-race. Start conservative, run by feel, " +
       "slow down if legs aren't recovered. No 3:30 split chasing — recovery is the priority.",
     is_rest_day: false,
     is_race: true,

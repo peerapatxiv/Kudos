@@ -10,7 +10,7 @@ import { format } from "date-fns";
 export function RaceCountdownCard({ race, href }: { race: Race; href: string }) {
   const days = daysUntil(race.date);
   const isA = race.priority === "a_race";
-  const label = isA ? "A-RACE" : race.priority === "tune_up" ? "TUNE-UP" : "SECONDARY / RECOVERY EFFORT";
+  const label = isA ? "A-RACE" : race.priority === "tune_up" ? "TUNE-UP" : "RACE of THE YEAR";
 
   return (
     <Link href={href}>

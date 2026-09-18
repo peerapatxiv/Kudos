@@ -70,14 +70,19 @@ export function TodayWorkoutCard({ workout, phase }: { workout: Workout | null; 
 
           {workout.notes && <p className="text-sm text-muted">{workout.notes}</p>}
 
-          <div className="flex gap-2 pt-1">
-            <Link href={`/calendar?date=${workout.date}`} className="flex-1">
+          <div className="flex flex-col gap-2 pt-1 sm:flex-row">
+            <Link href={`/calendar?date=${workout.date}`} className="sm:flex-1">
               <Button variant="outline" className="w-full">
                 View details
               </Button>
             </Link>
             {!workout.is_rest_day && !workout.completed && (
-              <Button variant="primary" size="lg" className="flex-1" onClick={() => setLoggerOpen(true)}>
+              <Button
+                variant="primary"
+                size="lg"
+                className="w-full sm:flex-1 sm:w-auto"
+                onClick={() => setLoggerOpen(true)}
+              >
                 <PlayCircle className="h-4 w-4" />
                 Start Workout
               </Button>

@@ -6,7 +6,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { RaceCountdownCard } from "@/components/dashboard/race-countdown";
 import { TodayWorkoutCard } from "@/components/dashboard/today-workout-card";
 import { WeeklySummary } from "@/components/dashboard/weekly-summary";
-import { WorkoutCard } from "@/components/workouts/workout-card";
+import { UpcomingList } from "@/components/dashboard/upcoming-list";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PaceZoneCard } from "@/components/pace/pace-zone-card";
 import { todayIso } from "@/lib/training/dates";
@@ -92,10 +92,8 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle>Next up</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
-            {upcoming.map((w) => (
-              <WorkoutCard key={w.id} workout={w} href={`/calendar?date=${w.date}`} dense />
-            ))}
+          <CardContent>
+            <UpcomingList workouts={upcoming} />
           </CardContent>
         </Card>
       )}

@@ -107,7 +107,7 @@ export function TrainingCalendar({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
@@ -117,7 +117,7 @@ export function TrainingCalendar({
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <h2 className="min-w-[9rem] text-center text-sm font-semibold text-foreground">
+          <h2 className="min-w-[7rem] text-center text-sm font-semibold text-foreground sm:min-w-[9rem]">
             {format(cursor, view === "week" ? "'Week of' MMM d" : "MMMM yyyy")}
           </h2>
           <Button

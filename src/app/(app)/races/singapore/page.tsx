@@ -32,7 +32,7 @@ export default async function SingaporePage() {
   return (
     <div className="space-y-6 animate-fade-in-up">
       <div className="flex items-center gap-2">
-        <Badge variant="secondary">SECONDARY / RECOVERY EFFORT</Badge>
+        <Badge variant="secondary">RACE of THE YEAR</Badge>
         <span className="text-xs text-muted">{days} days to go</span>
       </div>
 

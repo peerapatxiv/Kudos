@@ -1,9 +1,8 @@
-import { getAllWorkouts, getDailyLog } from "@/lib/training/queries";
+import { getAllWorkouts } from "@/lib/training/queries";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { SupabaseNotConfigured } from "@/components/shared/error-state";
 import { EmptyState } from "@/components/shared/empty-state";
 import { LogList } from "@/components/workouts/log-list";
-import { DailyLogForm } from "@/components/workouts/daily-log-form";
 import { todayIso } from "@/lib/training/dates";
 import { NotebookPen } from "lucide-react";
 
@@ -11,7 +10,7 @@ export default async function LogPage() {
   if (!isSupabaseConfigured) return <SupabaseNotConfigured />;
 
   const today = todayIso();
-  const [workoutsResult, dailyLog] = await Promise.all([getAllWorkouts(), getDailyLog(today)]);
+  const workoutsResult = await getAllWorkouts();
 
   if (workoutsResult.status !== "ok") {
     return <EmptyState title="Couldn't load your log" description="Refresh to try again." />;
@@ -35,10 +34,8 @@ export default async function LogPage() {
     <div className="space-y-6 animate-fade-in-up">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">Workout Log</h1>
-        <p className="text-sm text-muted">Mark workouts complete and track how you&rsquo;re feeling.</p>
+        <p className="text-sm text-muted">Mark workouts complete and review your training history.</p>
       </div>
-
-      <DailyLogForm date={today} initial={dailyLog} />
 
       <LogList workouts={sorted} />
     </div>

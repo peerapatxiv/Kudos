@@ -6,6 +6,7 @@ import { DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/di
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { WorkoutLogger } from "@/components/workouts/workout-logger";
+import { EditWorkoutDialog } from "@/components/workouts/edit-workout-dialog";
 import { workoutTypeMeta } from "@/components/workouts/workout-meta";
 import { secondsToPaceText, formatDuration } from "@/lib/training/pace";
 import { phaseForDate } from "@/lib/training/phases";
@@ -23,6 +24,7 @@ export function WorkoutDetailContent({
   race: Race | null;
 }) {
   const [loggerOpen, setLoggerOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const meta = workoutTypeMeta(workout.workout_type);
   const phase = phaseForDate(workout.date);
 
@@ -123,10 +125,15 @@ export function WorkoutDetailContent({
       {!workout.is_rest_day && (
         <div className="flex gap-2 pt-1">
           {!workout.completed ? (
-            <Button variant="primary" className="flex-1" onClick={() => setLoggerOpen(true)}>
-              <PlayCircle className="h-4 w-4" />
-              Log this workout
-            </Button>
+            <>
+              <Button variant="outline" size="icon" onClick={() => setEditOpen(true)} title="Edit workout">
+                <PencilLine className="h-4 w-4" />
+              </Button>
+              <Button variant="primary" className="flex-1" onClick={() => setLoggerOpen(true)}>
+                <PlayCircle className="h-4 w-4" />
+                Log this workout
+              </Button>
+            </>
           ) : (
             <Button variant="outline" className="flex-1" onClick={() => resetWorkout(workout.id)}>
               <RotateCcw className="h-4 w-4" />
@@ -136,7 +143,12 @@ export function WorkoutDetailContent({
         </div>
       )}
 
-      {!workout.is_rest_day && <WorkoutLogger workout={workout} open={loggerOpen} onOpenChange={setLoggerOpen} />}
+      {!workout.is_rest_day && (
+        <>
+          <WorkoutLogger workout={workout} open={loggerOpen} onOpenChange={setLoggerOpen} />
+          <EditWorkoutDialog workout={workout} open={editOpen} onOpenChange={setEditOpen} />
+        </>
+      )}
     </div>
   );
 }

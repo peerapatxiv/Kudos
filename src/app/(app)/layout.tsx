@@ -1,6 +1,7 @@
 import { Sidebar } from "@/components/layout/sidebar";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { MobileHeaderBar } from "@/components/layout/mobile-header-bar";
+import { OfflineQueueSync } from "@/components/layout/offline-queue-sync";
 import { getProfile } from "@/lib/training/queries";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -14,6 +15,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <main className="mx-auto max-w-6xl px-4 pb-24 pt-4 md:px-8 md:pb-12 md:pt-8">{children}</main>
       </div>
       <BottomNav />
+      <OfflineQueueSync />
     </div>
   );
 }

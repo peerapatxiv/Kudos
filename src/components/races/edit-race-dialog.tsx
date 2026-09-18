@@ -5,9 +5,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { deleteRace, updateRace } from "@/lib/training/actions";
 import { formatDuration, parseDurationToSeconds, paceTextToSeconds, secondsToPaceText } from "@/lib/training/pace";
-import type { Race } from "@/lib/training/types";
+import type { Race, RacePriority } from "@/lib/training/types";
 import { PencilLine, Trash2 } from "lucide-react";
 
 export function EditRaceDialog({ race }: { race: Race }) {
@@ -15,6 +16,7 @@ export function EditRaceDialog({ race }: { race: Race }) {
   const [name, setName] = useState(race.name);
   const [date, setDate] = useState(race.date);
   const [distance, setDistance] = useState(String(race.distance_km));
+  const [priority, setPriority] = useState<RacePriority>(race.priority);
   const [goalTime, setGoalTime] = useState(
     race.goal_time_seconds != null ? formatDuration(race.goal_time_seconds) : "",
   );
@@ -26,7 +28,7 @@ export function EditRaceDialog({ race }: { race: Race }) {
   const [error, setError] = useState<string | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
-  const deletable = race.priority !== "a_race" && race.priority !== "secondary";
+  const deletable = priority !== "a_race" && priority !== "secondary";
 
   function handleDelete() {
     if (!confirmingDelete) {
@@ -87,6 +89,7 @@ export function EditRaceDialog({ race }: { race: Race }) {
         name: trimmedName,
         date,
         distanceKm,
+        priority,
         goalTimeSeconds,
         goalPaceSecondsPerKm,
         notes: notes || null,
@@ -134,6 +137,27 @@ export function EditRaceDialog({ race }: { race: Race }) {
                   onChange={(e) => setDistance(e.target.value)}
                 />
               </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="race-priority">Type</Label>
+              <Select value={priority} onValueChange={(v) => setPriority(v as RacePriority)}>
+                <SelectTrigger id="race-priority">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="a_race">A-Race</SelectItem>
+                  <SelectItem value="secondary">Race of the Year</SelectItem>
+                  <SelectItem value="tune_up">Tune-up race</SelectItem>
+                  <SelectItem value="other">Other race</SelectItem>
+                </SelectContent>
+              </Select>
+              {(priority === "a_race" || priority === "secondary") && priority !== race.priority && (
+                <p className="text-xs text-muted">
+                  Any other race currently set as {priority === "a_race" ? "the A-race" : "Race of the Year"} will
+                  switch to &ldquo;Other race&rdquo;.
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-3">

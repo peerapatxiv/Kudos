@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { paceFromDistanceAndTime } from "@/lib/training/pace";
+import type { RacePriority } from "@/lib/training/types";
 
 export interface ActionResult {
   ok: boolean;
@@ -247,11 +248,28 @@ export async function upsertBodyMetric(input: BodyMetricInput): Promise<ActionRe
   return { ok: true };
 }
 
+/** At most one race per user can hold "a_race" or "secondary" — demote whichever race currently
+ * holds it (other than `keepRaceId`) to "other" so assigning it elsewhere never hits the DB's
+ * partial unique index. No-op for "tune_up"/"other", which allow any number of races. */
+async function demoteExistingHolder(
+  supabase: NonNullable<Awaited<ReturnType<typeof getSupabaseServerClient>>>,
+  userId: string,
+  priority: RacePriority,
+  keepRaceId: string | null,
+): Promise<void> {
+  if (priority !== "a_race" && priority !== "secondary") return;
+
+  let query = supabase.from("races").update({ priority: "other" }).eq("user_id", userId).eq("priority", priority);
+  if (keepRaceId) query = query.neq("id", keepRaceId);
+  await query;
+}
+
 export interface UpdateRaceInput {
   raceId: string;
   name: string;
   date: string;
   distanceKm: number;
+  priority: RacePriority;
   goalTimeSeconds?: number | null;
   goalPaceSecondsPerKm?: number | null;
   notes?: string | null;
@@ -266,12 +284,15 @@ export async function updateRace(input: UpdateRaceInput): Promise<ActionResult> 
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Not signed in." };
 
+  await demoteExistingHolder(supabase, user.id, input.priority, input.raceId);
+
   const { error } = await supabase
     .from("races")
     .update({
       name: input.name,
       date: input.date,
       distance_km: input.distanceKm,
+      priority: input.priority,
       goal_time_seconds: input.goalTimeSeconds ?? null,
       goal_pace_seconds_per_km: input.goalPaceSecondsPerKm ?? null,
       notes: input.notes ?? null,
@@ -290,7 +311,7 @@ export interface CreateRaceInput {
   name: string;
   date: string;
   distanceKm: number;
-  priority: "tune_up" | "other";
+  priority: RacePriority;
   goalTimeSeconds?: number | null;
   goalPaceSecondsPerKm?: number | null;
   notes?: string | null;
@@ -304,6 +325,8 @@ export async function createRace(input: CreateRaceInput): Promise<ActionResult> 
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Not signed in." };
+
+  await demoteExistingHolder(supabase, user.id, input.priority, null);
 
   const { error } = await supabase.from("races").insert({
     user_id: user.id,

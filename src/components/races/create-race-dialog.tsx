@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createRace } from "@/lib/training/actions";
 import { parseDurationToSeconds, paceTextToSeconds } from "@/lib/training/pace";
+import type { RacePriority } from "@/lib/training/types";
 import { Plus } from "lucide-react";
 
 export function CreateRaceDialog() {
@@ -15,7 +16,7 @@ export function CreateRaceDialog() {
   const [name, setName] = useState("");
   const [date, setDate] = useState("");
   const [distance, setDistance] = useState("");
-  const [priority, setPriority] = useState<"tune_up" | "other">("other");
+  const [priority, setPriority] = useState<RacePriority>("other");
   const [goalTime, setGoalTime] = useState("");
   const [goalPace, setGoalPace] = useState("");
   const [notes, setNotes] = useState("");
@@ -108,7 +109,7 @@ export function CreateRaceDialog() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add race</DialogTitle>
-            <DialogDescription>A tune-up race or any other race on your calendar.</DialogDescription>
+            <DialogDescription>Any race on your calendar — including the A-race or Race of the Year.</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
@@ -141,15 +142,23 @@ export function CreateRaceDialog() {
 
             <div className="space-y-1.5">
               <Label htmlFor="new-race-priority">Type</Label>
-              <Select value={priority} onValueChange={(v) => setPriority(v as "tune_up" | "other")}>
+              <Select value={priority} onValueChange={(v) => setPriority(v as RacePriority)}>
                 <SelectTrigger id="new-race-priority">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="a_race">A-Race</SelectItem>
+                  <SelectItem value="secondary">Race of the Year</SelectItem>
                   <SelectItem value="tune_up">Tune-up race</SelectItem>
                   <SelectItem value="other">Other race</SelectItem>
                 </SelectContent>
               </Select>
+              {(priority === "a_race" || priority === "secondary") && (
+                <p className="text-xs text-muted">
+                  Any race currently set as {priority === "a_race" ? "the A-race" : "Race of the Year"} will switch
+                  to &ldquo;Other race&rdquo;.
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-3">

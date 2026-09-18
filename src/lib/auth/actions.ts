@@ -142,3 +142,30 @@ export async function seedPlanForUser(userId: string): Promise<void> {
     }
   }
 }
+
+export async function sendPasswordReset(email: string, redirectTo: string): Promise<AuthResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+  if (error) return { ok: false, error: error.message };
+
+  return { ok: true, message: "Check your inbox for a password reset link." };
+}
+
+export async function updatePassword(newPassword: string): Promise<AuthResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { ok: false, error: "Your reset link has expired. Request a new one from the sign-in page." };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) return { ok: false, error: error.message };
+
+  redirect("/dashboard");
+}

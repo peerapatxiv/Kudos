@@ -1,6 +1,6 @@
 import "server-only";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
-import type { DailyLog, Race, TrainingWeek, Workout, WorkoutInterval, WorkoutWithIntervals } from "./types";
+import type { BodyMetric, DailyLog, Race, TrainingWeek, Workout, WorkoutInterval, WorkoutWithIntervals } from "./types";
 
 export type QueryResult<T> =
   | { status: "unconfigured" }
@@ -118,4 +118,19 @@ export async function getDailyLog(date: string): Promise<DailyLog | null> {
   if (!supabase) return null;
   const { data } = await supabase.from("daily_logs").select("*").eq("date", date).maybeSingle();
   return data as DailyLog | null;
+}
+
+export async function getBodyMetricByDate(date: string): Promise<BodyMetric | null> {
+  const supabase = await client();
+  if (!supabase) return null;
+  const { data } = await supabase.from("body_metrics").select("*").eq("date", date).maybeSingle();
+  return data as BodyMetric | null;
+}
+
+export async function getBodyMetrics(): Promise<QueryResult<BodyMetric[]>> {
+  const supabase = await client();
+  if (!supabase) return { status: "unconfigured" };
+  const { data, error } = await supabase.from("body_metrics").select("*").order("date", { ascending: true });
+  if (error) return { status: "error", message: error.message };
+  return { status: "ok", data: (data ?? []) as BodyMetric[] };
 }

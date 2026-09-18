@@ -6,10 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { sendMagicLink, signInWithPassword, signUpWithPassword } from "@/lib/auth/actions";
+import { sendMagicLink, sendPasswordReset, signInWithPassword, signUpWithPassword } from "@/lib/auth/actions";
 import { CheckCircle2, AlertCircle } from "lucide-react";
 
-type Mode = "sign-in" | "sign-up" | "magic-link";
+type Mode = "sign-in" | "sign-up" | "magic-link" | "reset";
 
 export function AuthForm() {
   const [mode, setMode] = useState<Mode>("sign-in");
@@ -29,7 +29,12 @@ export function AuthForm() {
           ? await signInWithPassword(email, password)
           : mode === "sign-up"
             ? await signUpWithPassword(email, password)
-            : await sendMagicLink(email, `${window.location.origin}/auth/callback`);
+            : mode === "magic-link"
+              ? await sendMagicLink(email, `${window.location.origin}/auth/callback`)
+              : await sendPasswordReset(
+                  email,
+                  `${window.location.origin}/auth/callback?redirectTo=/auth/reset-password`,
+                );
 
       if (!result) return; // redirect() throws internally on success for sign-in/sign-up
       if (!result.ok) setError(result.error ?? "Something went wrong.");
@@ -61,7 +66,7 @@ export function AuthForm() {
               />
             </div>
 
-            {mode !== "magic-link" && (
+            {mode !== "magic-link" && mode !== "reset" && (
               <div className="space-y-1.5">
                 <Label htmlFor="password">Password</Label>
                 <Input
@@ -75,6 +80,34 @@ export function AuthForm() {
                   placeholder="••••••••"
                 />
               </div>
+            )}
+
+            {mode === "sign-in" && (
+              <button
+                type="button"
+                onClick={() => {
+                  setMode("reset");
+                  setError(null);
+                  setMessage(null);
+                }}
+                className="text-xs text-muted underline underline-offset-2 hover:text-foreground"
+              >
+                Forgot password?
+              </button>
+            )}
+
+            {mode === "reset" && (
+              <button
+                type="button"
+                onClick={() => {
+                  setMode("sign-in");
+                  setError(null);
+                  setMessage(null);
+                }}
+                className="text-xs text-muted underline underline-offset-2 hover:text-foreground"
+              >
+                Back to sign in
+              </button>
             )}
 
             {error && (
@@ -97,7 +130,9 @@ export function AuthForm() {
                   ? "Sign in"
                   : mode === "sign-up"
                     ? "Create account"
-                    : "Send magic link"}
+                    : mode === "magic-link"
+                      ? "Send magic link"
+                      : "Send reset link"}
             </Button>
           </form>
         </Tabs>

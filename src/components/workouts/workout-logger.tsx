@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CheckCircle2, PartyPopper } from "lucide-react";
 import { completeWorkout, skipWorkout } from "@/lib/training/actions";
+import { enqueueCompletion } from "@/lib/offline/workout-queue";
 import { paceFromDistanceAndTime, secondsToPaceText } from "@/lib/training/pace";
 import type { Workout } from "@/lib/training/types";
 
@@ -25,6 +26,7 @@ export function WorkoutLogger({
   const [notes, setNotes] = useState("");
   const [pending, startTransition] = useTransition();
   const [done, setDone] = useState(false);
+  const [queuedOffline, setQueuedOffline] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const distanceKm = Number(distance);
@@ -34,21 +36,32 @@ export function WorkoutLogger({
 
   function reset() {
     setDone(false);
+    setQueuedOffline(false);
     setError(null);
   }
 
   function handleComplete() {
     setError(null);
     startTransition(async () => {
-      const result = await completeWorkout({
+      const input = {
         workoutId: workout.id,
         actualDistanceKm: distanceKm > 0 ? distanceKm : null,
         actualTimeSeconds: durationSeconds,
         perceivedEffort: Number(effort),
         athleteNotes: notes || null,
-      });
-      if (!result.ok) setError(result.error ?? "Could not save this workout.");
-      else setDone(true);
+      };
+      try {
+        const result = await completeWorkout(input);
+        if (!result.ok) {
+          setError(result.error ?? "Could not save this workout.");
+          return;
+        }
+        setDone(true);
+      } catch {
+        enqueueCompletion(input);
+        setQueuedOffline(true);
+        setDone(true);
+      }
     });
   }
 
@@ -75,11 +88,11 @@ export function WorkoutLogger({
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-success/15 text-success">
               <PartyPopper className="h-7 w-7" />
             </div>
-            <DialogTitle>Workout Complete</DialogTitle>
+            <DialogTitle>{queuedOffline ? "Saved Offline" : "Workout Complete"}</DialogTitle>
             <p className="text-sm text-muted">
-              {distanceKm > 0 ? `${distanceKm} km` : workout.title}
-              {durationSeconds ? ` in ${duration}` : ""}
-              {pace ? ` · ${secondsToPaceText(pace)}/km avg` : ""}
+              {queuedOffline
+                ? "You're offline — this will sync automatically once you're back online."
+                : `${distanceKm > 0 ? `${distanceKm} km` : workout.title}${durationSeconds ? ` in ${duration}` : ""}${pace ? ` · ${secondsToPaceText(pace)}/km avg` : ""}`}
             </p>
             <Button variant="primary" onClick={() => onOpenChange(false)} className="mt-2 w-full">
               Done

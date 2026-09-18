@@ -206,3 +206,37 @@ export async function updateProfile(displayName: string): Promise<ActionResult> 
   revalidatePath("/dashboard");
   return { ok: true };
 }
+
+export interface BodyMetricInput {
+  date: string;
+  weightKg?: number | null;
+  restingHr?: number | null;
+  notes?: string | null;
+}
+
+export async function upsertBodyMetric(input: BodyMetricInput): Promise<ActionResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const { error } = await supabase.from("body_metrics").upsert(
+    {
+      user_id: user.id,
+      date: input.date,
+      weight_kg: input.weightKg ?? null,
+      resting_hr: input.restingHr ?? null,
+      notes: input.notes ?? null,
+    },
+    { onConflict: "user_id,date" },
+  );
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/log");
+  revalidatePath("/progress");
+  return { ok: true };
+}

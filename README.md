@@ -42,7 +42,8 @@ src/
     supabase/              browser/server/middleware Supabase clients + hand-typed Database
     training/               domain layer: types, pace math, date math, phases, aggregation,
                              Supabase queries (reads) and Server Actions (writes)
-    auth/actions.ts        sign-up/sign-in/magic-link/sign-out + per-user plan seeding
+    auth/actions.ts        sign-up/sign-in/magic-link/password-reset/sign-out + per-user plan seeding
+    offline/workout-queue.ts  localStorage-backed queue for workout completions made offline
   middleware.ts             refreshes the Supabase session cookie, guards authenticated routes
 supabase/migrations/0001_init.sql   full schema, indexes, RLS policies
 scripts/seed.ts             repeatable CLI seed script (service-role key)
@@ -176,10 +177,10 @@ Any Next.js host works (Vercel is the path of least resistance):
 - `src/app/manifest.ts` — installable manifest (standalone display, brand icons in `public/icons/`).
 - `public/sw.js` — caches the app shell (`/dashboard`, `/calendar`, `/plan`, `/log`) so previously visited
   pages stay viewable offline; a small "Offline" badge (`ConnectionStatus`) appears when `navigator.onLine`
-  is false. This is **read-only** offline support, as scoped in the spec — workout completions made offline
-  are not queued for background sync in this version; the logging dialog surfaces a clear error if a save
-  fails while offline rather than pretending it succeeded. Extending this to a full mutation queue is a
-  clean follow-up (see the `WorkoutLogger` component for the single seam where that queue would plug in).
+  is false. Workout completions made offline are queued to `localStorage`
+  (`src/lib/offline/workout-queue.ts`) rather than dropped — the logging dialog saves normally, and
+  `<OfflineQueueSync />` automatically flushes the queue and syncs each entry to Supabase once the
+  connection returns, showing a small pending-count badge while items are waiting.
 - Bottom tab bar (Home/Plan/Calendar/Log/More) on mobile widths, a fixed sidebar (Dashboard/Training
   Plan/Calendar/Workout Log/Races/Progress/Settings) from `md:` up.
 - Marking a workout complete from the dashboard's "Start Workout" button is 2 taps (open the logger, tap
@@ -222,9 +223,11 @@ Any Next.js host works (Vercel is the path of least resistance):
 
 ## 15. Known follow-ups (documented, not silently skipped)
 
-- Offline **writes** (queue + background sync for workout completions made while offline) — read-only
-  offline caching is implemented; mutation queuing is the natural next step, and `WorkoutLogger`'s single
-  `completeWorkout` call is the seam where it would be added.
 - True background push notifications (requires a scheduled server-side sender) — local/foreground
   notification preferences are implemented and documented as such in Settings.
 - A dedicated native Expo app — deliberately out of scope in favor of one polished PWA (see §2).
+
+Closed: offline writes (queued via `localStorage` in `src/lib/offline/workout-queue.ts` and flushed by
+`OfflineQueueSync` on reconnect), password reset (`/auth/reset-password`), an edit-workout UI wired to
+the existing `modifyWorkout` action, and an optional body-metrics log (weight/resting HR) with charts on
+the Progress page.

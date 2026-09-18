@@ -1,4 +1,4 @@
-import { getAllWorkouts, getTrainingWeeks } from "@/lib/training/queries";
+import { getAllWorkouts, getBodyMetrics, getTrainingWeeks } from "@/lib/training/queries";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { SupabaseNotConfigured } from "@/components/shared/error-state";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -6,10 +6,14 @@ import {
   CompletionChart,
   LongRunChart,
   PaceChart,
+  RestingHrChart,
   WeeklyMileageChart,
+  WeightChart,
   type LongRunPoint,
   type PacePoint,
+  type RestingHrPoint,
   type WeeklyMileagePoint,
+  type WeightPoint,
 } from "@/components/progress/progress-charts";
 import { summarizeWeek, completionBreakdown } from "@/lib/training/aggregate";
 import { format } from "date-fns";
@@ -18,7 +22,11 @@ import { TrendingUp } from "lucide-react";
 export default async function ProgressPage() {
   if (!isSupabaseConfigured) return <SupabaseNotConfigured />;
 
-  const [weeksResult, workoutsResult] = await Promise.all([getTrainingWeeks(), getAllWorkouts()]);
+  const [weeksResult, workoutsResult, bodyMetricsResult] = await Promise.all([
+    getTrainingWeeks(),
+    getAllWorkouts(),
+    getBodyMetrics(),
+  ]);
 
   if (weeksResult.status !== "ok" || workoutsResult.status !== "ok") {
     return <EmptyState title="Couldn't load progress" description="Refresh to try again." />;
@@ -66,6 +74,14 @@ export default async function ProgressPage() {
 
   const breakdown = completionBreakdown(workouts);
 
+  const bodyMetrics = bodyMetricsResult.status === "ok" ? bodyMetricsResult.data : [];
+  const weightPoints: WeightPoint[] = bodyMetrics
+    .filter((m) => m.weight_kg != null)
+    .map((m) => ({ date: m.date, label: format(new Date(`${m.date}T00:00:00`), "MMM d"), weightKg: m.weight_kg! }));
+  const restingHrPoints: RestingHrPoint[] = bodyMetrics
+    .filter((m) => m.resting_hr != null)
+    .map((m) => ({ date: m.date, label: format(new Date(`${m.date}T00:00:00`), "MMM d"), restingHr: m.resting_hr! }));
+
   return (
     <div className="space-y-6 animate-fade-in-up">
       <div>
@@ -86,6 +102,10 @@ export default async function ProgressPage() {
       {longRuns.length > 0 && <LongRunChart data={longRuns} />}
 
       <CompletionChart completed={breakdown.completed} skipped={breakdown.skipped} planned={breakdown.planned} />
+
+      {weightPoints.length > 0 && <WeightChart data={weightPoints} />}
+
+      {restingHrPoints.length > 0 && <RestingHrChart data={restingHrPoints} />}
     </div>
   );
 }

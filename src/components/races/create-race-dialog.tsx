@@ -153,12 +153,6 @@ export function CreateRaceDialog() {
                   <SelectItem value="other">Other race</SelectItem>
                 </SelectContent>
               </Select>
-              {(priority === "a_race" || priority === "secondary") && (
-                <p className="text-xs text-muted">
-                  Any race currently set as {priority === "a_race" ? "the A-race" : "Race of the Year"} will switch
-                  to &ldquo;Other race&rdquo;.
-                </p>
-              )}
             </div>
 
             <div className="grid grid-cols-2 gap-3">

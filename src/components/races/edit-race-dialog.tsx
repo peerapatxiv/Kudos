@@ -28,8 +28,6 @@ export function EditRaceDialog({ race }: { race: Race }) {
   const [error, setError] = useState<string | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
-  const deletable = priority !== "a_race" && priority !== "secondary";
-
   function handleDelete() {
     if (!confirmingDelete) {
       setConfirmingDelete(true);
@@ -152,12 +150,6 @@ export function EditRaceDialog({ race }: { race: Race }) {
                   <SelectItem value="other">Other race</SelectItem>
                 </SelectContent>
               </Select>
-              {(priority === "a_race" || priority === "secondary") && priority !== race.priority && (
-                <p className="text-xs text-muted">
-                  Any other race currently set as {priority === "a_race" ? "the A-race" : "Race of the Year"} will
-                  switch to &ldquo;Other race&rdquo;.
-                </p>
-              )}
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -204,17 +196,15 @@ export function EditRaceDialog({ race }: { race: Race }) {
               </Button>
             </div>
 
-            {deletable && (
-              <Button
-                variant="outline"
-                className="w-full text-danger hover:bg-danger/5"
-                onClick={handleDelete}
-                disabled={pending}
-              >
-                <Trash2 className="h-4 w-4" />
-                {pending ? "Deleting…" : confirmingDelete ? "Click again to confirm delete" : "Delete race"}
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              className="w-full text-danger hover:bg-danger/5"
+              onClick={handleDelete}
+              disabled={pending}
+            >
+              <Trash2 className="h-4 w-4" />
+              {pending ? "Deleting…" : confirmingDelete ? "Click again to confirm delete" : "Delete race"}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

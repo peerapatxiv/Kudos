@@ -248,22 +248,6 @@ export async function upsertBodyMetric(input: BodyMetricInput): Promise<ActionRe
   return { ok: true };
 }
 
-/** At most one race per user can hold "a_race" or "secondary" — demote whichever race currently
- * holds it (other than `keepRaceId`) to "other" so assigning it elsewhere never hits the DB's
- * partial unique index. No-op for "tune_up"/"other", which allow any number of races. */
-async function demoteExistingHolder(
-  supabase: NonNullable<Awaited<ReturnType<typeof getSupabaseServerClient>>>,
-  userId: string,
-  priority: RacePriority,
-  keepRaceId: string | null,
-): Promise<void> {
-  if (priority !== "a_race" && priority !== "secondary") return;
-
-  let query = supabase.from("races").update({ priority: "other" }).eq("user_id", userId).eq("priority", priority);
-  if (keepRaceId) query = query.neq("id", keepRaceId);
-  await query;
-}
-
 export interface UpdateRaceInput {
   raceId: string;
   name: string;
@@ -283,8 +267,6 @@ export async function updateRace(input: UpdateRaceInput): Promise<ActionResult> 
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Not signed in." };
-
-  await demoteExistingHolder(supabase, user.id, input.priority, input.raceId);
 
   const { error } = await supabase
     .from("races")
@@ -326,8 +308,6 @@ export async function createRace(input: CreateRaceInput): Promise<ActionResult> 
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Not signed in." };
 
-  await demoteExistingHolder(supabase, user.id, input.priority, null);
-
   const { error } = await supabase.from("races").insert({
     user_id: user.id,
     name: input.name,
@@ -347,7 +327,6 @@ export async function createRace(input: CreateRaceInput): Promise<ActionResult> 
   return { ok: true };
 }
 
-/** Never removes the A-race or secondary race — the app's routing and dashboard assume exactly one of each. */
 export async function deleteRace(raceId: string): Promise<ActionResult> {
   const supabase = await getSupabaseServerClient();
   if (!supabase) return { ok: false, error: "Supabase is not configured." };
@@ -356,18 +335,6 @@ export async function deleteRace(raceId: string): Promise<ActionResult> {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Not signed in." };
-
-  const { data: race } = await supabase
-    .from("races")
-    .select("priority")
-    .eq("id", raceId)
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (!race) return { ok: false, error: "Race not found." };
-  if (race.priority === "a_race" || race.priority === "secondary") {
-    return { ok: false, error: "Can't delete the A-race or secondary race." };
-  }
 
   const { error } = await supabase.from("races").delete().eq("id", raceId).eq("user_id", user.id);
   if (error) return { ok: false, error: error.message };

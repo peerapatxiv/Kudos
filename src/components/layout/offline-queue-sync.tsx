@@ -40,7 +40,6 @@ export function OfflineQueueSync() {
       refreshCount();
     }
 
-     
     refreshCount();
     window.addEventListener("cockpit:queue-changed", refreshCount);
     window.addEventListener("online", flush);

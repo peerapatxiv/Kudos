@@ -167,6 +167,7 @@ export interface Database {
           date: string;
           weight_kg: number | null;
           resting_hr: number | null;
+          vo2max: number | null;
           notes: string | null;
         };
         Insert: Partial<Database["public"]["Tables"]["body_metrics"]["Row"]> & {

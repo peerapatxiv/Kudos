@@ -29,18 +29,19 @@ export function RaceDetailDialog({ race }: { race: Race }) {
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-h-[85vh] overflow-y-auto">
+        <DialogContent>
           <DialogHeader>
             <div className="flex items-center gap-2">
               <Badge variant={badgeVariant}>{label}</Badge>
               <span className="text-xs text-muted">{days} days to go</span>
-              <div className="ml-auto">
-                <EditRaceDialog race={race} />
-              </div>
             </div>
             <DialogTitle>{race.name}</DialogTitle>
             <DialogDescription>{format(new Date(`${race.date}T00:00:00`), "EEEE, MMMM d, yyyy")}</DialogDescription>
           </DialogHeader>
+
+          <div className="mb-4 flex justify-end">
+            <EditRaceDialog race={race} />
+          </div>
 
           <div className="space-y-5">
             <Card className={isA ? "border-a-race/30" : undefined}>

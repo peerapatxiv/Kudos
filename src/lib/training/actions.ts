@@ -284,3 +284,49 @@ export async function updateRace(input: UpdateRaceInput): Promise<ActionResult> 
   revalidatePath("/calendar");
   return { ok: true };
 }
+
+export interface EditCompletedWorkoutInput {
+  workoutId: string;
+  actualDistanceKm?: number | null;
+  actualTimeSeconds?: number | null;
+  perceivedEffort?: number | null;
+  athleteNotes?: string | null;
+}
+
+/** Corrects a completed workout's logged numbers in place, without touching its "completed" status. */
+export async function editCompletedWorkout(input: EditCompletedWorkoutInput): Promise<ActionResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const actualPace =
+    input.actualDistanceKm && input.actualTimeSeconds
+      ? paceFromDistanceAndTime(input.actualDistanceKm, input.actualTimeSeconds)
+      : null;
+
+  const { error } = await supabase
+    .from("workouts")
+    .update({
+      actual_distance_km: input.actualDistanceKm ?? null,
+      actual_time_seconds: input.actualTimeSeconds ?? null,
+      actual_pace_seconds_per_km: actualPace ? Math.round(actualPace) : null,
+      perceived_effort: input.perceivedEffort ?? null,
+      athlete_notes: input.athleteNotes ?? null,
+    })
+    .eq("id", input.workoutId)
+    .eq("user_id", user.id)
+    .eq("completed", true);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/dashboard");
+  revalidatePath("/calendar");
+  revalidatePath("/log");
+  revalidatePath("/plan");
+  revalidatePath("/progress");
+  return { ok: true };
+}

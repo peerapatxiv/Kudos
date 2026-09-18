@@ -242,3 +242,45 @@ export async function upsertBodyMetric(input: BodyMetricInput): Promise<ActionRe
   revalidatePath("/progress");
   return { ok: true };
 }
+
+export interface UpdateRaceInput {
+  raceId: string;
+  name: string;
+  date: string;
+  distanceKm: number;
+  goalTimeSeconds?: number | null;
+  goalPaceSecondsPerKm?: number | null;
+  notes?: string | null;
+}
+
+export async function updateRace(input: UpdateRaceInput): Promise<ActionResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const { error } = await supabase
+    .from("races")
+    .update({
+      name: input.name,
+      date: input.date,
+      distance_km: input.distanceKm,
+      goal_time_seconds: input.goalTimeSeconds ?? null,
+      goal_pace_seconds_per_km: input.goalPaceSecondsPerKm ?? null,
+      notes: input.notes ?? null,
+    })
+    .eq("id", input.raceId)
+    .eq("user_id", user.id);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/races");
+  revalidatePath("/races/a-race");
+  revalidatePath("/races/singapore");
+  revalidatePath("/dashboard");
+  revalidatePath("/calendar");
+  return { ok: true };
+}

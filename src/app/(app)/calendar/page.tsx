@@ -33,7 +33,7 @@ async function CalendarData() {
 
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-foreground">Races</h2>
-        <RacesPanel races={racesResult.data} workouts={workoutsResult.data} />
+        <RacesPanel races={racesResult.data} />
       </div>
     </div>
   );

@@ -84,8 +84,8 @@ export default async function DashboardPage() {
       <TodayWorkoutCard workout={todayWorkout} phase={phase} />
 
       <div className="grid gap-4 sm:grid-cols-2">
-        {aRace && <RaceDetailDialog race={aRace} workouts={workouts} />}
-        {secondaryRace && <RaceDetailDialog race={secondaryRace} workouts={workouts} aRaceDate={aRace?.date} />}
+        {aRace && <RaceDetailDialog race={aRace} />}
+        {secondaryRace && <RaceDetailDialog race={secondaryRace} />}
       </div>
 
       {currentWeek && <WeeklySummary week={currentWeek} stats={weekStats} />}

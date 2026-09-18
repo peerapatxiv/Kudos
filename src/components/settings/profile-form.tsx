@@ -8,14 +8,36 @@ import { Button } from "@/components/ui/button";
 import { updateProfile } from "@/lib/training/actions";
 import { CheckCircle2 } from "lucide-react";
 
-export function ProfileForm({ initialName, email }: { initialName: string | null; email: string }) {
+export function ProfileForm({
+  initialName,
+  initialHeightCm,
+  email,
+}: {
+  initialName: string | null;
+  initialHeightCm: number | null;
+  email: string;
+}) {
   const [name, setName] = useState(initialName ?? "");
+  const [height, setHeight] = useState(initialHeightCm != null ? String(initialHeightCm) : "");
   const [pending, startTransition] = useTransition();
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   function handleSave() {
+    setError(null);
     startTransition(async () => {
-      await updateProfile(name);
+      const trimmedHeight = height.trim();
+      const heightCm = trimmedHeight === "" ? null : Number(trimmedHeight);
+      if (heightCm !== null && (Number.isNaN(heightCm) || heightCm <= 0)) {
+        setError("Enter a valid height, or leave it blank.");
+        return;
+      }
+
+      const result = await updateProfile({ displayName: name, heightCm });
+      if (!result.ok) {
+        setError(result.error ?? "Could not save profile.");
+        return;
+      }
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     });
@@ -28,10 +50,23 @@ export function ProfileForm({ initialName, email }: { initialName: string | null
         <CardDescription>{email}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-1.5">
-          <Label htmlFor="display-name">Display name</Label>
-          <Input id="display-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Peerapat P." />
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="display-name">Display name</Label>
+            <Input id="display-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Peerapat P." />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="height-cm">Height (cm)</Label>
+            <Input
+              id="height-cm"
+              inputMode="decimal"
+              value={height}
+              onChange={(e) => setHeight(e.target.value)}
+              placeholder="175"
+            />
+          </div>
         </div>
+        {error && <p className="text-xs text-danger">{error}</p>}
         <Button variant="outline" onClick={handleSave} disabled={pending}>
           {saved ? (
             <>

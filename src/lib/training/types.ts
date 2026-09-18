@@ -113,6 +113,7 @@ export interface Profile {
   id: string;
   user_id: string;
   display_name: string | null;
+  height_cm: number | null;
   created_at: string;
   updated_at: string;
 }

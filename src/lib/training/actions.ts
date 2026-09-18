@@ -189,7 +189,12 @@ export async function upsertDailyLog(input: DailyLogInput): Promise<ActionResult
   return { ok: true };
 }
 
-export async function updateProfile(displayName: string): Promise<ActionResult> {
+export interface UpdateProfileInput {
+  displayName: string;
+  heightCm?: number | null;
+}
+
+export async function updateProfile(input: UpdateProfileInput): Promise<ActionResult> {
   const supabase = await getSupabaseServerClient();
   if (!supabase) return { ok: false, error: "Supabase is not configured." };
 
@@ -200,7 +205,10 @@ export async function updateProfile(displayName: string): Promise<ActionResult> 
 
   const { error } = await supabase
     .from("profiles")
-    .upsert({ user_id: user.id, display_name: displayName }, { onConflict: "user_id" });
+    .upsert(
+      { user_id: user.id, display_name: input.displayName, height_cm: input.heightCm ?? null },
+      { onConflict: "user_id" },
+    );
 
   if (error) return { ok: false, error: error.message };
 

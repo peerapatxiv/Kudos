@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getAllWorkouts, getLatestBodyMetric, getRaces, getTrainingWeeks } from "@/lib/training/queries";
+import { getAllWorkouts, getLatestBodyMetric, getProfile, getRaces, getTrainingWeeks } from "@/lib/training/queries";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { SupabaseNotConfigured } from "@/components/shared/error-state";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -25,11 +25,12 @@ export default async function DashboardPage() {
     );
   }
 
-  const [racesResult, weeksResult, workoutsResult, latestBodyMetric] = await Promise.all([
+  const [racesResult, weeksResult, workoutsResult, latestBodyMetric, profile] = await Promise.all([
     getRaces(),
     getTrainingWeeks(),
     getAllWorkouts(),
     getLatestBodyMetric(),
+    getProfile(),
   ]);
 
   if (racesResult.status === "error" || weeksResult.status === "error" || workoutsResult.status === "error") {
@@ -89,7 +90,7 @@ export default async function DashboardPage() {
 
       {currentWeek && <WeeklySummary week={currentWeek} stats={weekStats} />}
 
-      {latestBodyMetric && <BodyMetricsSummary metric={latestBodyMetric} />}
+      <BodyMetricsSummary metric={latestBodyMetric} profile={profile} />
 
       {upcoming.length > 0 && (
         <Card>

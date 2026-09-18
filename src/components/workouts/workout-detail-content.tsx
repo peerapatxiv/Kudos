@@ -124,16 +124,14 @@ export function WorkoutDetailContent({
 
       {!workout.is_rest_day && (
         <div className="flex gap-2 pt-1">
+          <Button variant="outline" size="icon" onClick={() => setEditOpen(true)} title="Edit workout">
+            <PencilLine className="h-4 w-4" />
+          </Button>
           {!workout.completed ? (
-            <>
-              <Button variant="outline" size="icon" onClick={() => setEditOpen(true)} title="Edit workout">
-                <PencilLine className="h-4 w-4" />
-              </Button>
-              <Button variant="primary" className="flex-1" onClick={() => setLoggerOpen(true)}>
-                <PlayCircle className="h-4 w-4" />
-                Log this workout
-              </Button>
-            </>
+            <Button variant="primary" className="flex-1" onClick={() => setLoggerOpen(true)}>
+              <PlayCircle className="h-4 w-4" />
+              Log this workout
+            </Button>
           ) : (
             <Button variant="outline" className="flex-1" onClick={() => resetWorkout(workout.id)}>
               <RotateCcw className="h-4 w-4" />

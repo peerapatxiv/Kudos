@@ -216,3 +216,31 @@ export function RestingHrChart({ data }: { data: RestingHrPoint[] }) {
     </Card>
   );
 }
+
+export interface Vo2MaxPoint {
+  date: string;
+  label: string;
+  vo2max: number;
+}
+
+export function Vo2MaxChart({ data }: { data: Vo2MaxPoint[] }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>VO2max</CardTitle>
+        <CardDescription>Logged VO2max over time.</CardDescription>
+      </CardHeader>
+      <CardContent className="h-64">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data} margin={{ left: -20 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+            <XAxis dataKey="label" tick={AXIS_STYLE} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
+            <YAxis tick={AXIS_STYLE} axisLine={false} tickLine={false} domain={["dataMin - 1", "dataMax + 1"]} />
+            <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v) => [`${v}`, "VO2max"]} />
+            <Line type="monotone" dataKey="vo2max" stroke="var(--recovery)" strokeWidth={2} dot={{ r: 3 }} />
+          </LineChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  );
+}

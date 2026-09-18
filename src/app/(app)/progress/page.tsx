@@ -2,20 +2,24 @@ import { getAllWorkouts, getBodyMetrics, getTrainingWeeks } from "@/lib/training
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { SupabaseNotConfigured } from "@/components/shared/error-state";
 import { EmptyState } from "@/components/shared/empty-state";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   CompletionChart,
   LongRunChart,
   PaceChart,
   RestingHrChart,
+  Vo2MaxChart,
   WeeklyMileageChart,
   WeightChart,
   type LongRunPoint,
   type PacePoint,
   type RestingHrPoint,
+  type Vo2MaxPoint,
   type WeeklyMileagePoint,
   type WeightPoint,
 } from "@/components/progress/progress-charts";
 import { summarizeWeek, completionBreakdown } from "@/lib/training/aggregate";
+import { estimateVo2max } from "@/lib/training/vo2max";
 import { format } from "date-fns";
 import { TrendingUp } from "lucide-react";
 
@@ -81,6 +85,20 @@ export default async function ProgressPage() {
   const restingHrPoints: RestingHrPoint[] = bodyMetrics
     .filter((m) => m.resting_hr != null)
     .map((m) => ({ date: m.date, label: format(new Date(`${m.date}T00:00:00`), "MMM d"), restingHr: m.resting_hr! }));
+  const vo2maxPoints: Vo2MaxPoint[] = bodyMetrics
+    .filter((m) => m.vo2max != null)
+    .map((m) => ({ date: m.date, label: format(new Date(`${m.date}T00:00:00`), "MMM d"), vo2max: m.vo2max! }));
+
+  const raceEfforts = workouts.filter(
+    (w) => w.workout_type === "race" && w.completed && w.actual_distance_km != null && w.actual_time_seconds != null,
+  );
+  const vo2maxEstimates = raceEfforts
+    .map((w) => ({ workout: w, estimate: estimateVo2max(w.actual_distance_km!, w.actual_time_seconds!) }))
+    .filter((e): e is { workout: (typeof workouts)[number]; estimate: number } => e.estimate !== null);
+  const bestVo2maxEstimate =
+    vo2maxEstimates.length > 0
+      ? vo2maxEstimates.reduce((best, e) => (e.estimate > best.estimate ? e : best))
+      : null;
 
   return (
     <div className="space-y-6 animate-fade-in-up">
@@ -106,6 +124,21 @@ export default async function ProgressPage() {
       {weightPoints.length > 0 && <WeightChart data={weightPoints} />}
 
       {restingHrPoints.length > 0 && <RestingHrChart data={restingHrPoints} />}
+
+      {bestVo2maxEstimate && (
+        <Card>
+          <CardContent className="pt-5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted">Estimated VO2max</p>
+            <p className="text-2xl font-bold tabular-nums text-foreground">{bestVo2maxEstimate.estimate}</p>
+            <p className="text-xs text-muted">
+              From {bestVo2maxEstimate.workout.title} ·{" "}
+              {format(new Date(`${bestVo2maxEstimate.workout.date}T00:00:00`), "MMM d, yyyy")}
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {vo2maxPoints.length > 0 && <Vo2MaxChart data={vo2maxPoints} />}
     </div>
   );
 }

@@ -186,3 +186,23 @@ body {
 .animate-fade-in-up {
   animation: fade-in-up 0.35s ease-out both;
 }
+
+/* Recharts makes its chart wrapper/svg focusable for keyboard users, which
+   shows a distracting focus ring on tap/click. Suppress it. */
+.recharts-wrapper:focus,
+.recharts-wrapper:focus-visible,
+.recharts-surface:focus,
+.recharts-surface:focus-visible {
+  outline: none;
+}
+
+/* iOS Safari auto-zooms the page when a focused form field renders below
+   16px. Bump form fields to 16px on small screens so typing never zooms,
+   without touching the desktop text-sm sizing. */
+@media (max-width: 640px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}

@@ -5,6 +5,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { RecoveryBridge } from "@/components/races/recovery-bridge";
+import { EditRaceDialog } from "@/components/races/edit-race-dialog";
 import { daysUntil, daysBetween } from "@/lib/training/dates";
 import { format } from "date-fns";
 import { Flag, CheckCircle2 } from "lucide-react";
@@ -34,6 +35,9 @@ export default async function SingaporePage() {
       <div className="flex items-center gap-2">
         <Badge variant="secondary">RACE of THE YEAR</Badge>
         <span className="text-xs text-muted">{days} days to go</span>
+        <div className="ml-auto">
+          <EditRaceDialog race={race} />
+        </div>
       </div>
 
       <div>

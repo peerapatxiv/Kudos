@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PaceCalculator } from "@/components/pace/pace-calculator";
 import { PaceZoneCard } from "@/components/pace/pace-zone-card";
+import { EditRaceDialog } from "@/components/races/edit-race-dialog";
 import { daysUntil } from "@/lib/training/dates";
 import { secondsToPaceText, formatDuration } from "@/lib/training/pace";
 import { format } from "date-fns";
@@ -26,6 +27,9 @@ export default async function ARacePage() {
       <div className="flex items-center gap-2">
         <Badge variant="a-race">A-RACE</Badge>
         <span className="text-xs text-muted">{days} days to go</span>
+        <div className="ml-auto">
+          <EditRaceDialog race={race} />
+        </div>
       </div>
 
       <div>

@@ -231,3 +231,8 @@ Closed: offline writes (queued via `localStorage` in `src/lib/offline/workout-qu
 `OfflineQueueSync` on reconnect), password reset (`/auth/reset-password`), an edit-workout UI wired to
 the existing `modifyWorkout` action, and an optional body-metrics log (weight/resting HR) with charts on
 the Progress page.
+
+Also closed: race editing (name/date/distance/goal time/goal pace/notes, from `/races/a-race` and
+`/races/singapore`), editing a completed workout's logged distance/time/effort/notes in place, and
+VO2max (a manual log field on the body-metrics form plus an auto-estimate computed from the
+athlete's best completed race effort, both on the Progress page).

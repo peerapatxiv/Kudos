@@ -72,7 +72,7 @@ export default async function ARacePage() {
 function Metric({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
     <div>
-      <p className={`text-xl font-bold tabular-nums ${accent ? "text-a-race" : "text-foreground"}`}>{value}</p>
+      <p className={`text-lg sm:text-xl font-bold tabular-nums ${accent ? "text-a-race" : "text-foreground"}`}>{value}</p>
       <p className="text-[11px] uppercase tracking-wide text-muted">{label}</p>
     </div>
   );

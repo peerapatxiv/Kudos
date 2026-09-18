@@ -49,7 +49,7 @@ export function DailyLogForm({ date, initial }: { date: string; initial: DailyLo
       </CardHeader>
       <CardContent className="space-y-4">
         {FIELDS.map((field) => (
-          <div key={field.key} className="flex items-center justify-between gap-3">
+          <div key={field.key} className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
             <span className="text-sm text-foreground">{field.label}</span>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((n) => (
@@ -58,7 +58,7 @@ export function DailyLogForm({ date, initial }: { date: string; initial: DailyLo
                   type="button"
                   onClick={() => setValues((v) => ({ ...v, [field.key]: n }))}
                   className={cn(
-                    "h-7 w-7 rounded-full border text-xs font-medium transition-colors",
+                    "h-9 w-9 rounded-full border text-xs font-medium transition-colors",
                     values[field.key] === n
                       ? "border-a-race bg-a-race text-a-race-foreground"
                       : "border-border text-muted hover:bg-surface-2",

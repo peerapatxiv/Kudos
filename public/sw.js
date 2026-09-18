@@ -2,7 +2,7 @@
 // (and this week's data they rendered) stay viewable offline. This is a
 // read-only cache — it never intercepts writes/mutations, which always go
 // straight to Supabase. See README "Offline behavior" for scope.
-const CACHE_NAME = "cockpit-shell-v1";
+const CACHE_NAME = "cockpit-shell-v2";
 const APP_SHELL = ["/dashboard", "/calendar", "/plan", "/log", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {

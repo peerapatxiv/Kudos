@@ -1,7 +1,8 @@
-import { getCurrentUser, getProfile } from "@/lib/training/queries";
+import { getCurrentUser, getLatestBodyMetric, getProfile } from "@/lib/training/queries";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { SupabaseNotConfigured } from "@/components/shared/error-state";
 import { ProfileForm } from "@/components/settings/profile-form";
+import { BodyMetricsForm } from "@/components/settings/body-metrics-form";
 import { NotificationSettings } from "@/components/settings/notification-settings";
 import { ThemeSettings } from "@/components/settings/theme-settings";
 import { signOut } from "@/lib/auth/actions";
@@ -9,7 +10,11 @@ import { signOut } from "@/lib/auth/actions";
 export default async function SettingsPage() {
   if (!isSupabaseConfigured) return <SupabaseNotConfigured />;
 
-  const [user, profile] = await Promise.all([getCurrentUser(), getProfile()]);
+  const [user, profile, latestBodyMetric] = await Promise.all([
+    getCurrentUser(),
+    getProfile(),
+    getLatestBodyMetric(),
+  ]);
 
   return (
     <div className="space-y-6 animate-fade-in-up">
@@ -18,6 +23,7 @@ export default async function SettingsPage() {
       </div>
 
       <ProfileForm initialName={profile?.display_name ?? null} email={user?.email ?? ""} />
+      <BodyMetricsForm latest={latestBodyMetric} />
       <ThemeSettings />
       <NotificationSettings />
 

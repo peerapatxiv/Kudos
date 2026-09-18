@@ -7,13 +7,16 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { upsertBodyMetric } from "@/lib/training/actions";
 import type { BodyMetric } from "@/lib/training/types";
+import { todayIso } from "@/lib/training/dates";
 import { CheckCircle2 } from "lucide-react";
 
-export function BodyMetricsForm({ date, initial }: { date: string; initial: BodyMetric | null }) {
-  const [weight, setWeight] = useState(initial?.weight_kg != null ? String(initial.weight_kg) : "");
-  const [restingHr, setRestingHr] = useState(initial?.resting_hr != null ? String(initial.resting_hr) : "");
-  const [vo2max, setVo2max] = useState(initial?.vo2max != null ? String(initial.vo2max) : "");
-  const [notes, setNotes] = useState(initial?.notes ?? "");
+/** Weight/resting HR/VO2max change rarely, so this saves an update as-of today rather than
+ * demanding a fresh entry every day — `latest` pre-fills with whatever was last logged. */
+export function BodyMetricsForm({ latest }: { latest: BodyMetric | null }) {
+  const [weight, setWeight] = useState(latest?.weight_kg != null ? String(latest.weight_kg) : "");
+  const [restingHr, setRestingHr] = useState(latest?.resting_hr != null ? String(latest.resting_hr) : "");
+  const [vo2max, setVo2max] = useState(latest?.vo2max != null ? String(latest.vo2max) : "");
+  const [notes, setNotes] = useState(latest?.notes ?? "");
   const [pending, startTransition] = useTransition();
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +46,7 @@ export function BodyMetricsForm({ date, initial }: { date: string; initial: Body
       }
 
       const result = await upsertBodyMetric({
-        date,
+        date: todayIso(),
         weightKg,
         restingHr: restingHrValue,
         vo2max: vo2maxValue,
@@ -62,7 +65,7 @@ export function BodyMetricsForm({ date, initial }: { date: string; initial: Body
     <Card>
       <CardHeader>
         <CardTitle>Body metrics</CardTitle>
-        <CardDescription>Optional — never required to use the app.</CardDescription>
+        <CardDescription>Optional — update these only when they actually change.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">

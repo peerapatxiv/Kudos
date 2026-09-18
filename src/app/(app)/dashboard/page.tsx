@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getAllWorkouts, getRaces, getTrainingWeeks } from "@/lib/training/queries";
+import { getAllWorkouts, getLatestBodyMetric, getRaces, getTrainingWeeks } from "@/lib/training/queries";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { SupabaseNotConfigured } from "@/components/shared/error-state";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -7,6 +7,7 @@ import { RaceCountdownCard } from "@/components/dashboard/race-countdown";
 import { TodayWorkoutCard } from "@/components/dashboard/today-workout-card";
 import { WeeklySummary } from "@/components/dashboard/weekly-summary";
 import { UpcomingList } from "@/components/dashboard/upcoming-list";
+import { BodyMetricsSummary } from "@/components/dashboard/body-metrics-summary";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PaceZoneCard } from "@/components/pace/pace-zone-card";
 import { todayIso } from "@/lib/training/dates";
@@ -24,10 +25,11 @@ export default async function DashboardPage() {
     );
   }
 
-  const [racesResult, weeksResult, workoutsResult] = await Promise.all([
+  const [racesResult, weeksResult, workoutsResult, latestBodyMetric] = await Promise.all([
     getRaces(),
     getTrainingWeeks(),
     getAllWorkouts(),
+    getLatestBodyMetric(),
   ]);
 
   if (racesResult.status === "error" || weeksResult.status === "error" || workoutsResult.status === "error") {
@@ -86,6 +88,8 @@ export default async function DashboardPage() {
       </div>
 
       {currentWeek && <WeeklySummary week={currentWeek} stats={weekStats} />}
+
+      {latestBodyMetric && <BodyMetricsSummary metric={latestBodyMetric} />}
 
       {upcoming.length > 0 && (
         <Card>

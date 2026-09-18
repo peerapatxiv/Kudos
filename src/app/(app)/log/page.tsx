@@ -1,10 +1,9 @@
-import { getAllWorkouts, getBodyMetricByDate, getDailyLog } from "@/lib/training/queries";
+import { getAllWorkouts, getDailyLog } from "@/lib/training/queries";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { SupabaseNotConfigured } from "@/components/shared/error-state";
 import { EmptyState } from "@/components/shared/empty-state";
 import { LogList } from "@/components/workouts/log-list";
 import { DailyLogForm } from "@/components/workouts/daily-log-form";
-import { BodyMetricsForm } from "@/components/workouts/body-metrics-form";
 import { todayIso } from "@/lib/training/dates";
 import { NotebookPen } from "lucide-react";
 
@@ -12,11 +11,7 @@ export default async function LogPage() {
   if (!isSupabaseConfigured) return <SupabaseNotConfigured />;
 
   const today = todayIso();
-  const [workoutsResult, dailyLog, bodyMetric] = await Promise.all([
-    getAllWorkouts(),
-    getDailyLog(today),
-    getBodyMetricByDate(today),
-  ]);
+  const [workoutsResult, dailyLog] = await Promise.all([getAllWorkouts(), getDailyLog(today)]);
 
   if (workoutsResult.status !== "ok") {
     return <EmptyState title="Couldn't load your log" description="Refresh to try again." />;
@@ -44,8 +39,6 @@ export default async function LogPage() {
       </div>
 
       <DailyLogForm date={today} initial={dailyLog} />
-
-      <BodyMetricsForm date={today} initial={bodyMetric} />
 
       <LogList workouts={sorted} />
     </div>

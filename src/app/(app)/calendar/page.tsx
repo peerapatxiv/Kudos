@@ -6,7 +6,6 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { LoadingState } from "@/components/shared/loading-state";
 import { TrainingCalendar } from "@/components/calendar/training-calendar";
 import { RacesPanel } from "@/components/races/races-panel";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 async function CalendarData() {
   const [workoutsResult, intervalsResult, racesResult] = await Promise.all([
@@ -29,20 +28,14 @@ async function CalendarData() {
   const racesById = new Map(racesResult.data.map((r) => [r.id, r]));
 
   return (
-    <Tabs defaultValue="calendar">
-      <TabsList>
-        <TabsTrigger value="calendar">Calendar</TabsTrigger>
-        <TabsTrigger value="races">Races</TabsTrigger>
-      </TabsList>
+    <div className="space-y-8">
+      <TrainingCalendar workouts={workoutsResult.data} intervalsByWorkout={intervalsByWorkout} racesById={racesById} />
 
-      <TabsContent value="calendar">
-        <TrainingCalendar workouts={workoutsResult.data} intervalsByWorkout={intervalsByWorkout} racesById={racesById} />
-      </TabsContent>
-
-      <TabsContent value="races">
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold text-foreground">Races</h2>
         <RacesPanel races={racesResult.data} />
-      </TabsContent>
-    </Tabs>
+      </div>
+    </div>
   );
 }
 

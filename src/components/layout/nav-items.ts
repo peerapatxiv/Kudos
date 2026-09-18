@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Calendar, Flag, Gauge, LayoutDashboard, MoreHorizontal, Settings, TrendingUp } from "lucide-react";
+import { Calendar, Gauge, LayoutDashboard, MoreHorizontal, Settings, TrendingUp } from "lucide-react";
 
 export interface NavItem {
   href: string;
@@ -18,13 +18,11 @@ export const DESKTOP_NAV: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/plan", label: "Training Plan", icon: Gauge },
   { href: "/calendar", label: "Calendar", icon: Calendar },
-  { href: "/races", label: "Races", icon: Flag },
   { href: "/progress", label: "Progress", icon: TrendingUp },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 export const MORE_NAV: NavItem[] = [
-  { href: "/races", label: "Races", icon: Flag },
   { href: "/progress", label: "Progress", icon: TrendingUp },
   { href: "/settings", label: "Settings", icon: Settings },
 ];

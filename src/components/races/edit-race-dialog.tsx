@@ -5,10 +5,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { updateRace } from "@/lib/training/actions";
+import { deleteRace, updateRace } from "@/lib/training/actions";
 import { formatDuration, parseDurationToSeconds, paceTextToSeconds, secondsToPaceText } from "@/lib/training/pace";
 import type { Race } from "@/lib/training/types";
-import { PencilLine } from "lucide-react";
+import { PencilLine, Trash2 } from "lucide-react";
 
 export function EditRaceDialog({ race }: { race: Race }) {
   const [open, setOpen] = useState(false);
@@ -24,6 +24,26 @@ export function EditRaceDialog({ race }: { race: Race }) {
   const [notes, setNotes] = useState(race.notes ?? "");
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+
+  const deletable = race.priority !== "a_race" && race.priority !== "secondary";
+
+  function handleDelete() {
+    if (!confirmingDelete) {
+      setConfirmingDelete(true);
+      return;
+    }
+    setError(null);
+    startTransition(async () => {
+      const result = await deleteRace(race.id);
+      if (!result.ok) {
+        setError(result.error ?? "Could not delete this race.");
+        setConfirmingDelete(false);
+        return;
+      }
+      setOpen(false);
+    });
+  }
 
   function handleSave() {
     setError(null);
@@ -81,7 +101,13 @@ export function EditRaceDialog({ race }: { race: Race }) {
       <Button variant="outline" size="icon" onClick={() => setOpen(true)} title="Edit race">
         <PencilLine className="h-4 w-4" />
       </Button>
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog
+        open={open}
+        onOpenChange={(next) => {
+          setOpen(next);
+          if (!next) setConfirmingDelete(false);
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit race</DialogTitle>
@@ -153,6 +179,18 @@ export function EditRaceDialog({ race }: { race: Race }) {
                 {pending ? "Saving…" : "Save changes"}
               </Button>
             </div>
+
+            {deletable && (
+              <Button
+                variant="outline"
+                className="w-full text-danger hover:bg-danger/5"
+                onClick={handleDelete}
+                disabled={pending}
+              >
+                <Trash2 className="h-4 w-4" />
+                {pending ? "Deleting…" : confirmingDelete ? "Click again to confirm delete" : "Delete race"}
+              </Button>
+            )}
           </div>
         </DialogContent>
       </Dialog>

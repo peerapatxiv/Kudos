@@ -1,4 +1,4 @@
-export type RacePriority = "a_race" | "secondary" | "tune_up";
+export type RacePriority = "a_race" | "secondary" | "tune_up" | "other";
 
 export type WorkoutType =
   | "easy"

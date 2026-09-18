@@ -10,7 +10,16 @@ import { format } from "date-fns";
 export function RaceCountdownCard({ race, href }: { race: Race; href: string }) {
   const days = daysUntil(race.date);
   const isA = race.priority === "a_race";
-  const label = isA ? "A-RACE" : race.priority === "tune_up" ? "TUNE-UP" : "RACE of THE YEAR";
+  const isSecondary = race.priority === "secondary";
+  const label = isA
+    ? "A-RACE"
+    : race.priority === "tune_up"
+      ? "TUNE-UP"
+      : isSecondary
+        ? "RACE of THE YEAR"
+        : "RACE";
+  const badgeVariant = isA ? "a-race" : race.priority === "tune_up" ? "tune-up" : isSecondary ? "secondary" : "neutral";
+  const accentClass = isA ? "text-a-race" : isSecondary ? "text-secondary-race" : "text-foreground";
 
   return (
     <Link href={href}>
@@ -21,21 +30,19 @@ export function RaceCountdownCard({ race, href }: { race: Race; href: string }) 
         )}
       >
         <div
-          className={cn("absolute inset-0 opacity-[0.06]", isA ? "bg-a-race" : "bg-secondary-race")}
+          className={cn("absolute inset-0 opacity-[0.06]", isA ? "bg-a-race" : isSecondary ? "bg-secondary-race" : "bg-muted")}
           aria-hidden
         />
         <CardContent className="relative pt-5 space-y-3">
           <div className="flex items-center justify-between">
-            <Badge variant={isA ? "a-race" : race.priority === "tune_up" ? "tune-up" : "secondary"}>
-              {label}
-            </Badge>
+            <Badge variant={badgeVariant}>{label}</Badge>
             <span className="text-xs text-muted">{format(new Date(`${race.date}T00:00:00`), "MMM d, yyyy")}</span>
           </div>
 
           <div>
             <p className="text-sm font-medium text-foreground">{race.name}</p>
             <div className="mt-1 flex items-baseline gap-1.5">
-              <span className={cn("text-3xl font-bold tabular-nums", isA ? "text-a-race" : "text-secondary-race")}>
+              <span className={cn("text-3xl font-bold tabular-nums", accentClass)}>
                 {days}
               </span>
               <span className="text-sm text-muted">day{days === 1 ? "" : "s"} to go</span>

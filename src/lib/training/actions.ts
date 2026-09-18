@@ -281,9 +281,76 @@ export async function updateRace(input: UpdateRaceInput): Promise<ActionResult> 
 
   if (error) return { ok: false, error: error.message };
 
-  revalidatePath("/races");
   revalidatePath("/races/a-race");
   revalidatePath("/races/singapore");
+  revalidatePath("/dashboard");
+  revalidatePath("/calendar");
+  return { ok: true };
+}
+
+export interface CreateRaceInput {
+  name: string;
+  date: string;
+  distanceKm: number;
+  priority: "tune_up" | "other";
+  goalTimeSeconds?: number | null;
+  goalPaceSecondsPerKm?: number | null;
+  notes?: string | null;
+}
+
+export async function createRace(input: CreateRaceInput): Promise<ActionResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const { error } = await supabase.from("races").insert({
+    user_id: user.id,
+    name: input.name,
+    race_type: "race",
+    date: input.date,
+    distance_km: input.distanceKm,
+    priority: input.priority,
+    goal_time_seconds: input.goalTimeSeconds ?? null,
+    goal_pace_seconds_per_km: input.goalPaceSecondsPerKm ?? null,
+    notes: input.notes ?? null,
+  });
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/dashboard");
+  revalidatePath("/calendar");
+  return { ok: true };
+}
+
+/** Never removes the A-race or secondary race — the app's routing and dashboard assume exactly one of each. */
+export async function deleteRace(raceId: string): Promise<ActionResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const { data: race } = await supabase
+    .from("races")
+    .select("priority")
+    .eq("id", raceId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (!race) return { ok: false, error: "Race not found." };
+  if (race.priority === "a_race" || race.priority === "secondary") {
+    return { ok: false, error: "Can't delete the A-race or secondary race." };
+  }
+
+  const { error } = await supabase.from("races").delete().eq("id", raceId).eq("user_id", user.id);
+  if (error) return { ok: false, error: error.message };
+
   revalidatePath("/dashboard");
   revalidatePath("/calendar");
   return { ok: true };

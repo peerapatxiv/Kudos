@@ -30,7 +30,7 @@ export interface Database {
           distance_km: number;
           goal_time_seconds: number | null;
           goal_pace_seconds_per_km: number | null;
-          priority: "a_race" | "secondary" | "tune_up";
+          priority: "a_race" | "secondary" | "tune_up" | "other";
           notes: string | null;
           created_at: string;
         };
@@ -40,7 +40,7 @@ export interface Database {
           race_type: string;
           date: string;
           distance_km: number;
-          priority: "a_race" | "secondary" | "tune_up";
+          priority: "a_race" | "secondary" | "tune_up" | "other";
         };
         Update: Partial<Database["public"]["Tables"]["races"]["Row"]>;
         Relationships: [];

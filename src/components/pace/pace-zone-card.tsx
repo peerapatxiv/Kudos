@@ -36,15 +36,15 @@ export function PaceZoneCard({ compact = false, className }: { compact?: boolean
         {PACE_ZONES.map((zone) => (
           <div
             key={zone.id}
-            className="space-y-2 rounded-lg border border-border/50 bg-gradient-to-br from-surface-2/40 to-surface-2/20 p-4"
+            className="space-y-1.5 rounded-lg border border-border/50 bg-gradient-to-br from-surface-2/40 to-surface-2/20 px-3 py-2.5"
           >
             <div className="flex items-center gap-2.5">
               <span className={cn("h-3 w-3 rounded-full", ZONE_COLOR[zone.id])} />
               <p className="text-sm font-semibold text-foreground">{zone.label}</p>
             </div>
-            <p className="text-2xl font-bold text-foreground">
+            <p className="text-lg font-semibold text-foreground">
               {zone.paceHigh ? `${zone.paceLow}–${zone.paceHigh}` : zone.paceLow}
-              <span className="text-sm font-normal text-muted">/km</span>
+              <span className="text-xs font-normal text-muted">/km</span>
             </p>
           </div>
         ))}

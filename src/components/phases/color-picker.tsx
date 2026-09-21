@@ -27,19 +27,16 @@ export function ColorPicker({
               key={color}
               onClick={() => onChange(color)}
               className={cn(
-                "relative h-14 rounded-lg border-2 transition-all flex flex-col items-center justify-center font-medium text-xs overflow-hidden group",
+                "relative h-14 w-full rounded-lg border-2 transition-all flex items-center justify-center overflow-hidden group",
                 PHASE_COLORS[color],
                 isSelected
-                  ? "border-foreground ring-2 ring-foreground/30 shadow-lg"
-                  : "border-border/30 hover:border-border/60 hover:shadow-md"
+                  ? "border-foreground ring-2 ring-foreground/30 shadow-lg scale-105"
+                  : "border-border/30 hover:border-border/60 hover:shadow-md hover:scale-102"
               )}
               title={color}
             >
-              <span className="capitalize">{color}</span>
               {isSelected && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/10">
-                  <Check className="h-4 w-4 text-white drop-shadow-lg" />
-                </div>
+                <Check className="h-5 w-5 text-white drop-shadow-lg" />
               )}
             </button>
           );

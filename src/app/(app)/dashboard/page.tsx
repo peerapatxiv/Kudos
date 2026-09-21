@@ -108,7 +108,7 @@ export default async function DashboardPage() {
       )}
 
       {/* Key Metrics */}
-      {latestBodyMetric || profile?.height_cm && (
+      {(latestBodyMetric || profile?.height_cm) && (
         <div className="space-y-4">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Key metrics</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

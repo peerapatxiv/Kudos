@@ -5,17 +5,17 @@
 
 export const DRAG_DATA_TYPE = "application/x-workout-id";
 
-export function setDragData(e: React.DragEvent<HTMLDivElement>, workoutId: string) {
+export function setDragData<T extends Element>(e: React.DragEvent<T>, workoutId: string) {
   e.dataTransfer.effectAllowed = "move";
   e.dataTransfer.setData(DRAG_DATA_TYPE, workoutId);
 }
 
-export function getDragData(e: React.DragEvent<HTMLDivElement>): string | null {
+export function getDragData<T extends Element>(e: React.DragEvent<T>): string | null {
   const data = e.dataTransfer.getData(DRAG_DATA_TYPE);
   return data || null;
 }
 
-export function allowDrop(e: React.DragEvent<HTMLDivElement>) {
+export function allowDrop<T extends Element>(e: React.DragEvent<T>) {
   e.preventDefault();
   e.dataTransfer.dropEffect = "move";
 }

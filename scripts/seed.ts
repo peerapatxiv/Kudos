@@ -87,20 +87,25 @@ async function main() {
 
   // Seed training phases (if table exists)
   try {
-    for (const phase of PHASES) {
-      await supabase.from("training_phases").upsert(
-        {
-          id: phase.id,
-          user_id: user.id,
-          label: phase.label,
-          description: phase.description,
-          start_date: phase.startDate,
-          end_date: phase.endDate,
-        },
-        { onConflict: "id,user_id" },
-      );
+    const phaseData = PHASES.map((phase) => ({
+      id: phase.id,
+      user_id: user.id,
+      label: phase.label,
+      description: phase.description,
+      start_date: phase.startDate,
+      end_date: phase.endDate,
+    }));
+
+    // @ts-ignore - training_phases table may not exist in types
+    const { error: phaseError } = await supabase.from("training_phases").upsert(phaseData, {
+      onConflict: "id,user_id",
+    });
+
+    if (phaseError) {
+      console.log("  (skipped training phases — table may not exist yet)");
+    } else {
+      console.log(`  inserted ${PHASES.length} training phases`);
     }
-    console.log(`  inserted ${PHASES.length} training phases`);
   } catch (error) {
     // training_phases table may not exist; that's fine, phases will use hardcoded values
     console.log("  (skipped training phases — table may not exist yet)");

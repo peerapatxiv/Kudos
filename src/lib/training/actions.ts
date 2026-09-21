@@ -705,14 +705,16 @@ export async function createPhase(input: CreatePhaseInput): Promise<ActionResult
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Not signed in." };
 
-  const { error } = await supabase.from("training_phases").insert({
+  // @ts-ignore - training_phases table may not exist in types yet
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = (await (supabase.from("training_phases") as any).insert({
     id: input.id,
     user_id: user.id,
     label: input.label,
     description: input.description,
     start_date: input.startDate,
     end_date: input.endDate,
-  });
+  } as any)) as any;
 
   if (error) return { ok: false, error: error.message };
 

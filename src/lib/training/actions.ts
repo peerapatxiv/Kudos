@@ -631,6 +631,8 @@ export interface CreateQuickWorkoutInput {
   title: string;
   workoutType: string;
   distanceKm?: number | null;
+  targetPace?: string;
+  isCompleted?: boolean;
 }
 
 export async function createQuickWorkout(input: CreateQuickWorkoutInput): Promise<ActionResult> {
@@ -649,10 +651,11 @@ export async function createQuickWorkout(input: CreateQuickWorkoutInput): Promis
       title: input.title,
       workout_type: input.workoutType,
       distance_km: input.distanceKm ?? null,
+      target_pace_min_sec_per_km: input.targetPace ?? null,
       is_rest_day: false,
       is_race: false,
-      completed: false,
-      status: "planned",
+      completed: input.isCompleted ? true : false,
+      status: input.isCompleted ? "completed" : "planned",
       day_of_week: new Date(`${input.date}T00:00:00`).toLocaleDateString("en-US", { weekday: "long" }),
     },
   ]);

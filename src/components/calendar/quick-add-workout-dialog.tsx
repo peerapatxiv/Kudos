@@ -14,13 +14,22 @@ interface QuickAddWorkoutDialogProps {
   date: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: { date: string; title: string; workoutType: WorkoutType; distanceKm?: number }) => Promise<void>;
+  onSubmit: (data: {
+    date: string;
+    title: string;
+    workoutType: WorkoutType;
+    distanceKm?: number;
+    targetPace?: string;
+    isCompleted?: boolean;
+  }) => Promise<void>;
 }
 
 export function QuickAddWorkoutDialog({ date, open, onOpenChange, onSubmit }: QuickAddWorkoutDialogProps) {
   const [selectedType, setSelectedType] = useState<WorkoutType>("easy");
   const [title, setTitle] = useState("");
   const [distance, setDistance] = useState("");
+  const [pace, setPace] = useState("");
+  const [isCompleted, setIsCompleted] = useState(false);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -46,10 +55,14 @@ export function QuickAddWorkoutDialog({ date, open, onOpenChange, onSubmit }: Qu
           title: finalTitle,
           workoutType: selectedType,
           distanceKm: selectedType === "rest" ? undefined : distanceKm,
+          targetPace: pace.trim() || undefined,
+          isCompleted,
         });
         setTitle("");
         setDistance("");
+        setPace("");
         setSelectedType("easy");
+        setIsCompleted(false);
         onOpenChange(false);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to add workout");
@@ -109,18 +122,44 @@ export function QuickAddWorkoutDialog({ date, open, onOpenChange, onSubmit }: Qu
           </div>
 
           {selectedType !== "rest" && (
-            <div className="space-y-1.5">
-              <Label htmlFor="distance">Distance (km) - Optional</Label>
-              <Input
-                id="distance"
-                inputMode="decimal"
-                value={distance}
-                onChange={(e) => setDistance(e.target.value)}
-                placeholder="10.5"
-                disabled={pending}
-              />
-            </div>
+            <>
+              <div className="space-y-1.5">
+                <Label htmlFor="distance">Distance (km) - Optional</Label>
+                <Input
+                  id="distance"
+                  inputMode="decimal"
+                  value={distance}
+                  onChange={(e) => setDistance(e.target.value)}
+                  placeholder="10.5"
+                  disabled={pending}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="pace">Target pace (min:sec/km) - Optional</Label>
+                <Input
+                  id="pace"
+                  value={pace}
+                  onChange={(e) => setPace(e.target.value)}
+                  placeholder="5:00"
+                  disabled={pending}
+                />
+              </div>
+            </>
           )}
+
+          <div className="space-y-1.5">
+            <Label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={isCompleted}
+                onChange={(e) => setIsCompleted(e.target.checked)}
+                disabled={pending}
+                className="h-4 w-4 rounded border-border"
+              />
+              <span>Mark as completed</span>
+            </Label>
+          </div>
 
           {error && <p className="text-xs text-danger">{error}</p>}
 

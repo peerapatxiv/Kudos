@@ -61,9 +61,11 @@ export function QuickAddWorkoutDialog({ date, open, onOpenChange, onSubmit }: Qu
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add Workout</DialogTitle>
-          <DialogDescription>
-            {format(new Date(`${date}T00:00:00`), "EEEE, MMMM d, yyyy")}
-          </DialogDescription>
+          {date && (
+            <DialogDescription>
+              {format(new Date(`${date}T00:00:00`), "EEEE, MMMM d, yyyy")}
+            </DialogDescription>
+          )}
         </DialogHeader>
 
         <div className="space-y-4">

@@ -57,64 +57,89 @@ export function EditPhaseDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit phase</DialogTitle>
-          <DialogDescription>{phase.label}</DialogDescription>
+          <DialogTitle className="text-xl">Edit phase</DialogTitle>
+          <DialogDescription className="text-sm text-muted">{phase.label}</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="phase-label">Label</Label>
+        <div className="space-y-5">
+          {/* Label */}
+          <div className="space-y-2">
+            <Label htmlFor="phase-label" className="text-sm font-medium">Phase name</Label>
             <Input
               id="phase-label"
               value={label}
               onChange={(e) => setLabel(e.target.value)}
-              placeholder="Phase label"
+              placeholder="e.g., Build"
+              className="h-9"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="phase-start">Start date</Label>
-              <Input
-                id="phase-start"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="phase-end">End date</Label>
-              <Input
-                id="phase-end"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
+          {/* Dates */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Duration</Label>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-muted mb-1 block">From</label>
+                <Input
+                  id="phase-start"
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="h-9 text-sm"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-muted mb-1 block">To</label>
+                <Input
+                  id="phase-end"
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="h-9 text-sm"
+                />
+              </div>
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="phase-desc">Description</Label>
+          {/* Description */}
+          <div className="space-y-2">
+            <Label htmlFor="phase-desc" className="text-sm font-medium">Description</Label>
             <textarea
               id="phase-desc"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
-              className="flex w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-a-race/40"
-              placeholder="Phase description"
+              className="flex w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-a-race/40 resize-none"
+              placeholder="What's the focus of this phase?"
             />
           </div>
 
-          {error && <p className="text-xs text-danger">{error}</p>}
+          {/* Error */}
+          {error && (
+            <div className="rounded-md bg-danger/10 border border-danger/20 p-3">
+              <p className="text-xs text-danger">{error}</p>
+            </div>
+          )}
 
-          <div className="flex gap-2 pt-1">
-            <Button variant="outline" className="flex-1" onClick={() => onOpenChange(false)} disabled={pending}>
+          {/* Buttons */}
+          <div className="flex gap-2 pt-2">
+            <Button
+              variant="outline"
+              className="flex-1 h-9"
+              onClick={() => onOpenChange(false)}
+              disabled={pending}
+            >
               Cancel
             </Button>
-            <Button variant="primary" className="flex-1" onClick={handleSave} disabled={pending}>
-              {pending ? "Saving…" : "Save changes"}
+            <Button
+              variant="primary"
+              className="flex-1 h-9"
+              onClick={handleSave}
+              disabled={pending}
+            >
+              {pending ? "Saving…" : "Save"}
             </Button>
           </div>
         </div>

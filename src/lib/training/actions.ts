@@ -605,10 +605,10 @@ export async function updatePhase(input: UpdatePhaseInput): Promise<ActionResult
 
     if (error) {
       // If table doesn't exist, return friendly error
-      if (error.message?.includes("does not exist")) {
+      if (error.message?.includes("does not exist") || error.message?.includes("schema cache")) {
         return {
           ok: false,
-          error: "Phase editing is not available yet. To enable it, create the training_phases table in Supabase."
+          error: "Run migrations to enable phase editing: supabase db push"
         };
       }
       return { ok: false, error: error.message };

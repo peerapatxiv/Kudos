@@ -5,7 +5,6 @@ import { SupabaseNotConfigured } from "@/components/shared/error-state";
 import { EmptyState } from "@/components/shared/empty-state";
 import { LoadingState } from "@/components/shared/loading-state";
 import { TrainingCalendar } from "@/components/calendar/training-calendar";
-import { WorkoutSearch } from "@/components/calendar/workout-search";
 import { RacesPanel } from "@/components/races/races-panel";
 
 async function CalendarData() {
@@ -30,11 +29,6 @@ async function CalendarData() {
 
   return (
     <div className="space-y-8">
-      <div className="space-y-3">
-        <p className="text-xs text-muted font-medium">Quick search</p>
-        <WorkoutSearch workouts={workoutsResult.data} />
-      </div>
-
       <TrainingCalendar workouts={workoutsResult.data} intervalsByWorkout={intervalsByWorkout} racesById={racesById} />
 
       <div className="space-y-4">

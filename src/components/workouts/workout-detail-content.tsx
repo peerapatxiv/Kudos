@@ -118,11 +118,6 @@ export function WorkoutDetailContent({
           <XCircle className="h-4 w-4" /> Skipped
         </p>
       )}
-      {workout.status === "modified" && (
-        <p className="flex items-center gap-1.5 text-sm font-medium text-tempo">
-          <PencilLine className="h-4 w-4" /> Modified
-        </p>
-      )}
 
       {!workout.is_rest_day && (
         <div className="flex gap-2 pt-1">

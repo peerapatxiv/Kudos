@@ -62,11 +62,10 @@ export function EditPhaseDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-xl">Edit phase</DialogTitle>
-          <DialogDescription className="text-sm text-muted">{phase.label}</DialogDescription>
+          <DialogTitle>Edit phase</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-5">
+        <div className="space-y-4">
           {/* Label */}
           <div className="space-y-2">
             <Label htmlFor="phase-label" className="text-sm font-medium">Phase name</Label>
@@ -75,32 +74,30 @@ export function EditPhaseDialog({
               value={label}
               onChange={(e) => setLabel(e.target.value)}
               placeholder="e.g., Build"
-              className="h-10"
+              className="h-9"
             />
           </div>
 
           {/* Dates */}
           <div className="space-y-2">
             <Label className="text-sm font-medium">Duration</Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs text-muted mb-1 block">From</label>
                 <Input
-                  id="phase-start"
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="h-10 text-base font-medium"
+                  className="h-9 text-sm"
                 />
               </div>
               <div>
                 <label className="text-xs text-muted mb-1 block">To</label>
                 <Input
-                  id="phase-end"
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="h-10 text-base font-medium"
+                  className="h-9 text-sm"
                 />
               </div>
             </div>
@@ -130,10 +127,10 @@ export function EditPhaseDialog({
           )}
 
           {/* Buttons */}
-          <div className="flex gap-2 pt-4">
+          <div className="flex gap-2 pt-2">
             <Button
               variant="outline"
-              className="flex-1 h-10"
+              className="flex-1 h-9"
               onClick={() => onOpenChange(false)}
               disabled={pending}
             >
@@ -141,7 +138,7 @@ export function EditPhaseDialog({
             </Button>
             <Button
               variant="primary"
-              className="flex-1 h-10"
+              className="flex-1 h-9"
               onClick={handleSave}
               disabled={pending}
             >

@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import { getAllWorkoutIntervals, getAllWorkouts, getRaces } from "@/lib/training/queries";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { SupabaseNotConfigured } from "@/components/shared/error-state";
-import { EmptyState } from "@/components/shared/empty-state";
 import { LoadingState } from "@/components/shared/loading-state";
 import { TrainingCalendar } from "@/components/calendar/training-calendar";
 import { RacesPanel } from "@/components/races/races-panel";
@@ -14,26 +13,27 @@ async function CalendarData() {
     getRaces(),
   ]);
 
-  if (workoutsResult.status !== "ok" || intervalsResult.status !== "ok" || racesResult.status !== "ok") {
-    return <EmptyState title="Couldn't load the calendar" description="Refresh to try again." />;
-  }
+  // Show calendar even if no data - always display the grid
+  const workouts = workoutsResult.status === "ok" ? workoutsResult.data : [];
+  const intervals = intervalsResult.status === "ok" ? intervalsResult.data : [];
+  const races = racesResult.status === "ok" ? racesResult.data : [];
 
-  const intervalsByWorkout = new Map<string, typeof intervalsResult.data>();
-  for (const interval of intervalsResult.data) {
+  const intervalsByWorkout = new Map<string, typeof intervals>();
+  for (const interval of intervals) {
     const list = intervalsByWorkout.get(interval.workout_id) ?? [];
     list.push(interval);
     intervalsByWorkout.set(interval.workout_id, list);
   }
 
-  const racesById = new Map(racesResult.data.map((r) => [r.id, r]));
+  const racesById = new Map(races.map((r) => [r.id, r]));
 
   return (
     <div className="space-y-8">
-      <TrainingCalendar workouts={workoutsResult.data} intervalsByWorkout={intervalsByWorkout} racesById={racesById} />
+      <TrainingCalendar workouts={workouts} intervalsByWorkout={intervalsByWorkout} racesById={racesById} />
 
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-foreground">Races</h2>
-        <RacesPanel races={racesResult.data} />
+        <RacesPanel races={races} />
       </div>
     </div>
   );

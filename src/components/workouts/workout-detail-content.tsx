@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { format } from "date-fns";
 import { DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
@@ -11,8 +11,8 @@ import { workoutTypeMeta } from "@/components/workouts/workout-meta";
 import { secondsToPaceText, formatDuration } from "@/lib/training/pace";
 import { phaseForDate } from "@/lib/training/phases";
 import type { Race, Workout, WorkoutInterval } from "@/lib/training/types";
-import { CheckCircle2, XCircle, PencilLine, PlayCircle, RotateCcw } from "lucide-react";
-import { resetWorkout } from "@/lib/training/actions";
+import { CheckCircle2, XCircle, PencilLine, PlayCircle, RotateCcw, Trash2 } from "lucide-react";
+import { resetWorkout, deleteWorkout } from "@/lib/training/actions";
 
 export function WorkoutDetailContent({
   workout,
@@ -27,8 +27,21 @@ export function WorkoutDetailContent({
 }) {
   const [loggerOpen, setLoggerOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [pending, startTransition] = useTransition();
   const meta = workoutTypeMeta(workout.workout_type);
   const phase = phaseForDate(workout.date);
+
+  const handleDelete = () => {
+    startTransition(async () => {
+      const result = await deleteWorkout(workout.id);
+      if (result.ok) {
+        window.location.reload();
+      } else {
+        alert("Failed to delete workout");
+      }
+    });
+  };
 
   return (
     <div className="space-y-5">
@@ -36,14 +49,14 @@ export function WorkoutDetailContent({
         <div className="flex items-center gap-2">
           <Badge variant={meta.badgeVariant}>{meta.label}</Badge>
           {workout.is_race && <Badge variant="race">Race</Badge>}
-          {phase && <Badge variant="neutral">{phase.label}</Badge>}
+          {phase && <Badge variant={phase.color as any}>{phase.label}</Badge>}
         </div>
         <DialogTitle>{workout.title}</DialogTitle>
         <DialogDescription>{format(new Date(`${workout.date}T00:00:00`), "EEEE, MMMM d, yyyy")}</DialogDescription>
       </DialogHeader>
 
       {!workout.is_rest_day && (
-        <div className="grid grid-cols-2 gap-3 text-sm">
+        <div className="grid grid-cols-2 gap-3">
           {workout.distance_km != null && (
             <Detail label="Distance" value={`${workout.distance_km} km`} />
           )}
@@ -95,22 +108,41 @@ export function WorkoutDetailContent({
       )}
 
       {!workout.is_rest_day && (
-        <div className="flex gap-2 pt-1">
-          <Button variant="outline" size="icon" onClick={() => setEditOpen(true)} title="Edit workout">
-            <PencilLine className="h-4 w-4" />
-          </Button>
-          {!workout.completed ? (
-            <Button variant="primary" className="flex-1" onClick={() => setLoggerOpen(true)}>
-              <PlayCircle className="h-4 w-4" />
-              Log this workout
-            </Button>
+        <>
+          {deleteConfirm ? (
+            <div className="rounded-md border border-danger/30 bg-danger/5 p-3 space-y-3">
+              <p className="text-sm font-medium text-danger">Delete this workout?</p>
+              <div className="flex gap-2">
+                <Button variant="outline" className="flex-1" onClick={() => setDeleteConfirm(false)} disabled={pending}>
+                  Cancel
+                </Button>
+                <Button variant="destructive" className="flex-1" onClick={handleDelete} disabled={pending}>
+                  {pending ? "Deleting..." : "Delete"}
+                </Button>
+              </div>
+            </div>
           ) : (
-            <Button variant="outline" className="flex-1" onClick={() => resetWorkout(workout.id)}>
-              <RotateCcw className="h-4 w-4" />
-              Reset
-            </Button>
+            <div className="flex gap-2 pt-1">
+              <Button variant="outline" size="icon" onClick={() => setEditOpen(true)} title="Edit workout" disabled={pending}>
+                <PencilLine className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="icon" onClick={() => setDeleteConfirm(true)} title="Delete workout" disabled={pending}>
+                <Trash2 className="h-4 w-4" />
+              </Button>
+              {!workout.completed ? (
+                <Button variant="primary" className="flex-1" onClick={() => setLoggerOpen(true)} disabled={pending}>
+                  <PlayCircle className="h-4 w-4" />
+                  Log this workout
+                </Button>
+              ) : (
+                <Button variant="outline" className="flex-1" onClick={() => resetWorkout(workout.id)} disabled={pending}>
+                  <RotateCcw className="h-4 w-4" />
+                  Reset
+                </Button>
+              )}
+            </div>
           )}
-        </div>
+        </>
       )}
 
       {!workout.is_rest_day && (

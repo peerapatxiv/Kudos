@@ -132,16 +132,6 @@ export function TrainingCalendar({
     return result;
   }, [cursor, view]);
 
-  if (workouts.length === 0) {
-    return (
-      <EmptyState
-        icon={CalendarX2}
-        title="No workouts to show"
-        description="Run the seed script to import the training plan into Supabase."
-      />
-    );
-  }
-
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -282,31 +272,33 @@ export function TrainingCalendar({
         <DialogContent>
           {selectedWorkout && (
             <div className="space-y-4">
-              {selectedWorkouts.length > 1 && (
-                <div className="flex items-center justify-between gap-2 pb-2 border-b border-border">
-                  <button
-                    onClick={() => setSelectedWorkoutIndex((i) => (i - 1 + selectedWorkouts.length) % selectedWorkouts.length)}
-                    className="text-muted hover:text-foreground text-sm"
-                  >
-                    ← Prev
-                  </button>
-                  <span className="text-xs text-muted">
-                    Workout {selectedWorkoutIndex + 1} of {selectedWorkouts.length}
-                  </span>
-                  <button
-                    onClick={() => setSelectedWorkoutIndex((i) => (i + 1) % selectedWorkouts.length)}
-                    className="text-muted hover:text-foreground text-sm"
-                  >
-                    Next →
-                  </button>
-                </div>
-              )}
               <WorkoutDetailContent
                 workout={selectedWorkout}
                 intervals={intervalsByWorkout.get(selectedWorkout.id) ?? []}
                 race={selectedWorkout.race_id ? racesById.get(selectedWorkout.race_id) ?? null : null}
                 availableRaces={Array.from(racesById.values())}
               />
+              {selectedWorkouts.length > 1 && (
+                <div className="flex items-center justify-center gap-8 pt-3 border-t border-border">
+                  <button
+                    onClick={() => setSelectedWorkoutIndex((i) => (i - 1 + selectedWorkouts.length) % selectedWorkouts.length)}
+                    className="flex items-center gap-1.5 text-muted hover:text-foreground transition-colors text-sm font-medium hover:underline underline-offset-2"
+                  >
+                    <span>←</span>
+                    <span>Prev</span>
+                  </button>
+                  <span className="text-xs text-muted/60 font-medium tracking-wide">
+                    {selectedWorkoutIndex + 1} / {selectedWorkouts.length}
+                  </span>
+                  <button
+                    onClick={() => setSelectedWorkoutIndex((i) => (i + 1) % selectedWorkouts.length)}
+                    className="flex items-center gap-1.5 text-muted hover:text-foreground transition-colors text-sm font-medium hover:underline underline-offset-2"
+                  >
+                    <span>Next</span>
+                    <span>→</span>
+                  </button>
+                </div>
+              )}
               {selectedDate && (
                 <div className="pt-2 border-t border-border">
                   <Button

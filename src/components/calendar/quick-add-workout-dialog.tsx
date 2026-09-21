@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { workoutTypeMeta, WORKOUT_TYPES } from "@/components/workouts/workout-meta";
 import type { WorkoutType } from "@/lib/training/types";
 import { format } from "date-fns";
+import { SEED_WORKOUTS } from "@/lib/training/plan-data";
+import { ChevronRight } from "lucide-react";
 
 interface QuickAddWorkoutDialogProps {
   date: string;
@@ -25,13 +27,28 @@ interface QuickAddWorkoutDialogProps {
 }
 
 export function QuickAddWorkoutDialog({ date, open, onOpenChange, onSubmit }: QuickAddWorkoutDialogProps) {
+  const [mode, setMode] = useState<"select" | "custom">("select");
+  const [selectedWorkoutIndex, setSelectedWorkoutIndex] = useState<number | null>(null);
   const [selectedType, setSelectedType] = useState<WorkoutType>("easy");
   const [title, setTitle] = useState("");
   const [distance, setDistance] = useState("");
   const [pace, setPace] = useState("");
-  const [isCompleted, setIsCompleted] = useState(false);
+  const [workoutMode, setWorkoutMode] = useState<"plan" | "activity">("plan");
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+
+  const planWorkouts = useMemo(() => {
+    return SEED_WORKOUTS.filter((w) => w.date === date);
+  }, [date]);
+
+  const handleSelectPlanWorkout = (index: number) => {
+    const workout = planWorkouts[index];
+    setSelectedWorkoutIndex(index);
+    setSelectedType(workout.workout_type);
+    setTitle(workout.title);
+    setDistance(workout.distance_km?.toString() || "");
+    setPace(workout.paceText || "");
+  };
 
   const handleSubmit = () => {
     setError(null);
@@ -56,13 +73,15 @@ export function QuickAddWorkoutDialog({ date, open, onOpenChange, onSubmit }: Qu
           workoutType: selectedType,
           distanceKm: selectedType === "rest" ? undefined : distanceKm,
           targetPace: pace.trim() || undefined,
-          isCompleted,
+          isCompleted: workoutMode === "activity",
         });
         setTitle("");
         setDistance("");
         setPace("");
         setSelectedType("easy");
-        setIsCompleted(false);
+        setWorkoutMode("plan");
+        setSelectedWorkoutIndex(null);
+        setMode("select");
         onOpenChange(false);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to add workout");
@@ -83,83 +102,104 @@ export function QuickAddWorkoutDialog({ date, open, onOpenChange, onSubmit }: Qu
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="title">
-              {selectedType === "rest" ? "Title (Optional)" : "Workout Title"}
-            </Label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder={selectedType === "rest" ? "Leave blank for 'Rest Day'" : "e.g., Morning run"}
-              disabled={pending}
-            />
-          </div>
+          {/* Custom Workout Form Only */}
+          <>
+              <div className="space-y-1.5">
+                <Label htmlFor="title">
+                  {selectedType === "rest" ? "Title (Optional)" : "Workout Title"}
+                </Label>
+                <Input
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder={selectedType === "rest" ? "Leave blank for 'Rest Day'" : "e.g., Morning run"}
+                  disabled={pending}
+                />
+              </div>
 
-          <div className="space-y-1.5">
-            <Label>Type</Label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {WORKOUT_TYPES.map((type) => {
-                const meta = workoutTypeMeta(type);
-                return (
+              <div className="space-y-1.5">
+                <Label>Type</Label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {WORKOUT_TYPES.map((type) => {
+                    const meta = workoutTypeMeta(type);
+                    return (
+                      <button
+                        key={type}
+                        onClick={() => setSelectedType(type)}
+                        disabled={pending}
+                        className="flex items-center gap-1.5 rounded-md border-2 px-2 py-1.5 text-xs font-medium transition-colors"
+                        style={{
+                          borderColor: selectedType === type ? "var(--a-race)" : "var(--border)",
+                          backgroundColor: selectedType === type ? "var(--a-race)" : "transparent",
+                          color: selectedType === type ? "white" : "var(--foreground)",
+                        }}
+                      >
+                        <meta.icon className="h-3.5 w-3.5" />
+                        {meta.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>Workout Mode</Label>
+                <div className="grid grid-cols-2 gap-2">
                   <button
-                    key={type}
-                    onClick={() => setSelectedType(type)}
+                    onClick={() => setWorkoutMode("plan")}
                     disabled={pending}
-                    className="flex items-center gap-1.5 rounded-md border-2 px-2 py-1.5 text-xs font-medium transition-colors"
+                    className="rounded-md border-2 px-3 py-2 text-xs font-medium transition-colors"
                     style={{
-                      borderColor: selectedType === type ? "var(--a-race)" : "var(--border)",
-                      backgroundColor: selectedType === type ? "var(--a-race)" : "transparent",
-                      color: selectedType === type ? "white" : "var(--foreground)",
+                      borderColor: workoutMode === "plan" ? "var(--tempo)" : "var(--border)",
+                      backgroundColor: workoutMode === "plan" ? "var(--tempo)" : "transparent",
+                      color: workoutMode === "plan" ? "white" : "var(--foreground)",
                     }}
                   >
-                    <meta.icon className="h-3.5 w-3.5" />
-                    {meta.label}
+                    Plan
                   </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {selectedType !== "rest" && (
-            <>
-              <div className="space-y-1.5">
-                <Label htmlFor="distance">Distance (km) - Optional</Label>
-                <Input
-                  id="distance"
-                  inputMode="decimal"
-                  value={distance}
-                  onChange={(e) => setDistance(e.target.value)}
-                  placeholder="10.5"
-                  disabled={pending}
-                />
+                  <button
+                    onClick={() => setWorkoutMode("activity")}
+                    disabled={pending}
+                    className="rounded-md border-2 px-3 py-2 text-xs font-medium transition-colors"
+                    style={{
+                      borderColor: workoutMode === "activity" ? "var(--completed)" : "var(--border)",
+                      backgroundColor: workoutMode === "activity" ? "var(--completed)" : "transparent",
+                      color: workoutMode === "activity" ? "white" : "var(--foreground)",
+                    }}
+                  >
+                    Activity Done
+                  </button>
+                </div>
               </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="pace">Target pace (min:sec/km) - Optional</Label>
-                <Input
-                  id="pace"
-                  value={pace}
-                  onChange={(e) => setPace(e.target.value)}
-                  placeholder="5:00"
-                  disabled={pending}
-                />
-              </div>
-            </>
-          )}
+              {selectedType !== "rest" && (
+                <>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="distance">Distance (km) - Optional</Label>
+                    <Input
+                      id="distance"
+                      inputMode="decimal"
+                      value={distance}
+                      onChange={(e) => setDistance(e.target.value)}
+                      placeholder="10.5"
+                      disabled={pending}
+                    />
+                  </div>
 
-          <div className="space-y-1.5">
-            <Label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={isCompleted}
-                onChange={(e) => setIsCompleted(e.target.checked)}
-                disabled={pending}
-                className="h-4 w-4 rounded border-border"
-              />
-              <span>Mark as completed</span>
-            </Label>
-          </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="pace">
+                      {workoutMode === "plan" ? "Target pace" : "Pace"} (min:sec/km) - Optional
+                    </Label>
+                    <Input
+                      id="pace"
+                      value={pace}
+                      onChange={(e) => setPace(e.target.value)}
+                      placeholder="5:00"
+                      disabled={pending}
+                    />
+                  </div>
+                </>
+              )}
 
           {error && <p className="text-xs text-danger">{error}</p>}
 
@@ -181,6 +221,7 @@ export function QuickAddWorkoutDialog({ date, open, onOpenChange, onSubmit }: Qu
               Cancel
             </Button>
           </div>
+        </>
         </div>
       </DialogContent>
     </Dialog>

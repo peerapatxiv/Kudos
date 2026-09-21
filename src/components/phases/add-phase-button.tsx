@@ -12,7 +12,6 @@ import { Plus } from "lucide-react";
 export function AddPhaseButton() {
   const [open, setOpen] = useState(false);
   const [phase, setPhase] = useState({
-    id: "",
     label: "",
     description: "",
     startDate: "",
@@ -22,11 +21,15 @@ export function AddPhaseButton() {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
+  const generatePhaseId = (label: string): string => {
+    return label.toLowerCase().replace(/\s+/g, "_");
+  };
+
   const handleAdd = async () => {
     setError(null);
 
-    if (!phase.id || !phase.label || !phase.startDate || !phase.endDate) {
-      setError("All fields are required.");
+    if (!phase.label || !phase.startDate || !phase.endDate) {
+      setError("Phase name and dates are required.");
       return;
     }
 
@@ -37,7 +40,7 @@ export function AddPhaseButton() {
 
     setPending(true);
     const result = await createPhase({
-      id: phase.id,
+      id: generatePhaseId(phase.label),
       label: phase.label,
       description: phase.description,
       startDate: phase.startDate,
@@ -51,7 +54,7 @@ export function AddPhaseButton() {
       setError(result.error ?? "Failed to create phase.");
     } else {
       setOpen(false);
-      setPhase({ id: "", label: "", description: "", startDate: "", endDate: "", color: "rest" });
+      setPhase({ label: "", description: "", startDate: "", endDate: "", color: "rest" });
     }
   };
 
@@ -75,23 +78,12 @@ export function AddPhaseButton() {
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="phase-id" className="text-sm font-medium">Phase ID</Label>
-              <Input
-                id="phase-id"
-                value={phase.id}
-                onChange={(e) => setPhase({ ...phase, id: e.target.value })}
-                placeholder="e.g., base, build, peak"
-                className="h-9"
-              />
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="phase-label" className="text-sm font-medium">Phase name</Label>
               <Input
                 id="phase-label"
                 value={phase.label}
                 onChange={(e) => setPhase({ ...phase, label: e.target.value })}
-                placeholder="e.g., Base building"
+                placeholder="e.g., Base, Build, Peak"
                 className="h-9"
               />
             </div>

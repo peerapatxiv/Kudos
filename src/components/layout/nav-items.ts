@@ -11,6 +11,7 @@ export const MOBILE_NAV: NavItem[] = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
   { href: "/plan", label: "Plan", icon: Gauge },
   { href: "/calendar", label: "Calendar", icon: Calendar },
+  { href: "/progress", label: "Progress", icon: TrendingUp },
   { href: "/more", label: "More", icon: MoreHorizontal },
 ];
 

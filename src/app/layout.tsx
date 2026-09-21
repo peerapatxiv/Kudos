@@ -22,6 +22,12 @@ export const metadata: Metadata = {
   description:
     "Peerapat's training cockpit for the Amazing Thailand Half Marathon and BYD Singapore Marathon.",
   manifest: "/manifest.webmanifest",
+  icons: [
+    { rel: "icon", url: "/favicon.svg", type: "image/svg+xml" },
+    { rel: "icon", url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+    { rel: "icon", url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    { rel: "apple-touch-icon", url: "/icons/icon-192.png" },
+  ],
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",

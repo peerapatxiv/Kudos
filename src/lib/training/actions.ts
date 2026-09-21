@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { paceFromDistanceAndTime } from "@/lib/training/pace";
 import type { RacePriority } from "@/lib/training/types";
+import { SEED_WORKOUTS, SEED_WEEKS } from "@/lib/training/plan-data";
 
 export interface ActionResult {
   ok: boolean;
@@ -756,6 +757,83 @@ export async function deletePhase(phaseId: string): Promise<ActionResult> {
   return { ok: true };
 }
 
+export async function seedPhases(): Promise<ActionResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const phases = [
+    {
+      id: "lead_in",
+      user_id: user.id,
+      label: "Lead-in",
+      description: "Easing into the plan. Controlled MP-pace and easy running — not yet race preparation.",
+      start_date: "2026-09-17",
+      end_date: "2026-09-21",
+      color: "easy",
+    },
+    {
+      id: "base",
+      user_id: user.id,
+      label: "Base",
+      description: "Aerobic foundation: speed touches, tempo, and a steadily growing long run.",
+      start_date: "2026-09-22",
+      end_date: "2026-10-05",
+      color: "tempo",
+    },
+    {
+      id: "build",
+      user_id: user.id,
+      label: "Build",
+      description: "Half-marathon-pace repeats and longer tempos layered onto a growing long run.",
+      start_date: "2026-10-06",
+      end_date: "2026-11-02",
+      color: "interval",
+    },
+    {
+      id: "peak",
+      user_id: user.id,
+      label: "Peak",
+      description: "Highest training load of the block — longest runs and sharpest race-pace work.",
+      start_date: "2026-11-03",
+      end_date: "2026-11-16",
+      color: "secondary-race",
+    },
+    {
+      id: "taper",
+      user_id: user.id,
+      label: "Taper",
+      description: "Volume drops, intensity stays sharp. Includes the Khao Yai tune-up race before the A-race.",
+      start_date: "2026-11-17",
+      end_date: "2026-11-28",
+      color: "rest",
+    },
+    {
+      id: "recovery_bridge",
+      user_id: user.id,
+      label: "Recovery Bridge",
+      description: "8 days between the half marathon and the full marathon. Do not add fitness here — recover.",
+      start_date: "2026-11-29",
+      end_date: "2026-12-06",
+      color: "recovery",
+    },
+  ];
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = (await (supabase.from("training_phases") as any).insert(phases as any)) as any;
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/plan");
+  revalidatePath("/dashboard");
+  revalidatePath("/calendar");
+  return { ok: true };
+}
+
 export interface MoveWorkoutInput {
   workoutId: string;
   newDate: string;
@@ -786,5 +864,265 @@ export async function moveWorkout(input: MoveWorkoutInput): Promise<ActionResult
   revalidatePath("/calendar");
   revalidatePath("/dashboard");
   revalidatePath("/plan");
+  return { ok: true };
+}
+
+export async function clearUserData(): Promise<ActionResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  // Delete all workouts
+  const { error: workoutError } = await supabase
+    .from("workouts")
+    .delete()
+    .eq("user_id", user.id);
+
+  if (workoutError) return { ok: false, error: workoutError.message };
+
+  // Delete all training weeks
+  const { error: weekError } = await supabase
+    .from("training_weeks")
+    .delete()
+    .eq("user_id", user.id);
+
+  if (weekError) return { ok: false, error: weekError.message };
+
+  // Delete all phases
+  const { error: phaseError } = await supabase
+    .from("training_phases")
+    .delete()
+    .eq("user_id", user.id);
+
+  if (phaseError) return { ok: false, error: phaseError.message };
+
+  revalidatePath("/");
+  revalidatePath("/plan");
+  revalidatePath("/calendar");
+  revalidatePath("/dashboard");
+  return { ok: true };
+}
+
+export async function seedBasePlanOnly(): Promise<ActionResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  // Create Base phase
+  const basePhase = {
+    id: "base",
+    user_id: user.id,
+    label: "Base",
+    description: "Aerobic foundation: speed touches, tempo, and a steadily growing long run.",
+    start_date: "2026-09-22",
+    end_date: "2026-10-05",
+    color: "tempo",
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error: phaseError } = (await (supabase.from("training_phases") as any).insert(basePhase as any)) as any;
+
+  if (phaseError) return { ok: false, error: phaseError.message };
+
+  // Get Base phase workouts
+  const baseWorkouts = SEED_WORKOUTS.filter(
+    (w) => w.date >= "2026-09-22" && w.date <= "2026-10-05"
+  );
+
+  // Create training week for Base
+  const { data: baseWeekData, error: weekError } = await supabase
+    .from("training_weeks")
+    .insert({
+      id: `week_base_${Date.now()}`,
+      user_id: user.id,
+      week_number: 1,
+      phase: "base",
+      start_date: "2026-09-22",
+      end_date: "2026-10-05",
+      notes: null,
+    })
+    .select()
+    .single();
+
+  if (weekError) return { ok: false, error: weekError.message };
+
+  const weekId = baseWeekData.id;
+
+  // Insert workouts
+  const workoutsToInsert = baseWorkouts.map((w, idx) => ({
+    id: `workout_${Date.now()}_${idx}`,
+    user_id: user.id,
+    training_week_id: weekId,
+    date: w.date,
+    day_of_week: w.date.split("-")[2],
+    title: w.title,
+    workout_type: w.workout_type,
+    distance_km: w.distance_km,
+    target_pace_min_sec_per_km: w.paceText,
+    pace_min_sec_per_km: w.paceSeconds,
+    notes: w.notes,
+    is_rest_day: w.is_rest_day,
+    is_race: w.is_race,
+    race_id: null,
+    completed: false,
+    status: "planned" as const,
+    completed_at: null,
+    actual_distance_km: null,
+    actual_time_seconds: null,
+    actual_pace_seconds_per_km: null,
+    perceived_effort: null,
+    athlete_notes: null,
+  }));
+
+  const { error: workoutError } = await supabase
+    .from("workouts")
+    .insert(workoutsToInsert);
+
+  if (workoutError) return { ok: false, error: workoutError.message };
+
+  revalidatePath("/");
+  revalidatePath("/plan");
+  revalidatePath("/calendar");
+  revalidatePath("/dashboard");
+  return { ok: true };
+}
+
+export async function seedCompleteTrainingPlan(): Promise<ActionResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  // 1. Create all phases
+  const phases = [
+    {
+      id: "lead_in",
+      user_id: user.id,
+      label: "Lead-in",
+      description: "Easing into the plan. Controlled MP-pace and easy running — not yet race preparation.",
+      start_date: "2026-09-17",
+      end_date: "2026-09-21",
+      color: "easy",
+    },
+    {
+      id: "base",
+      user_id: user.id,
+      label: "Base",
+      description: "Aerobic foundation: speed touches, tempo, and a steadily growing long run.",
+      start_date: "2026-09-22",
+      end_date: "2026-10-05",
+      color: "tempo",
+    },
+    {
+      id: "build",
+      user_id: user.id,
+      label: "Build",
+      description: "Half-marathon-pace repeats and longer tempos layered onto a growing long run.",
+      start_date: "2026-10-06",
+      end_date: "2026-11-02",
+      color: "interval",
+    },
+    {
+      id: "peak",
+      user_id: user.id,
+      label: "Peak",
+      description: "Highest training load of the block — longest runs and sharpest race-pace work.",
+      start_date: "2026-11-03",
+      end_date: "2026-11-16",
+      color: "secondary-race",
+    },
+    {
+      id: "taper",
+      user_id: user.id,
+      label: "Taper",
+      description: "Volume drops, intensity stays sharp. Includes the Khao Yai tune-up race before the A-race.",
+      start_date: "2026-11-17",
+      end_date: "2026-11-28",
+      color: "rest",
+    },
+    {
+      id: "recovery_bridge",
+      user_id: user.id,
+      label: "Recovery Bridge",
+      description: "8 days between the half marathon and the full marathon. Do not add fitness here — recover.",
+      start_date: "2026-11-29",
+      end_date: "2026-12-06",
+      color: "recovery",
+    },
+  ];
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error: phaseError } = (await (supabase.from("training_phases") as any).insert(phases as any)) as any;
+  if (phaseError) return { ok: false, error: `Phase insert failed: ${phaseError.message}` };
+
+  // 2. Create training weeks
+  const weeks = SEED_WEEKS.map((w: any) => ({
+    id: `${w.key}_${Date.now()}`,
+    user_id: user.id,
+    week_number: w.week_number,
+    phase: w.phase,
+    start_date: w.start_date,
+    end_date: w.end_date,
+    notes: w.notes,
+  }));
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: weekData, error: weekError } = await (supabase.from("training_weeks") as any).insert(weeks as any).select();
+  if (weekError) return { ok: false, error: `Week insert failed: ${weekError.message}` };
+
+  // Map old week keys to new IDs
+  const weekMap = new Map<string, string>();
+  (weekData as any[]).forEach((w, idx) => {
+    weekMap.set(SEED_WEEKS[idx].key, w.id);
+  });
+
+  // 3. Create all workouts with from_training_plan = true
+  const workouts = SEED_WORKOUTS.map((w: any, idx: number) => ({
+    id: `workout_${Date.now()}_${idx}`,
+    user_id: user.id,
+    training_week_id: weekMap.get(w.weekKey),
+    date: w.date,
+    day_of_week: new Date(`${w.date}T00:00:00`).toLocaleDateString("en-US", { weekday: "long" }),
+    title: w.title,
+    workout_type: w.workout_type,
+    distance_km: w.distance_km,
+    target_pace_min_sec_per_km: w.paceText,
+    pace_min_sec_per_km: w.paceSeconds,
+    notes: w.notes,
+    is_rest_day: w.is_rest_day,
+    is_race: w.is_race,
+    race_id: null,
+    completed: false,
+    status: "planned",
+    completed_at: null,
+    actual_distance_km: null,
+    actual_time_seconds: null,
+    actual_pace_seconds_per_km: null,
+    perceived_effort: null,
+    athlete_notes: null,
+    from_training_plan: true,
+  }));
+
+  const { error: workoutError } = await supabase
+    .from("workouts")
+    .insert(workouts);
+
+  if (workoutError) return { ok: false, error: `Workout insert failed: ${workoutError.message}` };
+
+  revalidatePath("/");
+  revalidatePath("/plan");
+  revalidatePath("/calendar");
+  revalidatePath("/dashboard");
   return { ok: true };
 }

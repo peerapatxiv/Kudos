@@ -112,8 +112,34 @@ export default async function DashboardPage() {
         <div className="space-y-4">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Key metrics</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {latestBodyMetric?.resting_hr && (
+            <Card className="min-h-[120px]">
+              <CardContent className="pt-5">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-3xl font-bold text-foreground">{latestBodyMetric.resting_hr}</p>
+                    <p className="mt-1 text-xs uppercase tracking-wide text-muted">Max HR</p>
+                  </div>
+                  <Heart className="h-6 w-6 text-muted-foreground/50" />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          {latestBodyMetric?.vo2max && (
+            <Card className="min-h-[120px]">
+              <CardContent className="pt-5">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-3xl font-bold text-foreground">{latestBodyMetric.vo2max}</p>
+                    <p className="mt-1 text-xs uppercase tracking-wide text-muted">VO2 Max</p>
+                  </div>
+                  <Zap className="h-6 w-6 text-muted-foreground/50" />
+                </div>
+              </CardContent>
+            </Card>
+          )}
           {profile?.height_cm && (
-            <Card>
+            <Card className="min-h-[120px]">
               <CardContent className="pt-5">
                 <div className="flex items-start justify-between">
                   <div>
@@ -125,21 +151,8 @@ export default async function DashboardPage() {
               </CardContent>
             </Card>
           )}
-          {latestBodyMetric?.resting_hr && (
-            <Card>
-              <CardContent className="pt-5">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-3xl font-bold text-foreground">{latestBodyMetric.resting_hr}</p>
-                    <p className="mt-1 text-xs uppercase tracking-wide text-muted">Resting HR</p>
-                  </div>
-                  <Heart className="h-6 w-6 text-muted-foreground/50" />
-                </div>
-              </CardContent>
-            </Card>
-          )}
           {latestBodyMetric?.weight_kg && (
-            <Card>
+            <Card className="min-h-[120px]">
               <CardContent className="pt-5">
                 <div className="flex items-start justify-between">
                   <div>
@@ -147,19 +160,6 @@ export default async function DashboardPage() {
                     <p className="mt-1 text-xs uppercase tracking-wide text-muted">Weight (kg)</p>
                   </div>
                   <Gauge className="h-6 w-6 text-muted-foreground/50" />
-                </div>
-              </CardContent>
-            </Card>
-          )}
-          {latestBodyMetric?.vo2max && (
-            <Card>
-              <CardContent className="pt-5">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-3xl font-bold text-foreground">{latestBodyMetric.vo2max}</p>
-                    <p className="mt-1 text-xs uppercase tracking-wide text-muted">VO2 Max</p>
-                  </div>
-                  <Zap className="h-6 w-6 text-muted-foreground/50" />
                 </div>
               </CardContent>
             </Card>

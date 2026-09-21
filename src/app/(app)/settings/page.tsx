@@ -6,31 +6,25 @@ import { BodyMetricsForm } from "@/components/settings/body-metrics-form";
 import { NotificationSettings } from "@/components/settings/notification-settings";
 import { ThemeSettings } from "@/components/settings/theme-settings";
 import { signOut } from "@/lib/auth/actions";
-
 export default async function SettingsPage() {
   if (!isSupabaseConfigured) return <SupabaseNotConfigured />;
-
   const [user, profile, latestBodyMetric] = await Promise.all([
     getCurrentUser(),
     getProfile(),
     getLatestBodyMetric(),
   ]);
-
   return (
     <div className="space-y-6 animate-fade-in-up">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">Settings</h1>
       </div>
-
       <ProfileForm
         initialName={profile?.display_name ?? null}
-        initialHeightCm={profile?.height_cm ?? null}
         email={user?.email ?? ""}
       />
-      <BodyMetricsForm latest={latestBodyMetric} />
+      <BodyMetricsForm latest={latestBodyMetric} initialHeightCm={profile?.height_cm ?? null} />
       <ThemeSettings />
       <NotificationSettings />
-
       <form action={signOut} className="md:hidden">
         <button
           type="submit"

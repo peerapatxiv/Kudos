@@ -5,14 +5,15 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { upsertBodyMetric } from "@/lib/training/actions";
+import { upsertBodyMetric, updateProfile } from "@/lib/training/actions";
 import type { BodyMetric } from "@/lib/training/types";
 import { todayIso } from "@/lib/training/dates";
 import { CheckCircle2 } from "lucide-react";
 
-/** Weight/max HR/VO2max change rarely, so this saves an update as-of today rather than
+/** Weight/height/resting HR/VO2max change rarely, so this saves an update as-of today rather than
  * demanding a fresh entry every day — `latest` pre-fills with whatever was last logged. */
-export function BodyMetricsForm({ latest }: { latest: BodyMetric | null }) {
+export function BodyMetricsForm({ latest, initialHeightCm }: { latest: BodyMetric | null; initialHeightCm: number | null }) {
+  const [height, setHeight] = useState(initialHeightCm != null ? String(initialHeightCm) : "");
   const [weight, setWeight] = useState(latest?.weight_kg != null ? String(latest.weight_kg) : "");
   const [restingHr, setRestingHr] = useState(latest?.resting_hr != null ? String(latest.resting_hr) : "");
   const [vo2max, setVo2max] = useState(latest?.vo2max != null ? String(latest.vo2max) : "");
@@ -24,6 +25,13 @@ export function BodyMetricsForm({ latest }: { latest: BodyMetric | null }) {
   function handleSave() {
     setError(null);
     startTransition(async () => {
+      const trimmedHeight = height.trim();
+      const heightCm = trimmedHeight === "" ? null : Number(trimmedHeight);
+      if (heightCm !== null && (Number.isNaN(heightCm) || heightCm <= 0)) {
+        setError("Enter a valid height, or leave it blank.");
+        return;
+      }
+
       const trimmedWeight = weight.trim();
       const weightKg = trimmedWeight === "" ? null : Number(trimmedWeight);
       if (weightKg !== null && Number.isNaN(weightKg)) {
@@ -45,17 +53,26 @@ export function BodyMetricsForm({ latest }: { latest: BodyMetric | null }) {
         return;
       }
 
-      const result = await upsertBodyMetric({
-        date: todayIso(),
-        weightKg,
-        restingHr: restingHrValue,
-        vo2max: vo2maxValue,
-        notes: notes || null,
-      });
-      if (!result.ok) {
-        setError(result.error ?? "Could not save body metrics.");
+      const [metricsResult, profileResult] = await Promise.all([
+        upsertBodyMetric({
+          date: todayIso(),
+          weightKg,
+          restingHr: restingHrValue,
+          vo2max: vo2maxValue,
+          notes: notes || null,
+        }),
+        updateProfile({ displayName: null, heightCm }),
+      ]);
+
+      if (!metricsResult.ok) {
+        setError(metricsResult.error ?? "Could not save body metrics.");
         return;
       }
+      if (!profileResult.ok) {
+        setError(profileResult.error ?? "Could not save height.");
+        return;
+      }
+
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     });
@@ -68,7 +85,18 @@ export function BodyMetricsForm({ latest }: { latest: BodyMetric | null }) {
         <CardDescription>Optional — update these only when they actually change.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="height-cm">Height (cm)</Label>
+            <Input
+              id="height-cm"
+              inputMode="decimal"
+              value={height}
+              onChange={(e) => setHeight(e.target.value)}
+              placeholder="175"
+              disabled={pending}
+            />
+          </div>
           <div className="space-y-1.5">
             <Label htmlFor="weight-kg">Weight (kg)</Label>
             <Input

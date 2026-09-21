@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ColorPicker } from "@/components/phases/color-picker";
 import { createPhase, deletePhase } from "@/lib/training/actions";
 import type { PhaseDefinition } from "@/lib/training/phases";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, AlertCircle } from "lucide-react";
 
 export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
   const [addOpen, setAddOpen] = useState(false);
@@ -109,58 +109,65 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
 
       {/* Add phase dialog */}
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Add new phase</DialogTitle>
+            <DialogTitle className="text-2xl">Create new phase</DialogTitle>
+            <DialogDescription>Define a training phase with custom dates and color</DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="phase-id" className="text-sm font-medium">Phase ID</Label>
-              <Input
-                id="phase-id"
-                value={newPhase.id}
-                onChange={(e) => setNewPhase({ ...newPhase, id: e.target.value })}
-                placeholder="e.g., base, build, peak"
-                className="h-9"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="phase-label" className="text-sm font-medium">Phase name</Label>
-              <Input
-                id="phase-label"
-                value={newPhase.label}
-                onChange={(e) => setNewPhase({ ...newPhase, label: e.target.value })}
-                placeholder="e.g., Base building"
-                className="h-9"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Duration</Label>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs text-muted mb-1 block">From</label>
+          <div className="space-y-6 py-4">
+            {/* Phase basics */}
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="phase-id" className="text-sm font-medium">Phase ID</Label>
                   <Input
-                    type="date"
-                    value={newPhase.startDate}
-                    onChange={(e) => setNewPhase({ ...newPhase, startDate: e.target.value })}
-                    className="h-9 text-sm"
+                    id="phase-id"
+                    value={newPhase.id}
+                    onChange={(e) => setNewPhase({ ...newPhase, id: e.target.value })}
+                    placeholder="e.g., base"
+                    className="h-10"
                   />
                 </div>
-                <div>
-                  <label className="text-xs text-muted mb-1 block">To</label>
+                <div className="space-y-2">
+                  <Label htmlFor="phase-label" className="text-sm font-medium">Phase name</Label>
                   <Input
-                    type="date"
-                    value={newPhase.endDate}
-                    onChange={(e) => setNewPhase({ ...newPhase, endDate: e.target.value })}
-                    className="h-9 text-sm"
+                    id="phase-label"
+                    value={newPhase.label}
+                    onChange={(e) => setNewPhase({ ...newPhase, label: e.target.value })}
+                    placeholder="e.g., Base building"
+                    className="h-10"
                   />
                 </div>
               </div>
             </div>
 
+            {/* Duration */}
+            <div className="space-y-3">
+              <Label className="text-sm font-medium">Duration</Label>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-medium text-muted-foreground">Start date</label>
+                  <Input
+                    type="date"
+                    value={newPhase.startDate}
+                    onChange={(e) => setNewPhase({ ...newPhase, startDate: e.target.value })}
+                    className="h-10"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-medium text-muted-foreground">End date</label>
+                  <Input
+                    type="date"
+                    value={newPhase.endDate}
+                    onChange={(e) => setNewPhase({ ...newPhase, endDate: e.target.value })}
+                    className="h-10"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Description */}
             <div className="space-y-2">
               <Label htmlFor="phase-desc" className="text-sm font-medium">Description</Label>
               <textarea
@@ -169,22 +176,26 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
                 onChange={(e) => setNewPhase({ ...newPhase, description: e.target.value })}
                 rows={3}
                 className="flex w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-a-race/40 resize-none"
-                placeholder="Phase description..."
+                placeholder="Describe the focus of this training phase..."
               />
             </div>
 
+            {/* Color picker */}
             <ColorPicker value={newPhase.color} onChange={(color) => setNewPhase({ ...newPhase, color })} />
 
+            {/* Error message */}
             {error && (
-              <div className="rounded-md bg-danger/10 border border-danger/20 p-3">
-                <p className="text-xs text-danger">{error}</p>
+              <div className="rounded-lg bg-danger/10 border border-danger/20 p-4 flex gap-3">
+                <AlertCircle className="h-5 w-5 text-danger flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-danger">{error}</p>
               </div>
             )}
 
-            <div className="flex gap-2 pt-2">
+            {/* Action buttons */}
+            <div className="flex gap-3 pt-2">
               <Button
                 variant="outline"
-                className="flex-1 h-9"
+                className="flex-1 h-10"
                 onClick={() => setAddOpen(false)}
                 disabled={pending}
               >
@@ -192,11 +203,11 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
               </Button>
               <Button
                 variant="primary"
-                className="flex-1 h-9"
+                className="flex-1 h-10"
                 onClick={handleAddPhase}
                 disabled={pending}
               >
-                {pending ? "Adding…" : "Add"}
+                {pending ? "Creating…" : "Create phase"}
               </Button>
             </div>
           </div>
@@ -208,16 +219,17 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Delete phase</DialogTitle>
+            <DialogDescription>This action cannot be undone</DialogDescription>
           </DialogHeader>
 
           <p className="text-sm text-muted">
-            Are you sure you want to delete this phase? This action cannot be undone.
+            Are you sure you want to delete this phase? All workouts and weeks associated with it will be affected.
           </p>
 
-          <div className="flex gap-2 pt-2">
+          <div className="flex gap-2 pt-4">
             <Button
               variant="outline"
-              className="flex-1 h-9"
+              className="flex-1 h-10"
               onClick={() => setToDelete(null)}
               disabled={pending}
             >
@@ -225,7 +237,7 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
             </Button>
             <Button
               variant="danger"
-              className="flex-1 h-9"
+              className="flex-1 h-10"
               onClick={() => toDelete && handleDeletePhase(toDelete)}
               disabled={pending}
             >

@@ -20,13 +20,16 @@ export default async function PlanPage() {
     getPhases(),
   ]);
 
-  if (weeksResult.status !== "ok" || workoutsResult.status !== "ok" || phasesResult.status !== "ok") {
+  // Phases always has a fallback, so it should always be ok
+  const phases = phasesResult.status === "ok" ? phasesResult.data : [];
+
+  // Workouts and weeks are required
+  if (weeksResult.status !== "ok" || workoutsResult.status !== "ok") {
     return <EmptyState title="Couldn't load the training plan" description="Refresh to try again." />;
   }
 
   const weeks = weeksResult.data;
   const workouts = workoutsResult.data;
-  const phases = phasesResult.data;
 
   const weekIdsByPhase = new Map<TrainingPhaseId, Set<string>>();
   const recentRaces = workouts

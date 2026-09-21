@@ -135,7 +135,7 @@ function Detail({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-md bg-surface-2/60 px-3 py-2">
       <p className="text-sm font-semibold text-foreground">{value}</p>
-      <p className="text-[11px] uppercase tracking-wide text-muted">{label}</p>
+      <p className="text-xs uppercase tracking-wide text-muted">{label}</p>
     </div>
   );
 }

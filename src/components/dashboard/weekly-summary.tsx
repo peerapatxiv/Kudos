@@ -42,7 +42,7 @@ function MetricBlock({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <p className="text-base font-semibold tabular-nums text-foreground">{value}</p>
-      <p className="text-[11px] uppercase tracking-wide text-muted">{label}</p>
+      <p className="text-xs uppercase tracking-wide text-muted">{label}</p>
     </div>
   );
 }

@@ -27,7 +27,7 @@ export function UpcomingList({ workouts }: { workouts: Workout[] }) {
               className="flex items-center gap-3 py-2.5 transition-colors hover:bg-surface-2 -mx-2 px-2 rounded-lg"
             >
               <div className="flex w-9 shrink-0 flex-col items-center leading-none">
-                <span className="text-[10px] font-medium uppercase text-muted">{format(day, "EEE")}</span>
+                <span className="text-xs font-medium uppercase text-muted">{format(day, "EEE")}</span>
                 <span className="mt-1 text-sm font-semibold tabular-nums text-foreground">{format(day, "d")}</span>
               </div>
 

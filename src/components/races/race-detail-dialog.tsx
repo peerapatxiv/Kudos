@@ -86,7 +86,7 @@ function Metric({ label, value, color }: { label: string; value: string; color?:
       >
         {value}
       </p>
-      <p className="mt-1 text-[11px] uppercase tracking-wide text-muted">{label}</p>
+      <p className="mt-1 text-xs uppercase tracking-wide text-muted">{label}</p>
     </div>
   );
 }

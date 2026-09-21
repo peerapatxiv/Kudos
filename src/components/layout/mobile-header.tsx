@@ -7,7 +7,7 @@ export function MobileHeader({ title }: { title: string }) {
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-surface/95 px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur md:hidden">
       <div className="flex items-center gap-2">
-        <div className="flex h-6 w-6 items-center justify-center rounded bg-a-race text-[11px] font-bold text-a-race-foreground">
+        <div className="flex h-6 w-6 items-center justify-center rounded bg-a-race text-xs font-bold text-a-race-foreground">
           C
         </div>
         <span className="text-sm font-semibold">{title}</span>

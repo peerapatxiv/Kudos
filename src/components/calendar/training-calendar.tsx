@@ -180,7 +180,7 @@ export function TrainingCalendar({
         className="grid grid-cols-7 gap-1.5 select-none"
       >
         {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
-          <div key={i} className="text-center text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+          <div key={i} className="text-center text-xs font-medium uppercase tracking-wide text-muted-foreground">
             {d}
           </div>
         ))}
@@ -245,7 +245,7 @@ export function TrainingCalendar({
                     return (
                       <span
                         key={workout.id}
-                        className="flex h-4 w-4 items-center justify-center rounded-full text-[10px]"
+                        className="flex h-4 w-4 items-center justify-center rounded-full text-xs"
                         style={{
                           backgroundColor: `color-mix(in oklab, ${meta.colorVar} 18%, transparent)`,
                           color: meta.colorVar,
@@ -258,7 +258,7 @@ export function TrainingCalendar({
                 </div>
               )}
               {workoutsForDay.length > 1 && (
-                <span className="text-[9px] text-muted">{workoutsForDay.length} workouts</span>
+                <span className="text-xs text-muted">{workoutsForDay.length} workouts</span>
               )}
               {workoutsForDay.some(w => w.completed) && <span className="h-0.5 w-1 rounded-full bg-completed" />}
             </button>

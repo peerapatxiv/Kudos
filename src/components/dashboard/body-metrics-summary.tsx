@@ -26,7 +26,7 @@ export function BodyMetricsSummary({ metric, profile }: { metric: BodyMetric | n
           {stats.map((s) => (
             <div key={s.label}>
               <p className="text-lg font-bold tabular-nums text-foreground">{s.value}</p>
-              <p className="text-[11px] uppercase tracking-wide text-muted">{s.label}</p>
+              <p className="text-xs uppercase tracking-wide text-muted">{s.label}</p>
             </div>
           ))}
         </div>

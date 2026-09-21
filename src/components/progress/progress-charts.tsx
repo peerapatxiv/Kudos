@@ -37,7 +37,7 @@ export function WeeklyMileageChart({ data }: { data: WeeklyMileagePoint[] }) {
         <CardTitle>Weekly Mileage</CardTitle>
         <CardDescription>Planned vs actual, by training week.</CardDescription>
       </CardHeader>
-      <CardContent className="h-64">
+      <CardContent className="h-48 sm:h-56 md:h-64">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ left: -20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
@@ -60,7 +60,7 @@ export function PaceChart({ data }: { data: PacePoint[] }) {
         <CardTitle>Pace Over Time</CardTitle>
         <CardDescription>Actual average pace for logged workouts.</CardDescription>
       </CardHeader>
-      <CardContent className="h-64">
+      <CardContent className="h-48 sm:h-56 md:h-64">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ left: -10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
@@ -92,7 +92,7 @@ export function LongRunChart({ data }: { data: LongRunPoint[] }) {
         <CardTitle>Long Run Progression</CardTitle>
         <CardDescription>Longest run distance, by week.</CardDescription>
       </CardHeader>
-      <CardContent className="h-64">
+      <CardContent className="h-48 sm:h-56 md:h-64">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ left: -20, right: 12, top: 8 }}>
             <CartesianGrid stroke="var(--border)" vertical={false} />
@@ -174,7 +174,7 @@ export function WeightChart({ data }: { data: WeightPoint[] }) {
         <CardTitle>Body Weight</CardTitle>
         <CardDescription>Logged weight over time.</CardDescription>
       </CardHeader>
-      <CardContent className="h-64">
+      <CardContent className="h-48 sm:h-56 md:h-64">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ left: -20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
@@ -202,7 +202,7 @@ export function MaxHrChart({ data }: { data: MaxHrPoint[] }) {
         <CardTitle>Max Heart Rate</CardTitle>
         <CardDescription>Logged max HR over time.</CardDescription>
       </CardHeader>
-      <CardContent className="h-64">
+      <CardContent className="h-48 sm:h-56 md:h-64">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ left: -20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
@@ -230,7 +230,7 @@ export function Vo2MaxChart({ data }: { data: Vo2MaxPoint[] }) {
         <CardTitle>VO2max</CardTitle>
         <CardDescription>Logged VO2max over time.</CardDescription>
       </CardHeader>
-      <CardContent className="h-64">
+      <CardContent className="h-48 sm:h-56 md:h-64">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ left: -20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />

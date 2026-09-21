@@ -24,7 +24,7 @@ export function ConnectionStatus() {
 
   return (
     <span
-      className="flex items-center gap-1 rounded-full bg-warning/15 px-2 py-1 text-[10px] font-semibold uppercase text-warning"
+      className="flex items-center gap-1 rounded-full bg-warning/15 px-2 py-1 text-xs font-semibold uppercase text-warning"
       title="Offline — showing cached data"
     >
       <WifiOff className="h-3 w-3" />

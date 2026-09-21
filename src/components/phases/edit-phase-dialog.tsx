@@ -75,14 +75,14 @@ export function EditPhaseDialog({
               value={label}
               onChange={(e) => setLabel(e.target.value)}
               placeholder="e.g., Build"
-              className="h-9"
+              className="h-10"
             />
           </div>
 
           {/* Dates */}
           <div className="space-y-2">
             <Label className="text-sm font-medium">Duration</Label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="text-xs text-muted mb-1 block">From</label>
                 <Input
@@ -132,10 +132,10 @@ export function EditPhaseDialog({
           )}
 
           {/* Buttons */}
-          <div className="flex gap-2 pt-2">
+          <div className="flex gap-2 pt-4">
             <Button
               variant="outline"
-              className="flex-1 h-9"
+              className="flex-1 h-10"
               onClick={() => onOpenChange(false)}
               disabled={pending}
             >
@@ -143,7 +143,7 @@ export function EditPhaseDialog({
             </Button>
             <Button
               variant="primary"
-              className="flex-1 h-9"
+              className="flex-1 h-10"
               onClick={handleSave}
               disabled={pending}
             >

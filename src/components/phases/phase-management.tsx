@@ -118,7 +118,7 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
           <div className="space-y-6 py-4">
             {/* Phase basics */}
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="phase-id" className="text-sm font-medium">Phase ID</Label>
                   <Input

@@ -111,7 +111,7 @@ export default async function DashboardPage() {
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Key metrics</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {latestBodyMetric?.resting_hr && (
-            <Card className="min-h-[120px]">
+            <Card className="min-h-20 sm:min-h-24">
               <CardContent className="pt-5">
                 <div className="flex items-start justify-between">
                   <div>
@@ -124,7 +124,7 @@ export default async function DashboardPage() {
             </Card>
           )}
           {latestBodyMetric?.vo2max && (
-            <Card className="min-h-[120px]">
+            <Card className="min-h-20 sm:min-h-24">
               <CardContent className="pt-5">
                 <div className="flex items-start justify-between">
                   <div>
@@ -137,7 +137,7 @@ export default async function DashboardPage() {
             </Card>
           )}
           {profile?.height_cm && (
-            <Card className="min-h-[120px]">
+            <Card className="min-h-20 sm:min-h-24">
               <CardContent className="pt-5">
                 <div className="flex items-start justify-between">
                   <div>
@@ -150,7 +150,7 @@ export default async function DashboardPage() {
             </Card>
           )}
           {latestBodyMetric?.weight_kg && (
-            <Card className="min-h-[120px]">
+            <Card className="min-h-20 sm:min-h-24">
               <CardContent className="pt-5">
                 <div className="flex items-start justify-between">
                   <div>

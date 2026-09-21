@@ -98,7 +98,7 @@ export function QuickAddWorkoutDialog({ date, open, onOpenChange, onSubmit }: Qu
 
           <div className="space-y-1.5">
             <Label>Type</Label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {WORKOUT_TYPES.map((type) => {
                 const meta = workoutTypeMeta(type);
                 return (

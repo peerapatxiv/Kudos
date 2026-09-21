@@ -37,7 +37,7 @@ export function RaceDetailDialog({ race }: { race: Race }) {
 
           <div className="space-y-5 pt-4">
             <Card style={{ borderColor: `color-mix(in oklab, ${meta.colorVar} 30%, transparent)` }}>
-              <CardContent className="grid grid-cols-3 gap-3 pt-5 text-center">
+              <CardContent className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-5 text-center">
                 <Metric label="Distance" value={`${race.distance_km} km`} />
                 <Metric
                   label="Goal"

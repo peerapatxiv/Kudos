@@ -8,19 +8,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { RaceCountdownCard } from "@/components/dashboard/race-countdown";
 import { EditRaceDialog } from "@/components/races/edit-race-dialog";
 import { PaceCalculator } from "@/components/pace/pace-calculator";
+import { raceTypeMeta } from "@/components/races/race-meta";
 import { daysUntil } from "@/lib/training/dates";
 import { secondsToPaceText, formatDuration } from "@/lib/training/pace";
 import type { Race } from "@/lib/training/types";
 
-/** Clicking any race card opens this popup with its full detail — no separate race pages. Every
- * race gets the same layout (stat tiles, notes, pace tools) regardless of its priority. */
 export function RaceDetailDialog({ race }: { race: Race }) {
   const [open, setOpen] = useState(false);
   const days = daysUntil(race.date);
-  const isA = race.priority === "a_race";
-  const isSecondary = race.priority === "secondary";
-  const badgeVariant = isA ? "a-race" : race.priority === "tune_up" ? "tune-up" : isSecondary ? "secondary" : "neutral";
-  const label = isA ? "A-RACE" : race.priority === "tune_up" ? "TUNE-UP" : isSecondary ? "RACE of THE YEAR" : "RACE";
+  const meta = raceTypeMeta(race.priority);
 
   return (
     <>
@@ -29,29 +25,32 @@ export function RaceDetailDialog({ race }: { race: Race }) {
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <div className="flex items-center gap-2">
-              <Badge variant={badgeVariant}>{label}</Badge>
-              <span className="text-xs text-muted">{days} days to go</span>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Badge variant={meta.badgeVariant}>{meta.label}</Badge>
+                <span className="text-xs font-medium text-muted">{days} days to go</span>
+              </div>
+              <EditRaceDialog race={race} />
             </div>
-            <DialogTitle>{race.name}</DialogTitle>
+            <DialogTitle className="text-2xl">{race.name}</DialogTitle>
             <DialogDescription>{format(new Date(`${race.date}T00:00:00`), "EEEE, MMMM d, yyyy")}</DialogDescription>
           </DialogHeader>
 
-          <div className="mb-4 flex justify-end">
-            <EditRaceDialog race={race} />
-          </div>
-
-          <div className="space-y-5">
-            <Card className={isA ? "border-a-race/30" : undefined}>
+          <div className="space-y-5 pt-4">
+            <Card style={{ borderColor: `color-mix(in oklab, ${meta.colorVar} 30%, transparent)` }}>
               <CardContent className="grid grid-cols-3 gap-3 pt-5 text-center">
                 <Metric label="Distance" value={`${race.distance_km} km`} />
-                <Metric label="Goal" value={race.goal_time_seconds ? formatDuration(race.goal_time_seconds) : "—"} accent={isA} />
+                <Metric
+                  label="Goal"
+                  value={race.goal_time_seconds ? formatDuration(race.goal_time_seconds) : "—"}
+                  color={meta.colorVar}
+                />
                 <Metric
                   label="Goal pace"
                   value={race.goal_pace_seconds_per_km ? `${secondsToPaceText(race.goal_pace_seconds_per_km)}/km` : "—"}
-                  accent={isA}
+                  color={meta.colorVar}
                 />
               </CardContent>
             </Card>
@@ -60,7 +59,7 @@ export function RaceDetailDialog({ race }: { race: Race }) {
               <Card>
                 <CardContent className="pt-5">
                   <p className="text-xs font-semibold uppercase tracking-wide text-muted">Race plan</p>
-                  <p className="mt-1 text-sm text-foreground">{race.notes}</p>
+                  <p className="mt-2 text-sm text-foreground">{race.notes}</p>
                 </CardContent>
               </Card>
             )}
@@ -77,11 +76,16 @@ export function RaceDetailDialog({ race }: { race: Race }) {
   );
 }
 
-function Metric({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+function Metric({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
     <div>
-      <p className={`text-lg font-bold tabular-nums ${accent ? "text-a-race" : "text-foreground"}`}>{value}</p>
-      <p className="text-[11px] uppercase tracking-wide text-muted">{label}</p>
+      <p
+        className="text-lg font-bold tabular-nums text-foreground"
+        style={color ? { color } : undefined}
+      >
+        {value}
+      </p>
+      <p className="mt-1 text-[11px] uppercase tracking-wide text-muted">{label}</p>
     </div>
   );
 }

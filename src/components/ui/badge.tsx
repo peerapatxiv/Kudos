@@ -11,6 +11,7 @@ const badgeVariants = cva(
         "a-race": "bg-a-race text-a-race-foreground",
         secondary: "bg-secondary-race text-secondary-race-foreground",
         "tune-up": "bg-tune-up text-white",
+        "other-race": "bg-other-race text-other-race-foreground",
         easy: "bg-easy/15 text-easy",
         tempo: "bg-tempo/15 text-tempo",
         interval: "bg-interval/15 text-interval",

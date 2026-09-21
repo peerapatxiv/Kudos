@@ -15,6 +15,9 @@
   --secondary-race: #3a6ea5;
   --secondary-race-foreground: #ffffff;
   --tune-up: #8a5cf6;
+  --tune-up-foreground: #ffffff;
+  --other-race: #64707d;
+  --other-race-foreground: #ffffff;
 
   /* Workout type semantics */
   --easy: #2f9e6a;
@@ -52,6 +55,9 @@
     --secondary-race: #6fa3d8;
     --secondary-race-foreground: #14181e;
     --tune-up: #b49bff;
+    --tune-up-foreground: #14181e;
+    --other-race: #a4adb8;
+    --other-race-foreground: #14181e;
 
     --easy: #4fc088;
     --tempo: #f0a94a;
@@ -85,6 +91,9 @@
   --secondary-race: #6fa3d8;
   --secondary-race-foreground: #14181e;
   --tune-up: #b49bff;
+  --tune-up-foreground: #14181e;
+  --other-race: #a4adb8;
+  --other-race-foreground: #14181e;
 
   --easy: #4fc088;
   --tempo: #f0a94a;

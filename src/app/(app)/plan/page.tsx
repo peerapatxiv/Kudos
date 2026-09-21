@@ -3,6 +3,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { SupabaseNotConfigured } from "@/components/shared/error-state";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PhaseCard } from "@/components/dashboard/phase-card";
+import { AddPhaseButton } from "@/components/phases/add-phase-button";
 import { PACE_ZONES } from "@/lib/training/pace-zones";
 import { PaceZoneCard } from "@/components/pace/pace-zone-card";
 import { HrZoneCard } from "@/components/training/hr-zone-card";
@@ -43,9 +44,12 @@ export default async function PlanPage() {
 
   return (
     <div className="space-y-6 animate-fade-in-up">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Training Plan</h1>
-        <p className="text-sm text-muted">Six phases from lead-in to the recovery bridge.</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Training Plan</h1>
+          <p className="text-sm text-muted">Six phases from lead-in to the recovery bridge.</p>
+        </div>
+        <AddPhaseButton />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

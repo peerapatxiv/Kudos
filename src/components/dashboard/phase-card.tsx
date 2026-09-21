@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { EditPhaseDialog } from "@/components/phases/edit-phase-dialog";
+import { deletePhase } from "@/lib/training/actions";
 import type { PhaseDefinition } from "@/lib/training/phases";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { PencilLine } from "lucide-react";
+import { PencilLine, Trash2 } from "lucide-react";
 
 const PHASE_TONE: Record<string, string> = {
   lead_in: "bg-rest/15 text-rest",
@@ -26,6 +28,20 @@ export function PhaseCard({
   stats?: { totalPlannedKm: number; workoutCount: number; longRunKm: number | null };
 }) {
   const [editOpen, setEditOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm(`Delete "${phase.label}" phase?`)) return;
+
+    setDeleting(true);
+    const result = await deletePhase(phase.id);
+    setDeleting(false);
+
+    if (!result.ok) {
+      alert("Failed to delete phase: " + result.error);
+    }
+  };
 
   return (
     <>
@@ -45,7 +61,18 @@ export function PhaseCard({
                 {format(new Date(`${phase.startDate}T00:00:00`), "MMM d")} –{" "}
                 {format(new Date(`${phase.endDate}T00:00:00`), "MMM d")}
               </span>
-              <PencilLine className="h-4 w-4 text-muted opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <PencilLine className="h-4 w-4 text-muted flex-shrink-0" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className="h-4 w-4 p-0 text-muted hover:text-danger hover:bg-transparent"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
           <p className="text-sm text-muted">{phase.description}</p>

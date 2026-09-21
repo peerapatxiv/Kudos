@@ -10,7 +10,7 @@ import type { BodyMetric } from "@/lib/training/types";
 import { todayIso } from "@/lib/training/dates";
 import { CheckCircle2 } from "lucide-react";
 
-/** Weight/height/resting HR/VO2max change rarely, so this saves an update as-of today rather than
+/** Weight/height/Max HR/VO2max change rarely, so this saves an update as-of today rather than
  * demanding a fresh entry every day — `latest` pre-fills with whatever was last logged. */
 export function BodyMetricsForm({ latest, initialHeightCm }: { latest: BodyMetric | null; initialHeightCm: number | null }) {
   const [height, setHeight] = useState(initialHeightCm != null ? String(initialHeightCm) : "");
@@ -42,7 +42,7 @@ export function BodyMetricsForm({ latest, initialHeightCm }: { latest: BodyMetri
       const trimmedHr = restingHr.trim();
       const restingHrValue = trimmedHr === "" ? null : Number(trimmedHr);
       if (restingHrValue !== null && Number.isNaN(restingHrValue)) {
-        setError("Enter a valid resting HR, or leave it blank.");
+        setError("Enter a valid Max HR, or leave it blank.");
         return;
       }
 
@@ -109,7 +109,7 @@ export function BodyMetricsForm({ latest, initialHeightCm }: { latest: BodyMetri
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="resting-hr">Resting HR</Label>
+            <Label htmlFor="resting-hr">Max HR</Label>
             <Input
               id="resting-hr"
               inputMode="numeric"

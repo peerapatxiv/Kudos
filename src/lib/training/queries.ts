@@ -137,7 +137,7 @@ export async function getBodyMetrics(): Promise<QueryResult<BodyMetric[]>> {
   return { status: "ok", data: (data ?? []) as BodyMetric[] };
 }
 
-/** Most recently logged body metric, regardless of date — weight/resting HR/VO2max change rarely, so callers use this to show or pre-fill "current" values instead of requiring a fresh entry every day. */
+/** Most recently logged body metric, regardless of date — weight/Max HR/VO2max change rarely, so callers use this to show or pre-fill "current" values instead of requiring a fresh entry every day. */
 export async function getLatestBodyMetric(): Promise<BodyMetric | null> {
   const supabase = await client();
   if (!supabase) return null;

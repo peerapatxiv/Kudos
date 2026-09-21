@@ -1232,7 +1232,7 @@ export function BodyMetricsForm({ date, initial }: { date: string; initial: Body
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="resting-hr">Resting HR</Label>
+            <Label htmlFor="resting-hr">Max HR</Label>
             <Input
               id="resting-hr"
               inputMode="numeric"
@@ -1338,7 +1338,7 @@ Expected: no errors.
 
 - [ ] **Step 4: Manually verify in the browser**
 
-Run: `npm run dev`, open `/log`, fill in weight and resting HR, click "Save". Expected: button shows "Saved" briefly; reloading the page shows the values pre-filled.
+Run: `npm run dev`, open `/log`, fill in weight and Max HR, click "Save". Expected: button shows "Saved" briefly; reloading the page shows the values pre-filled.
 
 - [ ] **Step 5: Commit**
 
@@ -1404,7 +1404,7 @@ export function RestingHrChart({ data }: { data: RestingHrPoint[] }) {
     <Card>
       <CardHeader>
         <CardTitle>Resting Heart Rate</CardTitle>
-        <CardDescription>Logged resting HR over time.</CardDescription>
+        <CardDescription>Logged Max HR over time.</CardDescription>
       </CardHeader>
       <CardContent className="h-64">
         <ResponsiveContainer width="100%" height="100%">
@@ -1412,7 +1412,7 @@ export function RestingHrChart({ data }: { data: RestingHrPoint[] }) {
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
             <XAxis dataKey="label" tick={AXIS_STYLE} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
             <YAxis tick={AXIS_STYLE} axisLine={false} tickLine={false} unit="bpm" domain={["dataMin - 2", "dataMax + 2"]} />
-            <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v) => [`${v} bpm`, "Resting HR"]} />
+            <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v) => [`${v} bpm`, "Max HR"]} />
             <Line type="monotone" dataKey="restingHr" stroke="var(--interval)" strokeWidth={2} dot={{ r: 3 }} />
           </LineChart>
         </ResponsiveContainer>
@@ -1609,7 +1609,7 @@ to:
 
 Closed: offline writes (queued via `localStorage` in `src/lib/offline/workout-queue.ts` and flushed by
 `OfflineQueueSync` on reconnect), password reset (`/auth/reset-password`), an edit-workout UI wired to
-the existing `modifyWorkout` action, and an optional body-metrics log (weight/resting HR) with charts on
+the existing `modifyWorkout` action, and an optional body-metrics log (weight/Max HR) with charts on
 the Progress page.
 ```
 

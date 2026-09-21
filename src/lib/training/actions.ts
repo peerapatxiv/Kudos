@@ -573,6 +573,7 @@ export interface UpdatePhaseInput {
   description: string;
   startDate: string;
   endDate: string;
+  color?: string;
 }
 
 export async function updatePhase(input: UpdatePhaseInput): Promise<ActionResult> {
@@ -583,7 +584,8 @@ export async function updatePhase(input: UpdatePhaseInput): Promise<ActionResult
   //   label TEXT NOT NULL,
   //   description TEXT,
   //   start_date DATE NOT NULL,
-  //   end_date DATE NOT NULL
+  //   end_date DATE NOT NULL,
+  //   color TEXT DEFAULT 'rest'
   // );
 
   try {
@@ -598,6 +600,7 @@ export async function updatePhase(input: UpdatePhaseInput): Promise<ActionResult
         description: input.description,
         start_date: input.startDate,
         end_date: input.endDate,
+        color: input.color || "rest",
       })
       .eq("id", input.id);
 
@@ -697,6 +700,7 @@ export interface CreatePhaseInput {
   description: string;
   startDate: string;
   endDate: string;
+  color?: string;
 }
 
 export async function createPhase(input: CreatePhaseInput): Promise<ActionResult> {
@@ -717,6 +721,7 @@ export async function createPhase(input: CreatePhaseInput): Promise<ActionResult
     description: input.description,
     start_date: input.startDate,
     end_date: input.endDate,
+    color: input.color || "rest",
   } as any)) as any;
 
   if (error) return { ok: false, error: error.message };

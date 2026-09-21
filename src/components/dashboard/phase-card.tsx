@@ -6,19 +6,10 @@ import { Button } from "@/components/ui/button";
 import { EditPhaseDialog } from "@/components/phases/edit-phase-dialog";
 import { deletePhase } from "@/lib/training/actions";
 import type { PhaseDefinition } from "@/lib/training/phases";
+import { PHASE_COLORS, type PhaseColor } from "@/lib/training/phases";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { PencilLine, Trash2 } from "lucide-react";
-
-const PHASE_TONE: Record<string, string> = {
-  lead_in: "bg-rest/15 text-rest",
-  pre_plan: "bg-rest/15 text-rest",
-  base: "bg-easy/15 text-easy",
-  build: "bg-tempo/15 text-tempo",
-  peak: "bg-interval/15 text-interval",
-  taper: "bg-secondary-race/15 text-secondary-race",
-  recovery_bridge: "bg-recovery/15 text-recovery",
-};
 
 export function PhaseCard({
   phase,
@@ -51,7 +42,7 @@ export function PhaseCard({
             <span
               className={cn(
                 "rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide",
-                PHASE_TONE[phase.id],
+                PHASE_COLORS[(phase.color as PhaseColor) || "rest"],
               )}
             >
               {phase.label}

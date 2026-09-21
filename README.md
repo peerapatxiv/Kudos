@@ -237,7 +237,7 @@ Any Next.js host works (Vercel is the path of least resistance):
 
 Closed: offline writes (queued via `localStorage` in `src/lib/offline/workout-queue.ts` and flushed by
 `OfflineQueueSync` on reconnect), password reset (`/auth/reset-password`), an edit-workout UI wired to
-the existing `modifyWorkout` action, and an optional body-metrics log (weight/resting HR) with charts on
+the existing `modifyWorkout` action, and an optional body-metrics log (weight/Max HR) with charts on
 the Progress page.
 
 Also closed: race editing (name/date/distance/goal time/goal pace/notes, from `/races/a-race` and

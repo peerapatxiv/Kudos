@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ColorPicker } from "@/components/phases/color-picker";
 import { createPhase } from "@/lib/training/actions";
 import { Plus } from "lucide-react";
 
@@ -16,6 +17,7 @@ export function AddPhaseButton() {
     description: "",
     startDate: "",
     endDate: "",
+    color: "rest",
   });
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -40,6 +42,7 @@ export function AddPhaseButton() {
       description: phase.description,
       startDate: phase.startDate,
       endDate: phase.endDate,
+      color: phase.color,
     });
 
     setPending(false);
@@ -48,7 +51,7 @@ export function AddPhaseButton() {
       setError(result.error ?? "Failed to create phase.");
     } else {
       setOpen(false);
-      setPhase({ id: "", label: "", description: "", startDate: "", endDate: "" });
+      setPhase({ id: "", label: "", description: "", startDate: "", endDate: "", color: "rest" });
     }
   };
 
@@ -128,6 +131,8 @@ export function AddPhaseButton() {
                 placeholder="Phase description..."
               />
             </div>
+
+            <ColorPicker value={phase.color} onChange={(color) => setPhase({ ...phase, color })} />
 
             {error && (
               <div className="rounded-md bg-danger/10 border border-danger/20 p-3">

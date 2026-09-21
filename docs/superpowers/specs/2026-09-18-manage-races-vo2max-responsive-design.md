@@ -25,7 +25,7 @@ than assuming specific breakage.
    for "start over," this is for "fix a typo."
 
 3. **VO2max** — two independent, additive pieces:
-   - **Manual log**: an optional `vo2max` field alongside weight/resting HR on `BodyMetricsForm`
+   - **Manual log**: an optional `vo2max` field alongside weight/Max HR on `BodyMetricsForm`
      (for anyone reading an estimate off a watch), charted on Progress exactly like weight/HR.
    - **Auto-estimate**: a pure `estimateVo2max(distanceKm, timeSeconds)` function implementing the
      Daniels–Gilbert VDOT formula, applied to the athlete's best completed race-effort workout

@@ -7,7 +7,19 @@ export interface PhaseDefinition {
   startDate: string;
   endDate: string;
   description: string;
+  color?: string;
 }
+
+export const PHASE_COLORS = {
+  rest: "bg-rest/15 text-rest",
+  easy: "bg-easy/15 text-easy",
+  tempo: "bg-tempo/15 text-tempo",
+  interval: "bg-interval/15 text-interval",
+  "secondary-race": "bg-secondary-race/15 text-secondary-race",
+  recovery: "bg-recovery/15 text-recovery",
+} as const;
+
+export type PhaseColor = keyof typeof PHASE_COLORS;
 
 export const PHASES: PhaseDefinition[] = [
   {

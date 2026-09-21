@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ColorPicker } from "@/components/phases/color-picker";
 import { updatePhase } from "@/lib/training/actions";
 import type { PhaseDefinition } from "@/lib/training/phases";
 import { format, parse } from "date-fns";
@@ -22,6 +23,7 @@ export function EditPhaseDialog({
   const [description, setDescription] = useState(phase.description);
   const [startDate, setStartDate] = useState(phase.startDate);
   const [endDate, setEndDate] = useState(phase.endDate);
+  const [color, setColor] = useState(phase.color || "rest");
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -45,6 +47,7 @@ export function EditPhaseDialog({
         description,
         startDate,
         endDate,
+        color,
       });
 
       if (!result.ok) {
@@ -117,6 +120,9 @@ export function EditPhaseDialog({
               placeholder="What's the focus of this phase?"
             />
           </div>
+
+          {/* Color */}
+          <ColorPicker value={color} onChange={setColor} />
 
           {/* Error */}
           {error && (

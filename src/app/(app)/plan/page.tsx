@@ -47,7 +47,7 @@ export default async function PlanPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">Training Plan</h1>
-          <p className="text-sm text-muted">Six phases from lead-in to the recovery bridge.</p>
+          <p className="text-sm text-muted">Training phases</p>
         </div>
         <AddPhaseButton />
       </div>

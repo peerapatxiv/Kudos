@@ -374,7 +374,7 @@ export function BodyMetricsForm({ date, initial }: { date: string; initial: Body
       const trimmedHr = restingHr.trim();
       const restingHrValue = trimmedHr === "" ? null : Number(trimmedHr);
       if (restingHrValue !== null && Number.isNaN(restingHrValue)) {
-        setError("Enter a valid resting HR, or leave it blank.");
+        setError("Enter a valid Max HR, or leave it blank.");
         return;
       }
 
@@ -419,7 +419,7 @@ export function BodyMetricsForm({ date, initial }: { date: string; initial: Body
       const trimmedHr = restingHr.trim();
       const restingHrValue = trimmedHr === "" ? null : Number(trimmedHr);
       if (restingHrValue !== null && Number.isNaN(restingHrValue)) {
-        setError("Enter a valid resting HR, or leave it blank.");
+        setError("Enter a valid Max HR, or leave it blank.");
         return;
       }
 
@@ -464,7 +464,7 @@ Change:
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="resting-hr">Resting HR</Label>
+            <Label htmlFor="resting-hr">Max HR</Label>
             <Input
               id="resting-hr"
               inputMode="numeric"
@@ -491,7 +491,7 @@ to:
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="resting-hr">Resting HR</Label>
+            <Label htmlFor="resting-hr">Max HR</Label>
             <Input
               id="resting-hr"
               inputMode="numeric"
@@ -520,7 +520,7 @@ Expected: no errors.
 
 - [ ] **Step 5: Manually verify in the browser**
 
-Run: `npm run dev`, open `/log`, fill in a VO2max value alongside weight/resting HR, click "Save".
+Run: `npm run dev`, open `/log`, fill in a VO2max value alongside weight/Max HR, click "Save".
 Expected: button shows "Saved" briefly; reloading the page shows the value pre-filled; at a narrow
 width (< 640px) the three fields wrap to two columns without any of them looking cramped, and at
 640px+ they sit in one row of three.

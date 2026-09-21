@@ -27,12 +27,9 @@ export function RaceDetailDialog({ race }: { race: Race }) {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <Badge variant={meta.badgeVariant}>{meta.label}</Badge>
-                <span className="text-xs font-medium text-muted">{days} days to go</span>
-              </div>
-              <EditRaceDialog race={race} />
+            <div className="flex items-center gap-2">
+              <Badge variant={meta.badgeVariant}>{meta.label}</Badge>
+              <span className="text-xs font-medium text-muted">{days} days to go</span>
             </div>
             <DialogTitle className="text-2xl">{race.name}</DialogTitle>
             <DialogDescription>{format(new Date(`${race.date}T00:00:00`), "EEEE, MMMM d, yyyy")}</DialogDescription>
@@ -69,6 +66,10 @@ export function RaceDetailDialog({ race }: { race: Race }) {
               defaultPaceText={race.goal_pace_seconds_per_km ? secondsToPaceText(race.goal_pace_seconds_per_km) : "4:30"}
               markers={[5, 10, 15, 20, race.distance_km]}
             />
+
+            <div className="border-t border-border pt-4">
+              <EditRaceDialog race={race} />
+            </div>
           </div>
         </DialogContent>
       </Dialog>

@@ -17,7 +17,7 @@ export function ColorPicker({
   const colors: PhaseColor[] = ["rest", "easy", "tempo", "interval", "secondary-race", "recovery"];
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <Label className="text-sm font-medium">{label}</Label>
       <div className="flex gap-3">
         {colors.map((color) => {

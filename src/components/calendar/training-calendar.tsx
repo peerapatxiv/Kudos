@@ -57,12 +57,18 @@ export function TrainingCalendar({
   const selectedDate = searchParams.get("date");
 
   const workoutsByDate = useMemo(() => {
-    const map = new Map<string, Workout>();
-    for (const w of workouts) map.set(w.date, w);
+    const map = new Map<string, Workout[]>();
+    for (const w of workouts) {
+      const list = map.get(w.date) ?? [];
+      list.push(w);
+      map.set(w.date, list);
+    }
     return map;
   }, [workouts]);
 
-  const selectedWorkout = selectedDate ? workoutsByDate.get(selectedDate) ?? null : null;
+  const selectedWorkouts = selectedDate ? workoutsByDate.get(selectedDate) ?? [] : [];
+  const [selectedWorkoutIndex, setSelectedWorkoutIndex] = useState(0);
+  const selectedWorkout = selectedWorkouts[selectedWorkoutIndex] ?? null;
 
   function selectDate(date: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -180,25 +186,24 @@ export function TrainingCalendar({
 
         {days.map((day) => {
           const iso = format(day, "yyyy-MM-dd");
-          const workout = workoutsByDate.get(iso);
+          const workoutsForDay = workoutsByDate.get(iso) ?? [];
           const inMonth = view === "week" || isSameMonth(day, cursor);
           const isToday = iso === today;
-          const meta = workout ? workoutTypeMeta(workout.workout_type) : null;
           const isDragOver = dragOverDate === iso;
 
           return (
             <button
               key={iso}
-              draggable={!!workout}
+              draggable={workoutsForDay.length > 0}
               onDragStart={(e) => {
-                if (workout) {
+                if (workoutsForDay.length > 0) {
                   e.dataTransfer.effectAllowed = "move";
-                  e.dataTransfer.setData(DRAG_DATA_TYPE, workout.id);
-                  setMovingWorkoutId(workout.id);
+                  e.dataTransfer.setData(DRAG_DATA_TYPE, workoutsForDay[0].id);
+                  setMovingWorkoutId(workoutsForDay[0].id);
                 }
               }}
               onDragOver={(e) => {
-                if (workout) {
+                if (workoutsForDay.length > 0) {
                   allowDrop(e);
                   setDragOverDate(iso);
                 }
@@ -209,39 +214,52 @@ export function TrainingCalendar({
               onDrop={(e) => {
                 handleDropWorkout(e, iso);
               }}
-              onClick={() => workout ? selectDate(iso) : setQuickAddDate(iso)}
+              onClick={() => {
+                if (workoutsForDay.length > 0) {
+                  setSelectedWorkoutIndex(0);
+                  selectDate(iso);
+                } else {
+                  setQuickAddDate(iso);
+                }
+              }}
               className={cn(
-                !workout && "cursor-pointer hover:border-foreground/30",
+                workoutsForDay.length === 0 && "cursor-pointer hover:border-foreground/30",
                 "flex flex-col items-center gap-1 rounded-lg border p-1.5 text-center transition-colors",
                 view === "week" ? "min-h-24" : "min-h-16",
                 inMonth ? "bg-surface" : "bg-surface/40 opacity-40",
                 isToday ? "border-a-race" : "border-border",
-                workout?.is_race && "ring-1 ring-race/50",
-                workout && "hover:border-foreground/30 cursor-pointer",
+                workoutsForDay.some(w => w.is_race) && "ring-1 ring-race/50",
+                workoutsForDay.length > 0 && "hover:border-foreground/30 cursor-pointer",
                 isDragOver && "bg-primary/10 border-primary",
-                movingWorkoutId === workout?.id && "opacity-50",
+                movingWorkoutId && workoutsForDay.some(w => w.id === movingWorkoutId) && "opacity-50",
               )}
             >
               <span className={cn("text-xs tabular-nums", isToday ? "font-bold text-a-race" : "text-foreground")}>
                 {format(day, "d")}
               </span>
-              {workout && meta && (
-                <>
-                  <span
-                    className="flex h-5 w-5 items-center justify-center rounded-full"
-                    style={{
-                      backgroundColor: `color-mix(in oklab, ${meta.colorVar} 18%, transparent)`,
-                      color: meta.colorVar,
-                    }}
-                  >
-                    <meta.icon className="h-3 w-3" />
-                  </span>
-                  {view === "week" && !workout.is_rest_day && workout.distance_km ? (
-                    <span className="text-[10px] text-muted">{workout.distance_km}k</span>
-                  ) : null}
-                  {workout.completed && <span className="h-1 w-1 rounded-full bg-completed" />}
-                </>
+              {workoutsForDay.length > 0 && (
+                <div className="flex gap-1 flex-wrap justify-center">
+                  {workoutsForDay.map((workout) => {
+                    const meta = workoutTypeMeta(workout.workout_type);
+                    return (
+                      <span
+                        key={workout.id}
+                        className="flex h-4 w-4 items-center justify-center rounded-full text-[10px]"
+                        style={{
+                          backgroundColor: `color-mix(in oklab, ${meta.colorVar} 18%, transparent)`,
+                          color: meta.colorVar,
+                        }}
+                      >
+                        <meta.icon className="h-2.5 w-2.5" />
+                      </span>
+                    );
+                  })}
+                </div>
               )}
+              {workoutsForDay.length > 1 && (
+                <span className="text-[9px] text-muted">{workoutsForDay.length} workouts</span>
+              )}
+              {workoutsForDay.some(w => w.completed) && <span className="h-0.5 w-1 rounded-full bg-completed" />}
             </button>
           );
         })}
@@ -262,12 +280,33 @@ export function TrainingCalendar({
       <Dialog open={!!selectedWorkout} onOpenChange={(open) => !open && closeDialog()}>
         <DialogContent>
           {selectedWorkout && (
-            <WorkoutDetailContent
-              workout={selectedWorkout}
-              intervals={intervalsByWorkout.get(selectedWorkout.id) ?? []}
-              race={selectedWorkout.race_id ? racesById.get(selectedWorkout.race_id) ?? null : null}
-              availableRaces={Array.from(racesById.values())}
-            />
+            <div className="space-y-4">
+              {selectedWorkouts.length > 1 && (
+                <div className="flex items-center justify-between gap-2 pb-2 border-b border-border">
+                  <button
+                    onClick={() => setSelectedWorkoutIndex((i) => (i - 1 + selectedWorkouts.length) % selectedWorkouts.length)}
+                    className="text-muted hover:text-foreground text-sm"
+                  >
+                    ← Prev
+                  </button>
+                  <span className="text-xs text-muted">
+                    Workout {selectedWorkoutIndex + 1} of {selectedWorkouts.length}
+                  </span>
+                  <button
+                    onClick={() => setSelectedWorkoutIndex((i) => (i + 1) % selectedWorkouts.length)}
+                    className="text-muted hover:text-foreground text-sm"
+                  >
+                    Next →
+                  </button>
+                </div>
+              )}
+              <WorkoutDetailContent
+                workout={selectedWorkout}
+                intervals={intervalsByWorkout.get(selectedWorkout.id) ?? []}
+                race={selectedWorkout.race_id ? racesById.get(selectedWorkout.race_id) ?? null : null}
+                availableRaces={Array.from(racesById.values())}
+              />
+            </div>
           )}
         </DialogContent>
       </Dialog>

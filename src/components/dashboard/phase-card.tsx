@@ -36,40 +36,57 @@ export function PhaseCard({
 
   return (
     <>
-      <Card className="overflow-hidden hover:border-foreground/30 transition-all hover:shadow-lg flex flex-col bg-gradient-to-br from-surface to-surface-2/50 border border-border/50">
-        <CardContent className="pt-5 space-y-4 flex-1">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between gap-3">
+      <div className="group rounded-xl border border-border/50 bg-gradient-to-br from-surface/80 via-surface to-surface-2/40 backdrop-blur-sm overflow-hidden transition-all hover:border-foreground/30 hover:shadow-xl hover:shadow-foreground/5 flex flex-col">
+        <div className="p-6 space-y-5 flex-1">
+          {/* Header */}
+          <div className="space-y-3">
+            <div className="flex items-start justify-between gap-3">
               <span
                 className={cn(
-                  "rounded-lg px-3 py-1.5 text-sm font-bold uppercase tracking-wider",
+                  "inline-block rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-widest transition-transform group-hover:scale-105",
                   PHASE_COLORS[(phase.color as PhaseColor) || "rest"],
                 )}
               >
                 {phase.label}
               </span>
-              <span className="text-sm font-medium text-muted-foreground whitespace-nowrap bg-surface-2/50 px-2.5 py-1 rounded-md">
-                {format(new Date(`${phase.startDate}T00:00:00`), "MMM d")} – {format(new Date(`${phase.endDate}T00:00:00`), "MMM d")}
-              </span>
+              <div className="text-right">
+                <p className="text-xs uppercase tracking-wide text-muted mb-1">Duration</p>
+                <p className="text-sm font-semibold text-foreground">
+                  {format(new Date(`${phase.startDate}T00:00:00`), "MMM d")}
+                  <span className="text-muted mx-1.5">→</span>
+                  {format(new Date(`${phase.endDate}T00:00:00`), "MMM d")}
+                </p>
+              </div>
             </div>
-            <p className="text-sm leading-relaxed text-muted/80">{phase.description}</p>
+            <p className="text-sm leading-relaxed text-muted/85">{phase.description}</p>
           </div>
 
+          {/* Stats */}
           {stats && (
             <div className="grid grid-cols-3 gap-3 pt-2">
-              <Stat label="Planned" value={`${stats.totalPlannedKm} km`} />
-              <Stat label="Workouts" value={String(stats.workoutCount)} />
-              <Stat label="Long run" value={stats.longRunKm ? `${stats.longRunKm} km` : "—"} />
+              <div className="rounded-lg bg-gradient-to-br from-surface-2/60 to-surface-2/30 p-3 text-center border border-border/30">
+                <p className="text-lg font-bold text-foreground">{stats.totalPlannedKm}</p>
+                <p className="text-xs uppercase tracking-wide text-muted mt-1">Planned km</p>
+              </div>
+              <div className="rounded-lg bg-gradient-to-br from-surface-2/60 to-surface-2/30 p-3 text-center border border-border/30">
+                <p className="text-lg font-bold text-foreground">{stats.workoutCount}</p>
+                <p className="text-xs uppercase tracking-wide text-muted mt-1">Workouts</p>
+              </div>
+              <div className="rounded-lg bg-gradient-to-br from-surface-2/60 to-surface-2/30 p-3 text-center border border-border/30">
+                <p className="text-lg font-bold text-foreground">{stats.longRunKm ? `${stats.longRunKm}` : "—"}</p>
+                <p className="text-xs uppercase tracking-wide text-muted mt-1">Long run km</p>
+              </div>
             </div>
           )}
-        </CardContent>
+        </div>
 
-        <div className="flex gap-2 border-t border-border/30 p-3 bg-surface-2/40">
+        {/* Action Buttons */}
+        <div className="flex gap-2 border-t border-border/30 p-4 bg-gradient-to-r from-surface-2/40 to-surface-2/20 backdrop-blur-sm">
           <Button
             variant="outline"
             size="sm"
             onClick={() => setEditOpen(true)}
-            className="flex-1 h-9 gap-2 font-medium"
+            className="flex-1 h-10 gap-2 font-medium text-sm rounded-lg hover:bg-foreground hover:text-background transition-colors"
           >
             <PencilLine className="h-4 w-4" />
             Edit
@@ -79,24 +96,15 @@ export function PhaseCard({
             size="sm"
             onClick={handleDelete}
             disabled={deleting}
-            className="flex-1 h-9 gap-2 font-medium hover:bg-danger/10 hover:text-danger text-muted-foreground"
+            className="flex-1 h-10 gap-2 font-medium text-sm rounded-lg hover:bg-danger/15 hover:text-danger transition-colors text-muted-foreground"
           >
             <Trash2 className="h-4 w-4" />
             Delete
           </Button>
         </div>
-      </Card>
+      </div>
 
       <EditPhaseDialog phase={phase} open={editOpen} onOpenChange={setEditOpen} />
     </>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-md bg-surface-2/60 py-2">
-      <p className="text-sm font-semibold text-foreground tabular-nums">{value}</p>
-      <p className="text-[10px] uppercase tracking-wide text-muted">{label}</p>
-    </div>
   );
 }

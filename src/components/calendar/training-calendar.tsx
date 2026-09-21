@@ -22,12 +22,13 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/shared/empty-state";
 import { WorkoutDetailContent } from "@/components/workouts/workout-detail-content";
 import { QuickAddWorkoutDialog } from "@/components/calendar/quick-add-workout-dialog";
-import { createQuickWorkout } from "@/lib/training/actions";
+import { createQuickWorkout, moveWorkout } from "@/lib/training/actions";
 import { workoutTypeMeta } from "@/components/workouts/workout-meta";
 import type { Race, Workout, WorkoutInterval } from "@/lib/training/types";
 import { todayIso } from "@/lib/training/dates";
 import { cn } from "@/lib/utils";
 import { CalendarX2 } from "lucide-react";
+import { DRAG_DATA_TYPE, getDragData, allowDrop } from "@/lib/training/drag-drop";
 
 type View = "month" | "week";
 
@@ -47,7 +48,9 @@ export function TrainingCalendar({
   const initialDate = searchParams.get("date") ?? today;
   const [view, setView] = useState<View>("month");
   const [quickAddDate, setQuickAddDate] = useState<string | null>(null);
+  const [dragOverDate, setDragOverDate] = useState<string | null>(null);
   const [cursor, setCursor] = useState(new Date(`${initialDate}T00:00:00`));
+  const [movingWorkoutId, setMovingWorkoutId] = useState<string | null>(null);
 
   // The URL is the source of truth for which day's dialog is open, so it
   // survives back/forward navigation and deep links (e.g. from the dashboard).
@@ -69,6 +72,30 @@ export function TrainingCalendar({
 
   function closeDialog() {
     router.replace("/calendar", { scroll: false });
+  }
+
+  function handleDropWorkout(e: React.DragEvent<HTMLButtonElement>, targetDate: string) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const workoutId = getDragData(e);
+    if (!workoutId) return;
+
+    const workout = workouts.find(w => w.id === workoutId);
+    if (!workout) return;
+
+    // Don't move if dropping on same day
+    if (workout.date === targetDate) {
+      setDragOverDate(null);
+      setMovingWorkoutId(null);
+      return;
+    }
+
+    setMovingWorkoutId(workoutId);
+    moveWorkout({ workoutId, newDate: targetDate }).then(() => {
+      setMovingWorkoutId(null);
+      setDragOverDate(null);
+    });
   }
 
   const touchStartX = useRef<number | null>(null);
@@ -157,10 +184,31 @@ export function TrainingCalendar({
           const inMonth = view === "week" || isSameMonth(day, cursor);
           const isToday = iso === today;
           const meta = workout ? workoutTypeMeta(workout.workout_type) : null;
+          const isDragOver = dragOverDate === iso;
 
           return (
             <button
               key={iso}
+              draggable={!!workout}
+              onDragStart={(e) => {
+                if (workout) {
+                  e.dataTransfer.effectAllowed = "move";
+                  e.dataTransfer.setData(DRAG_DATA_TYPE, workout.id);
+                  setMovingWorkoutId(workout.id);
+                }
+              }}
+              onDragOver={(e) => {
+                if (workout) {
+                  allowDrop(e);
+                  setDragOverDate(iso);
+                }
+              }}
+              onDragLeave={() => {
+                setDragOverDate(null);
+              }}
+              onDrop={(e) => {
+                handleDropWorkout(e, iso);
+              }}
               onClick={() => workout ? selectDate(iso) : setQuickAddDate(iso)}
               className={cn(
                 !workout && "cursor-pointer hover:border-foreground/30",
@@ -170,6 +218,8 @@ export function TrainingCalendar({
                 isToday ? "border-a-race" : "border-border",
                 workout?.is_race && "ring-1 ring-race/50",
                 workout && "hover:border-foreground/30 cursor-pointer",
+                isDragOver && "bg-primary/10 border-primary",
+                movingWorkoutId === workout?.id && "opacity-50",
               )}
             >
               <span className={cn("text-xs tabular-nums", isToday ? "font-bold text-a-race" : "text-foreground")}>

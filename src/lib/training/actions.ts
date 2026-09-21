@@ -743,3 +743,36 @@ export async function deletePhase(phaseId: string): Promise<ActionResult> {
   revalidatePath("/dashboard");
   return { ok: true };
 }
+
+export interface MoveWorkoutInput {
+  workoutId: string;
+  newDate: string;
+}
+
+export async function moveWorkout(input: MoveWorkoutInput): Promise<ActionResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const newDayOfWeek = new Date(`${input.newDate}T00:00:00`).toLocaleDateString("en-US", { weekday: "long" });
+
+  const { error } = await supabase
+    .from("workouts")
+    .update({
+      date: input.newDate,
+      day_of_week: newDayOfWeek,
+    })
+    .eq("id", input.workoutId)
+    .eq("user_id", user.id);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/calendar");
+  revalidatePath("/dashboard");
+  revalidatePath("/plan");
+  return { ok: true };
+}

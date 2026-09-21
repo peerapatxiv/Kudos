@@ -236,7 +236,7 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
               Cancel
             </Button>
             <Button
-              variant="danger"
+              variant="destructive"
               className="flex-1 h-10"
               onClick={() => toDelete && handleDeletePhase(toDelete)}
               disabled={pending}

@@ -61,7 +61,7 @@ export function BodyMetricsForm({ latest, initialHeightCm }: { latest: BodyMetri
           vo2max: vo2maxValue,
           notes: notes || null,
         }),
-        updateProfile({ displayName: null, heightCm }),
+        updateProfile({ displayName: "", heightCm }),
       ]);
 
       if (!metricsResult.ok) {

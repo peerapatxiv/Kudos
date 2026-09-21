@@ -1111,7 +1111,6 @@ export async function seedCompleteTrainingPlan(): Promise<ActionResult> {
     actual_pace_seconds_per_km: null,
     perceived_effort: null,
     athlete_notes: null,
-    from_training_plan: true,
   }));
 
   const { error: workoutError } = await supabase

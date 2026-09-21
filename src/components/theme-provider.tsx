@@ -6,13 +6,25 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Initialize theme on client side
+    try {
+      const theme = localStorage.getItem("theme") || "system";
+      const isDark =
+        theme === "dark" ||
+        (theme === "system" &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+      if (isDark) {
+        document.documentElement.setAttribute("data-theme", "dark");
+      } else {
+        document.documentElement.setAttribute("data-theme", "light");
+      }
+    } catch (e) {
+      // Ignore errors
+    }
+
     setMounted(true);
   }, []);
-
-  // Return children after hydration to avoid hydration mismatch
-  if (!mounted) {
-    return children;
-  }
 
   return children;
 }

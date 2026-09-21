@@ -34,18 +34,18 @@ export function TodayWorkoutCard({
   if (!workout) {
     return (
       <>
-        <div className="space-y-4 rounded-lg border border-dashed border-border/50 bg-gradient-to-br from-surface-2/30 to-surface-2/10 p-5">
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Rest day</h2>
-            <p className="mt-2 text-sm text-muted">Add an activity or enjoy the day off.</p>
+        <div className="rounded-lg border border-border/50 bg-gradient-to-br from-surface-2/40 to-surface-2/20 p-6 hover:border-foreground/20 hover:shadow-lg transition-all space-y-5">
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold text-foreground">Rest day</h2>
+            <p className="text-sm text-muted-foreground">Perfect time to recover and recharge.</p>
           </div>
           <Button
             variant="primary"
-            className="w-full"
+            className="w-full h-10"
             onClick={() => setQuickAddOpen(true)}
           >
             <Plus className="h-4 w-4" />
-            Add activity for today
+            Add activity
           </Button>
         </div>
 
@@ -71,8 +71,8 @@ export function TodayWorkoutCard({
 
   return (
     <>
-      <div className="space-y-3 rounded-lg border border-border/50 bg-gradient-to-br from-surface-2/40 to-surface-2/20 p-5">
-        <div className="flex items-center justify-between gap-2">
+      <div className="rounded-lg border border-border/50 bg-gradient-to-br from-surface-2/40 to-surface-2/20 p-6 hover:border-foreground/20 hover:shadow-lg transition-all space-y-5">
+        <div className="flex items-start justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant={meta.badgeVariant}>{meta.label}</Badge>
             {isLeadIn && <Badge variant="neutral">Lead-in · controlled</Badge>}
@@ -80,41 +80,46 @@ export function TodayWorkoutCard({
             {workout.is_race && <Badge variant="race">Race</Badge>}
           </div>
           {workout.completed && (
-            <span className="flex items-center gap-1 text-xs font-medium text-completed whitespace-nowrap">
-              <CheckCircle2 className="h-3.5 w-3.5" />
+            <span className="flex items-center gap-1.5 text-xs font-semibold text-completed whitespace-nowrap bg-completed/10 px-2.5 py-1 rounded-full">
+              <CheckCircle2 className="h-4 w-4" />
               Completed
             </span>
           )}
         </div>
 
-        <div>
-          <h2 className="text-xl font-bold text-foreground">
+        <div className="space-y-3">
+          <h2 className="text-2xl font-bold text-foreground">
             {workout.is_rest_day ? "Rest day" : workout.title}
           </h2>
           {!workout.is_rest_day && (
-            <div className="mt-3 flex flex-wrap items-center gap-4">
+            <div className="flex flex-wrap items-center gap-6">
               {workout.distance_km && (
                 <div>
-                  <p className="text-sm font-medium text-muted">Distance</p>
-                  <p className="text-base font-semibold text-foreground">{workout.distance_km} km</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Distance</p>
+                  <p className="mt-1 text-lg font-bold text-foreground">{workout.distance_km} km</p>
                 </div>
               )}
               {workout.target_pace_min_sec_per_km && (
                 <div>
-                  <p className="text-sm font-medium text-muted">Target pace</p>
-                  <p className="text-base font-semibold text-foreground">{workout.target_pace_min_sec_per_km}</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Target pace</p>
+                  <p className="mt-1 text-lg font-bold text-foreground">{workout.target_pace_min_sec_per_km}</p>
                 </div>
               )}
             </div>
           )}
         </div>
 
-        {workout.notes && <p className="rounded-md bg-surface-2/50 p-3 text-sm text-muted border border-border/50">{workout.notes}</p>}
+        {workout.notes && (
+          <div className="rounded-lg bg-surface-2/60 border border-border/30 p-4 text-sm text-muted-foreground">
+            <p className="font-medium text-foreground text-xs uppercase tracking-wide mb-2">Notes</p>
+            {workout.notes}
+          </div>
+        )}
 
-        <div className="flex flex-col gap-2 pt-1 sm:flex-row">
+        <div className="flex flex-col gap-2 sm:flex-row pt-2">
           <Button
             variant="outline"
-            className="flex-1"
+            className="flex-1 h-10"
             onClick={async () => {
               const result = await fetchWorkoutDetails(workout.date);
               if (result.status === "ok" && result.data) {
@@ -129,7 +134,7 @@ export function TodayWorkoutCard({
           {!workout.is_rest_day && !workout.completed && (
             <Button
               variant="primary"
-              className="flex-1"
+              className="flex-1 h-10"
               onClick={() => setLoggerOpen(true)}
             >
               <PlayCircle className="h-4 w-4" />
@@ -139,6 +144,7 @@ export function TodayWorkoutCard({
           <Button
             variant="outline"
             size="icon"
+            className="h-10 w-10"
             onClick={() => setQuickAddOpen(true)}
             title="Add another activity for today"
           >

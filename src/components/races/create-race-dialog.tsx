@@ -126,7 +126,7 @@ export function CreateRaceDialog() {
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="new-race-date">Date</Label>
-                <Input id="new-race-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+                <Input id="new-race-date" type="text" placeholder="YYYY-MM-DD" value={date} onChange={(e) => setDate(e.target.value)} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="new-race-distance">Distance (km)</Label>

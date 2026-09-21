@@ -84,9 +84,10 @@ export function EditPhaseDialog({
                 <label className="text-xs text-muted mb-1 block">From</label>
                 <Input
                   id="phase-start"
-                  type="date"
+                  type="text"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
+                  placeholder="YYYY-MM-DD"
                   className="h-9 text-sm"
                 />
               </div>
@@ -94,9 +95,10 @@ export function EditPhaseDialog({
                 <label className="text-xs text-muted mb-1 block">To</label>
                 <Input
                   id="phase-end"
-                  type="date"
+                  type="text"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
+                  placeholder="YYYY-MM-DD"
                   className="h-9 text-sm"
                 />
               </div>

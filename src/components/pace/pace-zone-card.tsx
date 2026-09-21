@@ -32,23 +32,20 @@ export function PaceZoneCard({ compact = false, className }: { compact?: boolean
       <CardHeader>
         <CardTitle>Pace Zones</CardTitle>
       </CardHeader>
-      <CardContent className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+      <CardContent className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {PACE_ZONES.map((zone) => (
           <div
             key={zone.id}
-            className="flex items-center justify-between gap-3 rounded-md border border-border bg-surface-2/60 px-3 py-3"
+            className="space-y-2 rounded-lg border border-border/50 bg-gradient-to-br from-surface-2/40 to-surface-2/20 p-4"
           >
             <div className="flex items-center gap-2.5">
-              <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", ZONE_COLOR[zone.id])} />
-              <div>
-                <p className="text-sm font-medium text-foreground">{zone.label}</p>
-                <p className="text-[11px] text-muted">{zone.description}</p>
-              </div>
+              <span className={cn("h-3 w-3 rounded-full", ZONE_COLOR[zone.id])} />
+              <p className="text-sm font-semibold text-foreground">{zone.label}</p>
             </div>
-            <span className="shrink-0 tabular-nums text-sm font-semibold text-foreground">
+            <p className="text-2xl font-bold text-foreground">
               {zone.paceHigh ? `${zone.paceLow}–${zone.paceHigh}` : zone.paceLow}
-              <span className="text-muted font-normal">/km</span>
-            </span>
+              <span className="text-sm font-normal text-muted">/km</span>
+            </p>
           </div>
         ))}
       </CardContent>

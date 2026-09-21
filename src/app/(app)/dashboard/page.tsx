@@ -13,7 +13,7 @@ import { HrZoneCard } from "@/components/training/hr-zone-card";
 import { todayIso } from "@/lib/training/dates";
 import { phaseForDate } from "@/lib/training/phases";
 import { summarizeWeek } from "@/lib/training/aggregate";
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, Heart, Gauge, Zap, Ruler } from "lucide-react";
 import { format, addDays } from "date-fns";
 
 export default async function DashboardPage() {
@@ -108,28 +108,62 @@ export default async function DashboardPage() {
       )}
 
       {/* Key Metrics */}
-      {latestBodyMetric && (
+      {latestBodyMetric || profile?.height_cm && (
         <div className="space-y-4">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Key metrics</h2>
-          <div className="grid gap-4 sm:grid-cols-3">
-          <Card>
-            <CardContent className="pt-5">
-              <p className="text-3xl font-bold text-foreground">{latestBodyMetric.resting_hr ?? "—"}</p>
-              <p className="mt-1 text-xs uppercase tracking-wide text-muted">Resting HR</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-5">
-              <p className="text-3xl font-bold text-foreground">{latestBodyMetric.weight_kg ?? "—"}</p>
-              <p className="mt-1 text-xs uppercase tracking-wide text-muted">Weight (kg)</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-5">
-              <p className="text-3xl font-bold text-foreground">{latestBodyMetric.vo2max ?? "—"}</p>
-              <p className="mt-1 text-xs uppercase tracking-wide text-muted">VO2 Max</p>
-            </CardContent>
-          </Card>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {profile?.height_cm && (
+            <Card>
+              <CardContent className="pt-5">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-3xl font-bold text-foreground">{profile.height_cm}</p>
+                    <p className="mt-1 text-xs uppercase tracking-wide text-muted">Height (cm)</p>
+                  </div>
+                  <Ruler className="h-6 w-6 text-muted-foreground/50" />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          {latestBodyMetric?.resting_hr && (
+            <Card>
+              <CardContent className="pt-5">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-3xl font-bold text-foreground">{latestBodyMetric.resting_hr}</p>
+                    <p className="mt-1 text-xs uppercase tracking-wide text-muted">Resting HR</p>
+                  </div>
+                  <Heart className="h-6 w-6 text-muted-foreground/50" />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          {latestBodyMetric?.weight_kg && (
+            <Card>
+              <CardContent className="pt-5">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-3xl font-bold text-foreground">{latestBodyMetric.weight_kg}</p>
+                    <p className="mt-1 text-xs uppercase tracking-wide text-muted">Weight (kg)</p>
+                  </div>
+                  <Gauge className="h-6 w-6 text-muted-foreground/50" />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          {latestBodyMetric?.vo2max && (
+            <Card>
+              <CardContent className="pt-5">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-3xl font-bold text-foreground">{latestBodyMetric.vo2max}</p>
+                    <p className="mt-1 text-xs uppercase tracking-wide text-muted">VO2 Max</p>
+                  </div>
+                  <Zap className="h-6 w-6 text-muted-foreground/50" />
+                </div>
+              </CardContent>
+            </Card>
+          )}
           </div>
         </div>
       )}

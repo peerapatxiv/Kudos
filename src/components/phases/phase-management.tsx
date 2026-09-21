@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ColorPicker } from "@/components/phases/color-picker";
 import { createPhase, deletePhase } from "@/lib/training/actions";
 import type { PhaseDefinition } from "@/lib/training/phases";
 import { Plus, Trash2 } from "lucide-react";
@@ -17,6 +18,7 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
     description: "",
     startDate: "",
     endDate: "",
+    color: "rest",
   });
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -47,6 +49,7 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
       description: newPhase.description,
       startDate: newPhase.startDate,
       endDate: newPhase.endDate,
+      color: newPhase.color,
     });
 
     setPending(false);
@@ -55,7 +58,7 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
       setError(result.error ?? "Failed to create phase.");
     } else {
       setAddOpen(false);
-      setNewPhase({ id: "", label: "", description: "", startDate: "", endDate: "" });
+      setNewPhase({ id: "", label: "", description: "", startDate: "", endDate: "", color: "rest" });
     }
   };
 
@@ -169,6 +172,8 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
                 placeholder="Phase description..."
               />
             </div>
+
+            <ColorPicker value={newPhase.color} onChange={(color) => setNewPhase({ ...newPhase, color })} />
 
             {error && (
               <div className="rounded-md bg-danger/10 border border-danger/20 p-3">

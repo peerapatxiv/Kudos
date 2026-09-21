@@ -153,35 +153,28 @@ export async function getLatestBodyMetric(): Promise<BodyMetric | null> {
 export async function getPhases(): Promise<QueryResult<PhaseDefinition[]>> {
   try {
     const supabase = await client();
-    if (!supabase) return { status: "ok", data: PHASES };
+    if (!supabase) return { status: "unconfigured" };
 
     const { data, error } = await supabase
       .from("training_phases")
       .select("*")
       .order("start_date", { ascending: true });
 
-    // If table doesn't exist or any error, fall back to hardcoded phases
     if (error) {
-      return { status: "ok", data: PHASES };
+      return { status: "error", message: error.message };
     }
 
-    if (data && data.length > 0) {
-      // Map database rows to PhaseDefinition format
-      const dbPhases = data.map((row: any) => ({
-        id: row.id,
-        label: row.label,
-        startDate: row.start_date,
-        endDate: row.end_date,
-        description: row.description || "",
-        color: row.color || "rest",
-      }));
-      return { status: "ok", data: dbPhases };
-    }
+    const dbPhases = (data ?? []).map((row: any) => ({
+      id: row.id,
+      label: row.label,
+      startDate: row.start_date,
+      endDate: row.end_date,
+      description: row.description || "",
+      color: row.color || "rest",
+    }));
 
-    // If database is empty, use hardcoded phases
-    return { status: "ok", data: PHASES };
-  } catch {
-    // Any error, fall back to hardcoded phases
-    return { status: "ok", data: PHASES };
+    return { status: "ok", data: dbPhases };
+  } catch (err) {
+    return { status: "error", message: err instanceof Error ? err.message : "Failed to fetch phases" };
   }
 }

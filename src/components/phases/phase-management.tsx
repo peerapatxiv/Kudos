@@ -152,7 +152,7 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
                     type="date"
                     value={newPhase.startDate}
                     onChange={(e) => setNewPhase({ ...newPhase, startDate: e.target.value })}
-                    className="h-10"
+                    className="h-10 rounded-lg border border-border/50 bg-surface px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-a-race/40 focus-visible:border-transparent transition-colors"
                   />
                 </div>
                 <div className="space-y-2">
@@ -161,7 +161,7 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
                     type="date"
                     value={newPhase.endDate}
                     onChange={(e) => setNewPhase({ ...newPhase, endDate: e.target.value })}
-                    className="h-10"
+                    className="h-10 rounded-lg border border-border/50 bg-surface px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-a-race/40 focus-visible:border-transparent transition-colors"
                   />
                 </div>
               </div>

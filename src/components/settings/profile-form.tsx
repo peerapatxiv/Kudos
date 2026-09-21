@@ -50,10 +50,16 @@ export function ProfileForm({
         <CardDescription>{email}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
           <div className="space-y-1.5">
             <Label htmlFor="display-name">Display name</Label>
-            <Input id="display-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Peerapat P." />
+            <Input
+              id="display-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Peerapat P."
+              disabled={pending}
+            />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="height-cm">Height (cm)</Label>
@@ -63,11 +69,12 @@ export function ProfileForm({
               value={height}
               onChange={(e) => setHeight(e.target.value)}
               placeholder="175"
+              disabled={pending}
             />
           </div>
         </div>
         {error && <p className="text-xs text-danger">{error}</p>}
-        <Button variant="outline" onClick={handleSave} disabled={pending}>
+        <Button variant="outline" className="w-full" onClick={handleSave} disabled={pending}>
           {saved ? (
             <>
               <CheckCircle2 className="h-4 w-4 text-success" /> Saved

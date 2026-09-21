@@ -1,6 +1,8 @@
 import "server-only";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import type { BodyMetric, DailyLog, Race, TrainingWeek, Workout, WorkoutInterval, WorkoutWithIntervals } from "./types";
+import type { PhaseDefinition } from "./phases";
+import { PHASES } from "./phases";
 
 export type QueryResult<T> =
   | { status: "unconfigured" }
@@ -146,4 +148,36 @@ export async function getLatestBodyMetric(): Promise<BodyMetric | null> {
     .limit(1)
     .maybeSingle();
   return data as BodyMetric | null;
+}
+
+export async function getPhases(): Promise<QueryResult<PhaseDefinition[]>> {
+  const supabase = await client();
+  if (!supabase) return { status: "ok", data: PHASES };
+
+  const { data, error } = await supabase
+    .from("training_phases")
+    .select("*")
+    .order("start_date", { ascending: true });
+
+  // If table doesn't exist, fall back to hardcoded phases
+  if (error && error.message?.includes("does not exist")) {
+    return { status: "ok", data: PHASES };
+  }
+
+  if (error) return { status: "error", message: error.message };
+
+  if (data && data.length > 0) {
+    // Map database rows to PhaseDefinition format
+    const dbPhases = data.map((row: any) => ({
+      id: row.id,
+      label: row.label,
+      startDate: row.start_date,
+      endDate: row.end_date,
+      description: row.description || "",
+    }));
+    return { status: "ok", data: dbPhases };
+  }
+
+  // If database is empty, use hardcoded phases
+  return { status: "ok", data: PHASES };
 }

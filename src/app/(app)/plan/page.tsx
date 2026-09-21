@@ -1,4 +1,4 @@
-import { getAllWorkouts, getTrainingWeeks, getLatestBodyMetric } from "@/lib/training/queries";
+import { getAllWorkouts, getTrainingWeeks, getLatestBodyMetric, getPhases } from "@/lib/training/queries";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { SupabaseNotConfigured } from "@/components/shared/error-state";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -7,25 +7,26 @@ import { PACE_ZONES } from "@/lib/training/pace-zones";
 import { PaceZoneCard } from "@/components/pace/pace-zone-card";
 import { HrZoneCard } from "@/components/training/hr-zone-card";
 import { AdaptiveZonesCard } from "@/components/training/adaptive-zones-card";
-import { PHASES } from "@/lib/training/phases";
 import { summarizePhase } from "@/lib/training/aggregate";
 import type { TrainingPhaseId } from "@/lib/training/types";
 
 export default async function PlanPage() {
   if (!isSupabaseConfigured) return <SupabaseNotConfigured />;
 
-  const [weeksResult, workoutsResult, latestBodyMetric] = await Promise.all([
+  const [weeksResult, workoutsResult, latestBodyMetric, phasesResult] = await Promise.all([
     getTrainingWeeks(),
     getAllWorkouts(),
     getLatestBodyMetric(),
+    getPhases(),
   ]);
 
-  if (weeksResult.status !== "ok" || workoutsResult.status !== "ok") {
+  if (weeksResult.status !== "ok" || workoutsResult.status !== "ok" || phasesResult.status !== "ok") {
     return <EmptyState title="Couldn't load the training plan" description="Refresh to try again." />;
   }
 
   const weeks = weeksResult.data;
   const workouts = workoutsResult.data;
+  const phases = phasesResult.data;
 
   const weekIdsByPhase = new Map<TrainingPhaseId, Set<string>>();
   const recentRaces = workouts
@@ -45,8 +46,8 @@ export default async function PlanPage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        {PHASES.map((phase) => {
-          const weekIds = weekIdsByPhase.get(phase.id) ?? new Set();
+        {phases.map((phase) => {
+          const weekIds = weekIdsByPhase.get(phase.id as TrainingPhaseId) ?? new Set();
           const phaseWorkouts = workouts.filter((w) => w.training_week_id && weekIds.has(w.training_week_id));
           const stats = summarizePhase(phaseWorkouts);
           return <PhaseCard key={phase.id} phase={phase} stats={stats} />;

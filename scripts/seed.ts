@@ -15,6 +15,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { SEED_RACES, SEED_WEEKS, SEED_WORKOUTS } from "../src/lib/training/plan-data";
+import { PHASES } from "../src/lib/training/phases";
 import { dayOfWeekLabel } from "../src/lib/training/dates";
 import type { Database } from "../src/lib/supabase/database.types";
 
@@ -55,6 +56,12 @@ async function main() {
   await supabase.from("workouts").delete().eq("user_id", user.id);
   await supabase.from("training_weeks").delete().eq("user_id", user.id);
   await supabase.from("races").delete().eq("user_id", user.id);
+  // Note: training_phases is app-managed (not seeded), but clear user's phases if reseeding
+  try {
+    await supabase.from("training_phases").delete().eq("user_id", user.id);
+  } catch {
+    // Table may not exist yet; that's ok, phases will fall back to hardcoded values
+  }
 
   const raceIdByKey = new Map<string, string>();
   for (const race of SEED_RACES) {
@@ -77,6 +84,27 @@ async function main() {
     raceIdByKey.set(race.key, data.id);
   }
   console.log(`  inserted ${SEED_RACES.length} races`);
+
+  // Seed training phases (if table exists)
+  try {
+    for (const phase of PHASES) {
+      await supabase.from("training_phases").upsert(
+        {
+          id: phase.id,
+          user_id: user.id,
+          label: phase.label,
+          description: phase.description,
+          start_date: phase.startDate,
+          end_date: phase.endDate,
+        },
+        { onConflict: "id,user_id" },
+      );
+    }
+    console.log(`  inserted ${PHASES.length} training phases`);
+  } catch (error) {
+    // training_phases table may not exist; that's fine, phases will use hardcoded values
+    console.log("  (skipped training phases — table may not exist yet)");
+  }
 
   const weekIdByKey = new Map<string, string>();
   for (const week of SEED_WEEKS) {

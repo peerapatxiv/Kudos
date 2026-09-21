@@ -8,10 +8,12 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { WorkoutLogger } from "@/components/workouts/workout-logger";
 import { WorkoutDetailContent } from "@/components/workouts/workout-detail-content";
 import { workoutTypeMeta } from "@/components/workouts/workout-meta";
+import { QuickAddWorkoutDialog } from "@/components/calendar/quick-add-workout-dialog";
 import type { Workout, WorkoutWithIntervals, Race } from "@/lib/training/types";
 import type { PhaseDefinition } from "@/lib/training/phases";
-import { CheckCircle2, PlayCircle } from "lucide-react";
-import { fetchWorkoutDetails } from "@/lib/training/actions";
+import { CheckCircle2, PlayCircle, Plus } from "lucide-react";
+import { fetchWorkoutDetails, createQuickWorkout } from "@/lib/training/actions";
+import { todayIso } from "@/lib/training/dates";
 
 export function TodayWorkoutCard({
   workout,
@@ -26,14 +28,42 @@ export function TodayWorkoutCard({
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [detailsData, setDetailsData] = useState<any>(null);
   const [detailRaces, setDetailRaces] = useState<Race[]>(availableRaces);
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
+  const today = todayIso();
 
   if (!workout) {
     return (
-      <Card>
-        <CardContent className="pt-5">
-          <p className="text-sm text-muted">No workout scheduled for today. Enjoy the day off.</p>
-        </CardContent>
-      </Card>
+      <>
+        <Card>
+          <CardContent className="pt-5 space-y-4">
+            <div>
+              <h2 className="text-xl font-semibold text-foreground">No workout scheduled</h2>
+              <p className="mt-1 text-sm text-muted">Add an activity or enjoy the day off.</p>
+            </div>
+            <Button
+              variant="primary"
+              className="w-full"
+              onClick={() => setQuickAddOpen(true)}
+            >
+              <Plus className="h-4 w-4" />
+              Add activity for today
+            </Button>
+          </CardContent>
+        </Card>
+
+        <QuickAddWorkoutDialog
+          date={today}
+          open={quickAddOpen}
+          onOpenChange={setQuickAddOpen}
+          onSubmit={async (data) => {
+            const result = await createQuickWorkout(data);
+            if (!result.ok) {
+              alert("Failed to add workout: " + result.error);
+            }
+            setQuickAddOpen(false);
+          }}
+        />
+      </>
     );
   }
 
@@ -109,6 +139,14 @@ export function TodayWorkoutCard({
                 Start Workout
               </Button>
             )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setQuickAddOpen(true)}
+              title="Add another activity for today"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -127,6 +165,19 @@ export function TodayWorkoutCard({
           </DialogContent>
         </Dialog>
       )}
+
+      <QuickAddWorkoutDialog
+        date={today}
+        open={quickAddOpen}
+        onOpenChange={setQuickAddOpen}
+        onSubmit={async (data) => {
+          const result = await createQuickWorkout(data);
+          if (!result.ok) {
+            alert("Failed to add workout: " + result.error);
+          }
+          setQuickAddOpen(false);
+        }}
+      />
     </>
   );
 }

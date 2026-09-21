@@ -43,7 +43,7 @@ export function PhaseCard({
             <div className="flex items-center justify-between gap-3">
               <span
                 className={cn(
-                  "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide",
+                  "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide",
                   PHASE_COLORS[(phase.color as PhaseColor) || "rest"],
                 )}
               >
@@ -57,7 +57,7 @@ export function PhaseCard({
           </div>
 
           {stats && (
-            <div className="grid grid-cols-3 gap-2 pt-1">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
               <Stat label="Planned" value={`${stats.totalPlannedKm} km`} />
               <Stat label="Workouts" value={String(stats.workoutCount)} />
               <Stat label="Long run" value={stats.longRunKm ? `${stats.longRunKm} km` : "—"} />
@@ -97,7 +97,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-md bg-surface-2/60 py-1.5 px-2">
       <p className="text-xs font-semibold text-foreground tabular-nums">{value}</p>
-      <p className="text-[10px] uppercase tracking-wide text-muted">{label}</p>
+      <p className="text-xs uppercase tracking-wide text-muted">{label}</p>
     </div>
   );
 }

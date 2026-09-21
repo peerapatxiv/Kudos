@@ -51,6 +51,7 @@ export function TrainingCalendar({
   const [dragOverDate, setDragOverDate] = useState<string | null>(null);
   const [cursor, setCursor] = useState(new Date(`${initialDate}T00:00:00`));
   const [movingWorkoutId, setMovingWorkoutId] = useState<string | null>(null);
+  const [showQuickAddForSelectedDate, setShowQuickAddForSelectedDate] = useState(false);
 
   // The URL is the source of truth for which day's dialog is open, so it
   // survives back/forward navigation and deep links (e.g. from the dashboard).
@@ -306,10 +307,34 @@ export function TrainingCalendar({
                 race={selectedWorkout.race_id ? racesById.get(selectedWorkout.race_id) ?? null : null}
                 availableRaces={Array.from(racesById.values())}
               />
+              {selectedDate && (
+                <div className="pt-2 border-t border-border">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => setShowQuickAddForSelectedDate(true)}
+                  >
+                    Add another workout
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </DialogContent>
       </Dialog>
+
+      <QuickAddWorkoutDialog
+        date={showQuickAddForSelectedDate && selectedDate ? selectedDate : ""}
+        open={showQuickAddForSelectedDate}
+        onOpenChange={(open) => !open && setShowQuickAddForSelectedDate(false)}
+        onSubmit={async (data) => {
+          const result = await createQuickWorkout(data);
+          if (!result.ok) {
+            alert("Failed to add workout: " + result.error);
+          }
+          setShowQuickAddForSelectedDate(false);
+        }}
+      />
     </div>
   );
 }

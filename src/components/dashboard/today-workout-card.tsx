@@ -41,10 +41,10 @@ export function TodayWorkoutCard({
           </div>
           <Button
             variant="primary"
-            className="w-full h-10"
+            className="w-full h-11 text-base font-semibold"
             onClick={() => setQuickAddOpen(true)}
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-5 w-5" />
             Add activity
           </Button>
         </div>
@@ -143,12 +143,11 @@ export function TodayWorkoutCard({
           )}
           <Button
             variant="outline"
-            size="icon"
-            className="h-10 w-10"
+            className="h-10 px-3 hover:bg-foreground/5 hover:border-foreground/30 transition-all"
             onClick={() => setQuickAddOpen(true)}
             title="Add another activity for today"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-5 w-5" />
           </Button>
         </div>
       </div>

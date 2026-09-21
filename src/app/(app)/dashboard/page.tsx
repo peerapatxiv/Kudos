@@ -109,7 +109,9 @@ export default async function DashboardPage() {
 
       {/* Key Metrics */}
       {latestBodyMetric && (
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="space-y-4">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Key metrics</h2>
+          <div className="grid gap-4 sm:grid-cols-3">
           <Card>
             <CardContent className="pt-5">
               <p className="text-3xl font-bold text-foreground">{latestBodyMetric.resting_hr ?? "—"}</p>
@@ -128,6 +130,7 @@ export default async function DashboardPage() {
               <p className="mt-1 text-xs uppercase tracking-wide text-muted">VO2 Max</p>
             </CardContent>
           </Card>
+          </div>
         </div>
       )}
 

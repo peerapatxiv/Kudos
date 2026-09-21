@@ -94,6 +94,7 @@ async function main() {
       description: phase.description,
       start_date: phase.startDate,
       end_date: phase.endDate,
+      color: phase.color || "rest",
     }));
 
     // @ts-ignore - training_phases table may not exist in types

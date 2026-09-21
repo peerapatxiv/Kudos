@@ -173,6 +173,7 @@ export async function getPhases(): Promise<QueryResult<PhaseDefinition[]>> {
         startDate: row.start_date,
         endDate: row.end_date,
         description: row.description || "",
+        color: row.color || "rest",
       }));
       return { status: "ok", data: dbPhases };
     }

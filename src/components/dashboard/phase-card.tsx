@@ -1,7 +1,12 @@
+"use client";
+
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { EditPhaseDialog } from "@/components/phases/edit-phase-dialog";
 import type { PhaseDefinition } from "@/lib/training/phases";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { PencilLine } from "lucide-react";
 
 const PHASE_TONE: Record<string, string> = {
   lead_in: "bg-rest/15 text-rest",
@@ -20,12 +25,13 @@ export function PhaseCard({
   phase: PhaseDefinition;
   stats?: { totalPlannedKm: number; workoutCount: number; longRunKm: number | null };
 }) {
+  const [editOpen, setEditOpen] = useState(false);
 
   return (
     <>
-      <Card>
+      <Card className="cursor-pointer hover:border-foreground/30 transition-colors group" onClick={() => setEditOpen(true)}>
         <CardContent className="pt-5 space-y-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <span
               className={cn(
                 "rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide",
@@ -34,10 +40,13 @@ export function PhaseCard({
             >
               {phase.label}
             </span>
-            <span className="text-xs text-muted">
-              {format(new Date(`${phase.startDate}T00:00:00`), "MMM d")} –{" "}
-              {format(new Date(`${phase.endDate}T00:00:00`), "MMM d")}
-            </span>
+            <div className="flex items-center gap-2 min-w-fit">
+              <span className="text-xs text-muted">
+                {format(new Date(`${phase.startDate}T00:00:00`), "MMM d")} –{" "}
+                {format(new Date(`${phase.endDate}T00:00:00`), "MMM d")}
+              </span>
+              <PencilLine className="h-4 w-4 text-muted opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+            </div>
           </div>
           <p className="text-sm text-muted">{phase.description}</p>
           {stats && (
@@ -49,6 +58,8 @@ export function PhaseCard({
           )}
         </CardContent>
       </Card>
+
+      <EditPhaseDialog phase={phase} open={editOpen} onOpenChange={setEditOpen} />
     </>
   );
 }

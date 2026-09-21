@@ -73,41 +73,71 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6 animate-fade-in-up">
+      {/* Header */}
       <div>
         <p className="text-xs font-medium uppercase tracking-wide text-muted">
           {format(new Date(`${today}T00:00:00`), "EEEE, MMMM d, yyyy")}
         </p>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
           {phase ? phase.label : "Training"}
         </h1>
       </div>
 
-      <TodayWorkoutCard workout={todayWorkout} phase={phase} />
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        {aRace && <RaceDetailDialog race={aRace} />}
-        {secondaryRace && <RaceDetailDialog race={secondaryRace} />}
+      {/* Today's Focus */}
+      <div className="space-y-4">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Today</h2>
+        <TodayWorkoutCard workout={todayWorkout} phase={phase} />
       </div>
 
-      {currentWeek && <WeeklySummary week={currentWeek} stats={weekStats} />}
-
-      <BodyMetricsSummary metric={latestBodyMetric} profile={profile} />
-
-      {upcoming.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Next up</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <UpcomingList workouts={upcoming} />
-          </CardContent>
-        </Card>
+      {/* Key Races */}
+      {(aRace || secondaryRace) && (
+        <div className="space-y-4">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Target races</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {aRace && <RaceDetailDialog race={aRace} />}
+            {secondaryRace && <RaceDetailDialog race={secondaryRace} />}
+          </div>
+        </div>
       )}
 
-      <HrZoneCard maxHr={latestBodyMetric?.resting_hr ?? null} />
+      {/* Weekly Progress */}
+      {currentWeek && (
+        <div className="space-y-4">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">This week</h2>
+          <WeeklySummary week={currentWeek} stats={weekStats} />
+        </div>
+      )}
 
-      <PaceZoneCard />
+      {/* Training Data */}
+      <div className="space-y-4">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Training zones</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <HrZoneCard maxHr={latestBodyMetric?.resting_hr ?? null} />
+          <PaceZoneCard />
+        </div>
+      </div>
 
+      {/* Body Metrics */}
+      {latestBodyMetric && (
+        <div className="space-y-4">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Body metrics</h2>
+          <BodyMetricsSummary metric={latestBodyMetric} profile={profile} />
+        </div>
+      )}
+
+      {/* Upcoming */}
+      {upcoming.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Next 5 days</h2>
+          <Card>
+            <CardContent className="pt-5">
+              <UpcomingList workouts={upcoming} />
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Footer */}
       <p className="text-center text-xs text-muted">
         <Link href="/plan" className="underline underline-offset-2">
           View the full training plan

@@ -10,6 +10,7 @@ import { UpcomingList } from "@/components/dashboard/upcoming-list";
 import { BodyMetricsSummary } from "@/components/dashboard/body-metrics-summary";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PaceZoneCard } from "@/components/pace/pace-zone-card";
+import { HrZoneCard } from "@/components/training/hr-zone-card";
 import { todayIso } from "@/lib/training/dates";
 import { phaseForDate } from "@/lib/training/phases";
 import { summarizeWeek } from "@/lib/training/aggregate";
@@ -102,6 +103,8 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       )}
+
+      <HrZoneCard maxHr={latestBodyMetric?.resting_hr ?? null} />
 
       <PaceZoneCard />
 

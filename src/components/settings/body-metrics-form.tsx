@@ -10,11 +10,11 @@ import type { BodyMetric } from "@/lib/training/types";
 import { todayIso } from "@/lib/training/dates";
 import { CheckCircle2 } from "lucide-react";
 
-/** Weight/resting HR/VO2max change rarely, so this saves an update as-of today rather than
+/** Weight/max HR/VO2max change rarely, so this saves an update as-of today rather than
  * demanding a fresh entry every day — `latest` pre-fills with whatever was last logged. */
 export function BodyMetricsForm({ latest }: { latest: BodyMetric | null }) {
   const [weight, setWeight] = useState(latest?.weight_kg != null ? String(latest.weight_kg) : "");
-  const [restingHr, setRestingHr] = useState(latest?.resting_hr != null ? String(latest.resting_hr) : "");
+  const [maxHr, setMaxHr] = useState(latest?.resting_hr != null ? String(latest.resting_hr) : "");
   const [vo2max, setVo2max] = useState(latest?.vo2max != null ? String(latest.vo2max) : "");
   const [notes, setNotes] = useState(latest?.notes ?? "");
   const [pending, startTransition] = useTransition();
@@ -31,10 +31,10 @@ export function BodyMetricsForm({ latest }: { latest: BodyMetric | null }) {
         return;
       }
 
-      const trimmedHr = restingHr.trim();
-      const restingHrValue = trimmedHr === "" ? null : Number(trimmedHr);
-      if (restingHrValue !== null && Number.isNaN(restingHrValue)) {
-        setError("Enter a valid resting HR, or leave it blank.");
+      const trimmedHr = maxHr.trim();
+      const maxHrValue = trimmedHr === "" ? null : Number(trimmedHr);
+      if (maxHrValue !== null && Number.isNaN(maxHrValue)) {
+        setError("Enter a valid max HR, or leave it blank.");
         return;
       }
 
@@ -48,7 +48,7 @@ export function BodyMetricsForm({ latest }: { latest: BodyMetric | null }) {
       const result = await upsertBodyMetric({
         date: todayIso(),
         weightKg,
-        restingHr: restingHrValue,
+        restingHr: maxHrValue,
         vo2max: vo2maxValue,
         notes: notes || null,
       });
@@ -80,13 +80,13 @@ export function BodyMetricsForm({ latest }: { latest: BodyMetric | null }) {
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="resting-hr">Resting HR</Label>
+            <Label htmlFor="max-hr">Max HR</Label>
             <Input
-              id="resting-hr"
+              id="max-hr"
               inputMode="numeric"
-              value={restingHr}
-              onChange={(e) => setRestingHr(e.target.value)}
-              placeholder="52"
+              value={maxHr}
+              onChange={(e) => setMaxHr(e.target.value)}
+              placeholder="180"
             />
           </div>
           <div className="space-y-1.5">

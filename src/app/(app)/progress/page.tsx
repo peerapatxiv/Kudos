@@ -7,13 +7,13 @@ import {
   CompletionChart,
   LongRunChart,
   PaceChart,
-  RestingHrChart,
+  MaxHrChart,
   Vo2MaxChart,
   WeeklyMileageChart,
   WeightChart,
   type LongRunPoint,
   type PacePoint,
-  type RestingHrPoint,
+  type MaxHrPoint,
   type Vo2MaxPoint,
   type WeeklyMileagePoint,
   type WeightPoint,
@@ -82,9 +82,9 @@ export default async function ProgressPage() {
   const weightPoints: WeightPoint[] = bodyMetrics
     .filter((m) => m.weight_kg != null)
     .map((m) => ({ date: m.date, label: format(new Date(`${m.date}T00:00:00`), "MMM d"), weightKg: m.weight_kg! }));
-  const restingHrPoints: RestingHrPoint[] = bodyMetrics
+  const maxHrPoints: MaxHrPoint[] = bodyMetrics
     .filter((m) => m.resting_hr != null)
-    .map((m) => ({ date: m.date, label: format(new Date(`${m.date}T00:00:00`), "MMM d"), restingHr: m.resting_hr! }));
+    .map((m) => ({ date: m.date, label: format(new Date(`${m.date}T00:00:00`), "MMM d"), maxHr: m.resting_hr! }));
   const vo2maxPoints: Vo2MaxPoint[] = bodyMetrics
     .filter((m) => m.vo2max != null)
     .map((m) => ({ date: m.date, label: format(new Date(`${m.date}T00:00:00`), "MMM d"), vo2max: m.vo2max! }));
@@ -123,7 +123,7 @@ export default async function ProgressPage() {
 
       {weightPoints.length > 0 && <WeightChart data={weightPoints} />}
 
-      {restingHrPoints.length > 0 && <RestingHrChart data={restingHrPoints} />}
+      {maxHrPoints.length > 0 && <MaxHrChart data={maxHrPoints} />}
 
       {bestVo2maxEstimate && (
         <Card>

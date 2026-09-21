@@ -13,7 +13,7 @@ export function BodyMetricsSummary({ metric, profile }: { metric: BodyMetric | n
     metric?.weight_kg != null && { label: "Weight", value: `${metric.weight_kg} kg` },
     heightCm != null && { label: "Height", value: `${heightCm} cm` },
     bmi != null && { label: "BMI", value: bmi.toFixed(1) },
-    metric?.resting_hr != null && { label: "Resting HR", value: `${metric.resting_hr} bpm` },
+    metric?.resting_hr != null && { label: "Max HR", value: `${metric.resting_hr} bpm` },
     metric?.vo2max != null && { label: "VO2max", value: String(metric.vo2max) },
   ].filter((s): s is { label: string; value: string } => s !== false);
 

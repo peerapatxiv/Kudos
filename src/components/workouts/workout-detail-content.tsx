@@ -18,10 +18,12 @@ export function WorkoutDetailContent({
   workout,
   intervals,
   race,
+  availableRaces = [],
 }: {
   workout: Workout;
   intervals: WorkoutInterval[];
   race: Race | null;
+  availableRaces?: Race[];
 }) {
   const [loggerOpen, setLoggerOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -147,8 +149,11 @@ export function WorkoutDetailContent({
           <EditWorkoutDialog
             key={workout.completed ? "completed" : "planned"}
             workout={workout}
+            intervals={intervals}
+            race={race}
             open={editOpen}
             onOpenChange={setEditOpen}
+            availableRaces={availableRaces}
           />
         </>
       )}

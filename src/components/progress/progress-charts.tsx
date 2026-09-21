@@ -189,18 +189,18 @@ export function WeightChart({ data }: { data: WeightPoint[] }) {
   );
 }
 
-export interface RestingHrPoint {
+export interface MaxHrPoint {
   date: string;
   label: string;
-  restingHr: number;
+  maxHr: number;
 }
 
-export function RestingHrChart({ data }: { data: RestingHrPoint[] }) {
+export function MaxHrChart({ data }: { data: MaxHrPoint[] }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Resting Heart Rate</CardTitle>
-        <CardDescription>Logged resting HR over time.</CardDescription>
+        <CardTitle>Max Heart Rate</CardTitle>
+        <CardDescription>Logged max HR over time.</CardDescription>
       </CardHeader>
       <CardContent className="h-64">
         <ResponsiveContainer width="100%" height="100%">
@@ -208,8 +208,8 @@ export function RestingHrChart({ data }: { data: RestingHrPoint[] }) {
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
             <XAxis dataKey="label" tick={AXIS_STYLE} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
             <YAxis tick={AXIS_STYLE} axisLine={false} tickLine={false} unit="bpm" domain={["dataMin - 2", "dataMax + 2"]} />
-            <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v) => [`${v} bpm`, "Resting HR"]} />
-            <Line type="monotone" dataKey="restingHr" stroke="var(--interval)" strokeWidth={2} dot={{ r: 3 }} />
+            <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v) => [`${v} bpm`, "Max HR"]} />
+            <Line type="monotone" dataKey="maxHr" stroke="var(--interval)" strokeWidth={2} dot={{ r: 3 }} />
           </LineChart>
         </ResponsiveContainer>
       </CardContent>

@@ -388,3 +388,358 @@ export async function editCompletedWorkout(input: EditCompletedWorkoutInput): Pr
   revalidatePath("/progress");
   return { ok: true };
 }
+
+export async function fetchWorkoutDetails(date: string): Promise<{ status: "ok" | "error"; data?: any; races?: any[]; message?: string }> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { status: "error", message: "Supabase is not configured." };
+
+  const [workoutResult, racesResult] = await Promise.all([
+    supabase
+      .from("workouts")
+      .select("*, workout_intervals(*), race:races(*)")
+      .eq("date", date)
+      .maybeSingle(),
+    supabase.from("races").select("*"),
+  ]);
+
+  if (workoutResult.error) return { status: "error", message: workoutResult.error.message };
+
+  return { status: "ok", data: workoutResult.data, races: racesResult.data || [] };
+}
+
+export interface UpdateWorkoutMetadataInput {
+  workoutId: string;
+  title?: string;
+  workoutType?: string;
+  distanceKm?: number | null;
+  targetPaceMinSecPerKm?: string | null;
+  notes?: string | null;
+}
+
+export async function updateWorkoutMetadata(input: UpdateWorkoutMetadataInput): Promise<ActionResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const { error } = await supabase
+    .from("workouts")
+    .update({
+      title: input.title,
+      workout_type: input.workoutType,
+      distance_km: input.distanceKm ?? null,
+      target_pace_min_sec_per_km: input.targetPaceMinSecPerKm ?? null,
+      notes: input.notes ?? null,
+    })
+    .eq("id", input.workoutId)
+    .eq("user_id", user.id);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/dashboard");
+  revalidatePath("/calendar");
+  revalidatePath("/plan");
+  return { ok: true };
+}
+
+export interface CreateWorkoutIntervalInput {
+  workoutId: string;
+  intervalNumber: number;
+  distanceM: number;
+  targetPaceSecondsPerKm?: number | null;
+  recoverySeconds?: number | null;
+  recoveryType?: string | null;
+}
+
+export async function createWorkoutInterval(input: CreateWorkoutIntervalInput): Promise<ActionResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const { error } = await supabase.from("workout_intervals").insert([
+    {
+      workout_id: input.workoutId,
+      interval_number: input.intervalNumber,
+      distance_m: input.distanceM,
+      target_pace_seconds_per_km: input.targetPaceSecondsPerKm ?? null,
+      recovery_seconds: input.recoverySeconds ?? null,
+      recovery_type: input.recoveryType ?? null,
+    },
+  ]);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/dashboard");
+  revalidatePath("/calendar");
+  return { ok: true };
+}
+
+export interface UpdateWorkoutIntervalInput {
+  intervalId: string;
+  distanceM?: number;
+  targetPaceSecondsPerKm?: number | null;
+  recoverySeconds?: number | null;
+  recoveryType?: string | null;
+}
+
+export async function updateWorkoutInterval(input: UpdateWorkoutIntervalInput): Promise<ActionResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const { error } = await supabase
+    .from("workout_intervals")
+    .update({
+      distance_m: input.distanceM,
+      target_pace_seconds_per_km: input.targetPaceSecondsPerKm ?? null,
+      recovery_seconds: input.recoverySeconds ?? null,
+      recovery_type: input.recoveryType ?? null,
+    })
+    .eq("id", input.intervalId);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/dashboard");
+  revalidatePath("/calendar");
+  return { ok: true };
+}
+
+export async function deleteWorkoutInterval(intervalId: string): Promise<ActionResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const { error } = await supabase.from("workout_intervals").delete().eq("id", intervalId);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/dashboard");
+  revalidatePath("/calendar");
+  return { ok: true };
+}
+
+export interface LinkWorkoutRaceInput {
+  workoutId: string;
+  raceId: string;
+}
+
+export async function linkWorkoutRace(input: LinkWorkoutRaceInput): Promise<ActionResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const { error } = await supabase
+    .from("workouts")
+    .update({ race_id: input.raceId })
+    .eq("id", input.workoutId)
+    .eq("user_id", user.id);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/dashboard");
+  revalidatePath("/calendar");
+  return { ok: true };
+}
+
+export async function unlinkWorkoutRace(workoutId: string): Promise<ActionResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const { error } = await supabase
+    .from("workouts")
+    .update({ race_id: null })
+    .eq("id", workoutId)
+    .eq("user_id", user.id);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/dashboard");
+  revalidatePath("/calendar");
+  return { ok: true };
+}
+
+export interface UpdatePhaseInput {
+  id: string;
+  label: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+}
+
+export async function updatePhase(input: UpdatePhaseInput): Promise<ActionResult> {
+  // Phase editing requires the training_phases table in Supabase.
+  // To enable this, create the table with:
+  // CREATE TABLE public.training_phases (
+  //   id TEXT PRIMARY KEY,
+  //   label TEXT NOT NULL,
+  //   description TEXT,
+  //   start_date DATE NOT NULL,
+  //   end_date DATE NOT NULL
+  // );
+
+  try {
+    const supabase = await getSupabaseServerClient();
+    if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+    const updateResponse = await supabase
+      .from("training_phases")
+      // @ts-ignore - training_phases table typing
+      .update({
+        label: input.label,
+        description: input.description,
+        start_date: input.startDate,
+        end_date: input.endDate,
+      })
+      .eq("id", input.id);
+
+    const error = updateResponse.error;
+
+    if (error) {
+      // If table doesn't exist, return friendly error
+      if (error.message?.includes("does not exist")) {
+        return {
+          ok: false,
+          error: "Phase editing is not available yet. To enable it, create the training_phases table in Supabase."
+        };
+      }
+      return { ok: false, error: error.message };
+    }
+
+    revalidatePath("/plan");
+    revalidatePath("/dashboard");
+    revalidatePath("/calendar");
+    return { ok: true };
+  } catch (err) {
+    return {
+      ok: false,
+      error: "Phase editing is not available. Edit phases in src/lib/training/phases.ts directly."
+    };
+  }
+}
+
+export interface CreateQuickWorkoutInput {
+  date: string;
+  title: string;
+  workoutType: string;
+  distanceKm?: number | null;
+}
+
+export async function createQuickWorkout(input: CreateQuickWorkoutInput): Promise<ActionResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const { error } = await supabase.from("workouts").insert([
+    {
+      user_id: user.id,
+      date: input.date,
+      title: input.title,
+      workout_type: input.workoutType,
+      distance_km: input.distanceKm ?? null,
+      is_rest_day: false,
+      is_race: false,
+      completed: false,
+      status: "planned",
+      day_of_week: new Date(`${input.date}T00:00:00`).toLocaleDateString("en-US", { weekday: "long" }),
+    },
+  ]);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/calendar");
+  revalidatePath("/dashboard");
+  revalidatePath("/plan");
+  return { ok: true };
+}
+
+export async function deleteWorkout(workoutId: string): Promise<ActionResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const { error } = await supabase
+    .from("workouts")
+    .delete()
+    .eq("id", workoutId)
+    .eq("user_id", user.id);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/calendar");
+  revalidatePath("/dashboard");
+  revalidatePath("/plan");
+  return { ok: true };
+}
+
+export interface CreatePhaseInput {
+  id: string;
+  label: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+}
+
+export async function createPhase(input: CreatePhaseInput): Promise<ActionResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const { error } = await supabase.from("training_phases").insert({
+    id: input.id,
+    user_id: user.id,
+    label: input.label,
+    description: input.description,
+    start_date: input.startDate,
+    end_date: input.endDate,
+  });
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/plan");
+  revalidatePath("/dashboard");
+  revalidatePath("/calendar");
+  return { ok: true };
+}
+
+export async function deletePhase(phaseId: string): Promise<ActionResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const { error } = await supabase
+    .from("training_phases")
+    .delete()
+    .eq("id", phaseId)
+    .eq("user_id", user.id);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/plan");
+  revalidatePath("/dashboard");
+  return { ok: true };
+}

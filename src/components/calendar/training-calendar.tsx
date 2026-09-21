@@ -21,6 +21,8 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/shared/empty-state";
 import { WorkoutDetailContent } from "@/components/workouts/workout-detail-content";
+import { QuickAddWorkoutDialog } from "@/components/calendar/quick-add-workout-dialog";
+import { createQuickWorkout } from "@/lib/training/actions";
 import { workoutTypeMeta } from "@/components/workouts/workout-meta";
 import type { Race, Workout, WorkoutInterval } from "@/lib/training/types";
 import { todayIso } from "@/lib/training/dates";
@@ -44,6 +46,7 @@ export function TrainingCalendar({
 
   const initialDate = searchParams.get("date") ?? today;
   const [view, setView] = useState<View>("month");
+  const [quickAddDate, setQuickAddDate] = useState<string | null>(null);
   const [cursor, setCursor] = useState(new Date(`${initialDate}T00:00:00`));
 
   // The URL is the source of truth for which day's dialog is open, so it
@@ -158,9 +161,9 @@ export function TrainingCalendar({
           return (
             <button
               key={iso}
-              onClick={() => workout && selectDate(iso)}
-              disabled={!workout}
+              onClick={() => workout ? selectDate(iso) : setQuickAddDate(iso)}
               className={cn(
+                !workout && "cursor-pointer hover:border-foreground/30",
                 "flex flex-col items-center gap-1 rounded-lg border p-1.5 text-center transition-colors",
                 view === "week" ? "min-h-24" : "min-h-16",
                 inMonth ? "bg-surface" : "bg-surface/40 opacity-40",
@@ -194,6 +197,18 @@ export function TrainingCalendar({
         })}
       </div>
 
+      <QuickAddWorkoutDialog
+        date={quickAddDate ?? ""}
+        open={!!quickAddDate}
+        onOpenChange={(open) => !open && setQuickAddDate(null)}
+        onSubmit={async (data) => {
+          const result = await createQuickWorkout(data);
+          if (!result.ok) {
+            alert("Failed to add workout: " + result.error);
+          }
+        }}
+      />
+
       <Dialog open={!!selectedWorkout} onOpenChange={(open) => !open && closeDialog()}>
         <DialogContent>
           {selectedWorkout && (
@@ -201,6 +216,7 @@ export function TrainingCalendar({
               workout={selectedWorkout}
               intervals={intervalsByWorkout.get(selectedWorkout.id) ?? []}
               race={selectedWorkout.race_id ? racesById.get(selectedWorkout.race_id) ?? null : null}
+              availableRaces={Array.from(racesById.values())}
             />
           )}
         </DialogContent>

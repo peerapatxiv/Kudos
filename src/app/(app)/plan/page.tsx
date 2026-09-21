@@ -1,10 +1,12 @@
-import { getAllWorkouts, getTrainingWeeks } from "@/lib/training/queries";
+import { getAllWorkouts, getTrainingWeeks, getLatestBodyMetric } from "@/lib/training/queries";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { SupabaseNotConfigured } from "@/components/shared/error-state";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PhaseCard } from "@/components/dashboard/phase-card";
 import { PACE_ZONES } from "@/lib/training/pace-zones";
 import { PaceZoneCard } from "@/components/pace/pace-zone-card";
+import { HrZoneCard } from "@/components/training/hr-zone-card";
+import { AdaptiveZonesCard } from "@/components/training/adaptive-zones-card";
 import { PHASES } from "@/lib/training/phases";
 import { summarizePhase } from "@/lib/training/aggregate";
 import type { TrainingPhaseId } from "@/lib/training/types";
@@ -12,7 +14,11 @@ import type { TrainingPhaseId } from "@/lib/training/types";
 export default async function PlanPage() {
   if (!isSupabaseConfigured) return <SupabaseNotConfigured />;
 
-  const [weeksResult, workoutsResult] = await Promise.all([getTrainingWeeks(), getAllWorkouts()]);
+  const [weeksResult, workoutsResult, latestBodyMetric] = await Promise.all([
+    getTrainingWeeks(),
+    getAllWorkouts(),
+    getLatestBodyMetric(),
+  ]);
 
   if (weeksResult.status !== "ok" || workoutsResult.status !== "ok") {
     return <EmptyState title="Couldn't load the training plan" description="Refresh to try again." />;
@@ -22,6 +28,10 @@ export default async function PlanPage() {
   const workouts = workoutsResult.data;
 
   const weekIdsByPhase = new Map<TrainingPhaseId, Set<string>>();
+  const recentRaces = workouts
+    .filter((w) => w.is_race && w.completed && w.actual_distance_km != null && w.actual_time_seconds != null)
+    .sort((a, b) => (b.date > a.date ? 1 : -1))
+    .slice(0, 1);
   for (const week of weeks) {
     if (!weekIdsByPhase.has(week.phase)) weekIdsByPhase.set(week.phase, new Set());
     weekIdsByPhase.get(week.phase)!.add(week.id);
@@ -42,6 +52,10 @@ export default async function PlanPage() {
           return <PhaseCard key={phase.id} phase={phase} stats={stats} />;
         })}
       </div>
+
+      <AdaptiveZonesCard recentRaces={recentRaces} />
+
+      <HrZoneCard maxHr={latestBodyMetric?.resting_hr ?? null} />
 
       <PaceZoneCard />
 

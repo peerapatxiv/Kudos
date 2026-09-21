@@ -19,6 +19,8 @@ export const WORKOUT_TYPE_META: Record<WorkoutType, WorkoutTypeMeta> = {
   recovery: { label: "Recovery", icon: Leaf, badgeVariant: "recovery", colorVar: "var(--recovery)" },
 };
 
+export const WORKOUT_TYPES: WorkoutType[] = ["easy", "tempo", "interval", "long_run", "rest", "race", "recovery"];
+
 export function workoutTypeMeta(type: WorkoutType): WorkoutTypeMeta {
   return WORKOUT_TYPE_META[type] ?? WORKOUT_TYPE_META.easy;
 }

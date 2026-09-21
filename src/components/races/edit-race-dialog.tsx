@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ConfirmationDialog } from "@/components/shared/confirmation-dialog";
 import { deleteRace, updateRace } from "@/lib/training/actions";
 import { formatDuration, parseDurationToSeconds, paceTextToSeconds, secondsToPaceText } from "@/lib/training/pace";
 import type { Race, RacePriority } from "@/lib/training/types";
@@ -26,24 +27,7 @@ export function EditRaceDialog({ race }: { race: Race }) {
   const [notes, setNotes] = useState(race.notes ?? "");
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [confirmingDelete, setConfirmingDelete] = useState(false);
-
-  function handleDelete() {
-    if (!confirmingDelete) {
-      setConfirmingDelete(true);
-      return;
-    }
-    setError(null);
-    startTransition(async () => {
-      const result = await deleteRace(race.id);
-      if (!result.ok) {
-        setError(result.error ?? "Could not delete this race.");
-        setConfirmingDelete(false);
-        return;
-      }
-      setOpen(false);
-    });
-  }
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   function handleSave() {
     setError(null);
@@ -102,13 +86,7 @@ export function EditRaceDialog({ race }: { race: Race }) {
       <Button variant="outline" size="icon" onClick={() => setOpen(true)} title="Edit race">
         <PencilLine className="h-4 w-4" />
       </Button>
-      <Dialog
-        open={open}
-        onOpenChange={(next) => {
-          setOpen(next);
-          if (!next) setConfirmingDelete(false);
-        }}
-      >
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit race</DialogTitle>
@@ -191,23 +169,37 @@ export function EditRaceDialog({ race }: { race: Race }) {
               <Button variant="outline" className="flex-1" onClick={() => setOpen(false)} disabled={pending}>
                 Cancel
               </Button>
+              <Button
+                variant="destructive"
+                size="icon"
+                onClick={() => setShowDeleteConfirm(true)}
+                disabled={pending}
+                title="Delete this race"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
               <Button variant="primary" className="flex-1" onClick={handleSave} disabled={pending}>
                 {pending ? "Saving…" : "Save changes"}
               </Button>
             </div>
-
-            <Button
-              variant="outline"
-              className="w-full text-danger hover:bg-danger/5"
-              onClick={handleDelete}
-              disabled={pending}
-            >
-              <Trash2 className="h-4 w-4" />
-              {pending ? "Deleting…" : confirmingDelete ? "Click again to confirm delete" : "Delete race"}
-            </Button>
           </div>
         </DialogContent>
       </Dialog>
+
+      <ConfirmationDialog
+        open={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+        title="Delete race?"
+        description={`Are you sure you want to delete "${race.name}"? This action cannot be undone.`}
+        destructiveText="Delete"
+        onConfirm={async () => {
+          const result = await deleteRace(race.id);
+          if (!result.ok) {
+            throw new Error(result.error ?? "Failed to delete race");
+          }
+          setOpen(false);
+        }}
+      />
     </>
   );
 }

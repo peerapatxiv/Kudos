@@ -1,18 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { WorkoutLogger } from "@/components/workouts/workout-logger";
+import { WorkoutDetailContent } from "@/components/workouts/workout-detail-content";
 import { workoutTypeMeta } from "@/components/workouts/workout-meta";
-import type { Workout } from "@/lib/training/types";
+import type { Workout, WorkoutWithIntervals, Race } from "@/lib/training/types";
 import type { PhaseDefinition } from "@/lib/training/phases";
 import { CheckCircle2, PlayCircle } from "lucide-react";
+import { fetchWorkoutDetails } from "@/lib/training/actions";
 
-export function TodayWorkoutCard({ workout, phase }: { workout: Workout | null; phase: PhaseDefinition | null }) {
+export function TodayWorkoutCard({
+  workout,
+  phase,
+  availableRaces = [],
+}: {
+  workout: Workout | null;
+  phase: PhaseDefinition | null;
+  availableRaces?: Race[];
+}) {
   const [loggerOpen, setLoggerOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [detailsData, setDetailsData] = useState<any>(null);
+  const [detailRaces, setDetailRaces] = useState<Race[]>(availableRaces);
 
   if (!workout) {
     return (
@@ -71,11 +84,20 @@ export function TodayWorkoutCard({ workout, phase }: { workout: Workout | null; 
           {workout.notes && <p className="text-sm text-muted">{workout.notes}</p>}
 
           <div className="flex flex-col gap-2 pt-1 sm:flex-row">
-            <Link href={`/calendar?date=${workout.date}`} className="sm:flex-1">
-              <Button variant="outline" className="w-full">
-                View details
-              </Button>
-            </Link>
+            <Button
+              variant="outline"
+              className="w-full sm:flex-1"
+              onClick={async () => {
+                const result = await fetchWorkoutDetails(workout.date);
+                if (result.status === "ok" && result.data) {
+                  setDetailsData(result.data);
+                  setDetailRaces(result.races || availableRaces);
+                  setDetailsOpen(true);
+                }
+              }}
+            >
+              View details
+            </Button>
             {!workout.is_rest_day && !workout.completed && (
               <Button
                 variant="primary"
@@ -92,6 +114,19 @@ export function TodayWorkoutCard({ workout, phase }: { workout: Workout | null; 
       </Card>
 
       {!workout.is_rest_day && <WorkoutLogger workout={workout} open={loggerOpen} onOpenChange={setLoggerOpen} />}
+
+      {detailsData && (
+        <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
+          <DialogContent>
+            <WorkoutDetailContent
+              workout={detailsData}
+              intervals={detailsData.workout_intervals ?? []}
+              race={detailsData.race ?? null}
+              availableRaces={detailRaces}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 }

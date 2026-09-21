@@ -7,7 +7,6 @@ import { RaceDetailDialog } from "@/components/races/race-detail-dialog";
 import { TodayWorkoutCard } from "@/components/dashboard/today-workout-card";
 import { WeeklySummary } from "@/components/dashboard/weekly-summary";
 import { UpcomingList } from "@/components/dashboard/upcoming-list";
-import { BodyMetricsSummary } from "@/components/dashboard/body-metrics-summary";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PaceZoneCard } from "@/components/pace/pace-zone-card";
 import { HrZoneCard } from "@/components/training/hr-zone-card";
@@ -58,8 +57,7 @@ export default async function DashboardPage() {
     );
   }
 
-  const aRace = races.find((r) => r.priority === "a_race") ?? null;
-  const secondaryRace = races.find((r) => r.priority === "secondary") ?? null;
+  const upcomingRaces = races.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   const todayWorkout = workouts.find((w) => w.date === today) ?? null;
   const phase = phaseForDate(today);
@@ -90,12 +88,13 @@ export default async function DashboardPage() {
       </div>
 
       {/* Key Races */}
-      {(aRace || secondaryRace) && (
+      {upcomingRaces.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Target races</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {aRace && <RaceDetailDialog race={aRace} />}
-            {secondaryRace && <RaceDetailDialog race={secondaryRace} />}
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Upcoming races</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {upcomingRaces.map((race) => (
+              <RaceDetailDialog key={race.id} race={race} />
+            ))}
           </div>
         </div>
       )}
@@ -108,7 +107,31 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* Training Data */}
+      {/* Key Metrics */}
+      {latestBodyMetric && (
+        <div className="grid gap-4 sm:grid-cols-3">
+          <Card>
+            <CardContent className="pt-5">
+              <p className="text-3xl font-bold text-foreground">{latestBodyMetric.resting_hr ?? "—"}</p>
+              <p className="mt-1 text-xs uppercase tracking-wide text-muted">Resting HR</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-5">
+              <p className="text-3xl font-bold text-foreground">{latestBodyMetric.weight_kg ?? "—"}</p>
+              <p className="mt-1 text-xs uppercase tracking-wide text-muted">Weight (kg)</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-5">
+              <p className="text-3xl font-bold text-foreground">{latestBodyMetric.vo2max ?? "—"}</p>
+              <p className="mt-1 text-xs uppercase tracking-wide text-muted">VO2 Max</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Training Zones */}
       <div className="space-y-4">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Training zones</h2>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -117,15 +140,7 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Body Metrics */}
-      {latestBodyMetric && (
-        <div className="space-y-4">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Body metrics</h2>
-          <BodyMetricsSummary metric={latestBodyMetric} profile={profile} />
-        </div>
-      )}
-
-      {/* Upcoming */}
+{/* Upcoming */}
       {upcoming.length > 0 && (
         <div className="space-y-4">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Next 5 days</h2>

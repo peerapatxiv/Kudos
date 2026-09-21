@@ -34,11 +34,11 @@ export function TodayWorkoutCard({
   if (!workout) {
     return (
       <>
-        <Card>
-          <CardContent className="pt-5 space-y-4">
+        <Card className="border-dashed border-2">
+          <CardContent className="pt-6 space-y-4">
             <div>
-              <h2 className="text-xl font-semibold text-foreground">No workout scheduled</h2>
-              <p className="mt-1 text-sm text-muted">Add an activity or enjoy the day off.</p>
+              <h2 className="text-lg font-semibold text-foreground">No workout scheduled</h2>
+              <p className="mt-2 text-sm text-muted">Add an activity or enjoy the day off.</p>
             </div>
             <Button
               variant="primary"
@@ -73,18 +73,17 @@ export function TodayWorkoutCard({
 
   return (
     <>
-      <Card className="overflow-hidden">
-        <div className="h-1" style={{ backgroundColor: meta.colorVar }} />
-        <CardContent className="pt-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+      <Card className="overflow-hidden border-l-4" style={{ borderLeftColor: meta.colorVar }}>
+        <CardContent className="pt-6 space-y-4">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Badge variant={meta.badgeVariant}>{meta.label}</Badge>
               {isLeadIn && <Badge variant="neutral">Lead-in · controlled</Badge>}
               {isBridge && <Badge variant="recovery">Recovery bridge</Badge>}
               {workout.is_race && <Badge variant="race">Race</Badge>}
             </div>
             {workout.completed && (
-              <span className="flex items-center gap-1 text-xs font-medium text-completed">
+              <span className="flex items-center gap-1 text-xs font-medium text-completed whitespace-nowrap">
                 <CheckCircle2 className="h-3.5 w-3.5" />
                 Completed
               </span>
@@ -92,31 +91,33 @@ export function TodayWorkoutCard({
           </div>
 
           <div>
-            <h2 className="text-xl font-semibold text-foreground">
+            <h2 className="text-2xl font-bold text-foreground">
               {workout.is_rest_day ? "Rest day" : workout.title}
             </h2>
             {!workout.is_rest_day && (
-              <div className="mt-1 flex flex-wrap items-baseline gap-x-4 gap-y-1 text-sm text-muted">
-                {workout.distance_km ? (
-                  <span>
-                    <strong className="text-foreground">{workout.distance_km}</strong> km
-                  </span>
-                ) : null}
-                {workout.target_pace_min_sec_per_km ? (
-                  <span>
-                    Target <strong className="text-foreground">{workout.target_pace_min_sec_per_km}</strong>
-                  </span>
-                ) : null}
+              <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {workout.distance_km && (
+                  <div>
+                    <p className="text-lg font-semibold text-foreground">{workout.distance_km}</p>
+                    <p className="text-xs uppercase text-muted">km</p>
+                  </div>
+                )}
+                {workout.target_pace_min_sec_per_km && (
+                  <div>
+                    <p className="text-lg font-semibold text-foreground">{workout.target_pace_min_sec_per_km}</p>
+                    <p className="text-xs uppercase text-muted">Pace</p>
+                  </div>
+                )}
               </div>
             )}
           </div>
 
-          {workout.notes && <p className="text-sm text-muted">{workout.notes}</p>}
+          {workout.notes && <p className="rounded-md bg-surface-2 p-3 text-sm text-muted">{workout.notes}</p>}
 
-          <div className="flex flex-col gap-2 pt-1 sm:flex-row">
+          <div className="flex flex-col gap-2 pt-2 sm:flex-row">
             <Button
               variant="outline"
-              className="w-full sm:flex-1"
+              className="flex-1"
               onClick={async () => {
                 const result = await fetchWorkoutDetails(workout.date);
                 if (result.status === "ok" && result.data) {
@@ -131,17 +132,16 @@ export function TodayWorkoutCard({
             {!workout.is_rest_day && !workout.completed && (
               <Button
                 variant="primary"
-                size="lg"
-                className="w-full sm:flex-1 sm:w-auto"
+                className="flex-1"
                 onClick={() => setLoggerOpen(true)}
               >
                 <PlayCircle className="h-4 w-4" />
-                Start Workout
+                Start
               </Button>
             )}
             <Button
               variant="outline"
-              size="sm"
+              size="icon"
               onClick={() => setQuickAddOpen(true)}
               title="Add another activity for today"
             >

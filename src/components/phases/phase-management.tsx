@@ -111,11 +111,11 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-2xl">Create new phase</DialogTitle>
-            <DialogDescription>Define a training phase with custom dates and color</DialogDescription>
+            <DialogTitle className="text-2xl font-bold">Create new phase</DialogTitle>
+            <DialogDescription className="text-sm">Define a training phase with custom dates and color</DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-6 py-4">
+          <div className="space-y-6 py-6">
             {/* Phase basics */}
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -126,7 +126,7 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
                     value={newPhase.id}
                     onChange={(e) => setNewPhase({ ...newPhase, id: e.target.value })}
                     placeholder="e.g., base"
-                    className="h-10"
+                    className="h-10 rounded-lg"
                   />
                 </div>
                 <div className="space-y-2">
@@ -136,7 +136,7 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
                     value={newPhase.label}
                     onChange={(e) => setNewPhase({ ...newPhase, label: e.target.value })}
                     placeholder="e.g., Base building"
-                    className="h-10"
+                    className="h-10 rounded-lg"
                   />
                 </div>
               </div>
@@ -145,14 +145,14 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
             {/* Duration */}
             <div className="space-y-3">
               <Label className="text-sm font-medium">Duration</Label>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-xs font-medium text-muted-foreground">Start date</label>
                   <Input
                     type="date"
                     value={newPhase.startDate}
                     onChange={(e) => setNewPhase({ ...newPhase, startDate: e.target.value })}
-                    className="h-10 rounded-lg border border-border/50 bg-surface px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-a-race/40 focus-visible:border-transparent transition-colors"
+                    className="h-10"
                   />
                 </div>
                 <div className="space-y-2">
@@ -161,7 +161,7 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
                     type="date"
                     value={newPhase.endDate}
                     onChange={(e) => setNewPhase({ ...newPhase, endDate: e.target.value })}
-                    className="h-10 rounded-lg border border-border/50 bg-surface px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-a-race/40 focus-visible:border-transparent transition-colors"
+                    className="h-10"
                   />
                 </div>
               </div>
@@ -175,7 +175,7 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
                 value={newPhase.description}
                 onChange={(e) => setNewPhase({ ...newPhase, description: e.target.value })}
                 rows={3}
-                className="flex w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-a-race/40 resize-none"
+                className="flex w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-a-race/40 resize-none"
                 placeholder="Describe the focus of this training phase..."
               />
             </div>
@@ -187,12 +187,12 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
             {error && (
               <div className="rounded-lg bg-danger/10 border border-danger/20 p-4 flex gap-3">
                 <AlertCircle className="h-5 w-5 text-danger flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-danger">{error}</p>
+                <p className="text-sm text-danger font-medium">{error}</p>
               </div>
             )}
 
             {/* Action buttons */}
-            <div className="flex gap-3 pt-2">
+            <div className="flex gap-3 pt-4">
               <Button
                 variant="outline"
                 className="flex-1 h-10"
@@ -203,7 +203,7 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
               </Button>
               <Button
                 variant="primary"
-                className="flex-1 h-10"
+                className="flex-1 h-10 font-semibold"
                 onClick={handleAddPhase}
                 disabled={pending}
               >

@@ -63,31 +63,6 @@ export function WorkoutDetailContent({
         </div>
       )}
 
-      {intervals.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Main set</p>
-          <div className="space-y-1.5">
-            {intervals.map((interval) => (
-              <div
-                key={interval.id}
-                className="flex items-center justify-between rounded-md bg-surface-2/60 px-3 py-2 text-sm"
-              >
-                <span className="text-foreground">
-                  #{interval.interval_number} · {interval.distance_m >= 1000 ? `${interval.distance_m / 1000} km` : `${interval.distance_m} m`}
-                </span>
-                <span className="text-muted">
-                  {interval.target_pace_seconds_per_km ? `${secondsToPaceText(interval.target_pace_seconds_per_km)}/km` : "—"}
-                  {interval.recovery_seconds
-                    ? ` · ${interval.recovery_seconds}s ${interval.recovery_type ?? "recovery"}`
-                    : interval.recovery_type
-                      ? ` · ${interval.recovery_type} recovery`
-                      : ""}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {workout.notes && (
         <div>

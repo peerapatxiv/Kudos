@@ -8,8 +8,6 @@ import { TodayWorkoutCard } from "@/components/dashboard/today-workout-card";
 import { WeeklySummary } from "@/components/dashboard/weekly-summary";
 import { UpcomingList } from "@/components/dashboard/upcoming-list";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PaceZoneCard } from "@/components/pace/pace-zone-card";
-import { HrZoneCard } from "@/components/training/hr-zone-card";
 import { todayIso } from "@/lib/training/dates";
 import { phaseForDate } from "@/lib/training/phases";
 import { summarizeWeek } from "@/lib/training/aggregate";
@@ -168,16 +166,7 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* Training Zones */}
-      <div className="space-y-4">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Training zones</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <HrZoneCard maxHr={latestBodyMetric?.resting_hr ?? null} />
-          <PaceZoneCard />
-        </div>
-      </div>
-
-{/* Upcoming */}
+      {/* Upcoming */}
       {upcoming.length > 0 && (
         <div className="space-y-4">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Next 5 days</h2>

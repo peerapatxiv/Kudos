@@ -61,11 +61,15 @@ export default async function PlanPage() {
         })}
       </div>
 
+      <div className="space-y-4">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Training zones</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <HrZoneCard maxHr={latestBodyMetric?.resting_hr ?? null} />
+          <PaceZoneCard />
+        </div>
+      </div>
+
       <AdaptiveZonesCard recentRaces={recentRaces} />
-
-      <HrZoneCard maxHr={latestBodyMetric?.resting_hr ?? null} />
-
-      <PaceZoneCard />
 
       <p className="text-xs text-muted">
         Pace zones: Easy {PACE_ZONES[0].paceLow}–{PACE_ZONES[0].paceHigh}/km · Half pace {PACE_ZONES[2].paceLow}/km is

@@ -109,55 +109,55 @@ export default async function DashboardPage() {
       {(latestBodyMetric || profile?.height_cm) && (
         <div className="space-y-4">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Key metrics</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
           {latestBodyMetric?.resting_hr && (
-            <Card className="min-h-20 sm:min-h-24">
-              <CardContent className="pt-5">
+            <Card className="min-h-20 sm:min-h-24 hover:border-foreground/20 transition-all hover:shadow-lg hover:bg-surface-2/40">
+              <CardContent className="p-4 sm:p-5">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-3xl font-bold text-foreground">{latestBodyMetric.resting_hr}</p>
                     <p className="mt-1 text-xs uppercase tracking-wide text-muted">Max HR</p>
                   </div>
-                  <Heart className="h-6 w-6 text-muted-foreground/50" />
+                  <Heart className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground/40 transition-colors group-hover:text-a-race/60" />
                 </div>
               </CardContent>
             </Card>
           )}
           {latestBodyMetric?.vo2max && (
-            <Card className="min-h-20 sm:min-h-24">
-              <CardContent className="pt-5">
+            <Card className="min-h-20 sm:min-h-24 hover:border-foreground/20 transition-all hover:shadow-lg hover:bg-surface-2/40">
+              <CardContent className="p-4 sm:p-5">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-3xl font-bold text-foreground">{latestBodyMetric.vo2max}</p>
                     <p className="mt-1 text-xs uppercase tracking-wide text-muted">VO2 Max</p>
                   </div>
-                  <Zap className="h-6 w-6 text-muted-foreground/50" />
+                  <Zap className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground/40 transition-colors group-hover:text-easy/60" />
                 </div>
               </CardContent>
             </Card>
           )}
           {profile?.height_cm && (
-            <Card className="min-h-20 sm:min-h-24">
-              <CardContent className="pt-5">
+            <Card className="min-h-20 sm:min-h-24 hover:border-foreground/20 transition-all hover:shadow-lg hover:bg-surface-2/40">
+              <CardContent className="p-4 sm:p-5">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-3xl font-bold text-foreground">{profile.height_cm}</p>
                     <p className="mt-1 text-xs uppercase tracking-wide text-muted">Height (cm)</p>
                   </div>
-                  <Ruler className="h-6 w-6 text-muted-foreground/50" />
+                  <Ruler className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground/40 transition-colors group-hover:text-interval/60" />
                 </div>
               </CardContent>
             </Card>
           )}
           {latestBodyMetric?.weight_kg && (
-            <Card className="min-h-20 sm:min-h-24">
-              <CardContent className="pt-5">
+            <Card className="min-h-20 sm:min-h-24 hover:border-foreground/20 transition-all hover:shadow-lg hover:bg-surface-2/40">
+              <CardContent className="p-4 sm:p-5">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-3xl font-bold text-foreground">{latestBodyMetric.weight_kg}</p>
                     <p className="mt-1 text-xs uppercase tracking-wide text-muted">Weight (kg)</p>
                   </div>
-                  <Gauge className="h-6 w-6 text-muted-foreground/50" />
+                  <Gauge className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground/40 transition-colors group-hover:text-recovery/60" />
                 </div>
               </CardContent>
             </Card>
@@ -171,7 +171,7 @@ export default async function DashboardPage() {
         <div className="space-y-4">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Next 5 days</h2>
           <Card>
-            <CardContent className="pt-5">
+            <CardContent className="p-4 sm:p-5">
               <UpcomingList workouts={upcoming} />
             </CardContent>
           </Card>

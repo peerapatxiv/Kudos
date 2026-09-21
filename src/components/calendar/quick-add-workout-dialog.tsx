@@ -27,7 +27,8 @@ export function QuickAddWorkoutDialog({ date, open, onOpenChange, onSubmit }: Qu
   const handleSubmit = () => {
     setError(null);
 
-    if (!title.trim()) {
+    const finalTitle = selectedType === "rest" && !title.trim() ? "Rest Day" : title.trim();
+    if (!finalTitle) {
       setError("Please enter a workout title");
       return;
     }
@@ -42,9 +43,9 @@ export function QuickAddWorkoutDialog({ date, open, onOpenChange, onSubmit }: Qu
       try {
         await onSubmit({
           date,
-          title: title.trim(),
+          title: finalTitle,
           workoutType: selectedType,
-          distanceKm,
+          distanceKm: selectedType === "rest" ? undefined : distanceKm,
         });
         setTitle("");
         setDistance("");
@@ -70,12 +71,14 @@ export function QuickAddWorkoutDialog({ date, open, onOpenChange, onSubmit }: Qu
 
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="title">Workout Title</Label>
+            <Label htmlFor="title">
+              {selectedType === "rest" ? "Title (Optional)" : "Workout Title"}
+            </Label>
             <Input
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g., Morning run"
+              placeholder={selectedType === "rest" ? "Leave blank for 'Rest Day'" : "e.g., Morning run"}
               disabled={pending}
             />
           </div>
@@ -83,7 +86,7 @@ export function QuickAddWorkoutDialog({ date, open, onOpenChange, onSubmit }: Qu
           <div className="space-y-1.5">
             <Label>Type</Label>
             <div className="grid grid-cols-3 gap-2">
-              {WORKOUT_TYPES.filter((t) => t !== "rest").map((type) => {
+              {WORKOUT_TYPES.map((type) => {
                 const meta = workoutTypeMeta(type);
                 return (
                   <button
@@ -105,17 +108,19 @@ export function QuickAddWorkoutDialog({ date, open, onOpenChange, onSubmit }: Qu
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="distance">Distance (km) - Optional</Label>
-            <Input
-              id="distance"
-              inputMode="decimal"
-              value={distance}
-              onChange={(e) => setDistance(e.target.value)}
-              placeholder="10.5"
-              disabled={pending}
-            />
-          </div>
+          {selectedType !== "rest" && (
+            <div className="space-y-1.5">
+              <Label htmlFor="distance">Distance (km) - Optional</Label>
+              <Input
+                id="distance"
+                inputMode="decimal"
+                value={distance}
+                onChange={(e) => setDistance(e.target.value)}
+                placeholder="10.5"
+                disabled={pending}
+              />
+            </div>
+          )}
 
           {error && <p className="text-xs text-danger">{error}</p>}
 

@@ -19,7 +19,7 @@ export function ColorPicker({
   return (
     <div className="space-y-3">
       <Label className="text-sm font-medium">{label}</Label>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="flex gap-3">
         {colors.map((color) => {
           const isSelected = value === color;
           return (
@@ -27,16 +27,16 @@ export function ColorPicker({
               key={color}
               onClick={() => onChange(color)}
               className={cn(
-                "relative h-14 w-full rounded-lg border-2 transition-all flex items-center justify-center overflow-hidden group",
+                "relative h-10 w-10 rounded-full border-2 transition-all flex items-center justify-center overflow-hidden group flex-shrink-0",
                 PHASE_COLORS[color],
                 isSelected
-                  ? "border-foreground ring-2 ring-foreground/30 shadow-lg scale-105"
-                  : "border-border/30 hover:border-border/60 hover:shadow-md hover:scale-102"
+                  ? "border-foreground ring-2 ring-foreground/30 shadow-lg scale-110"
+                  : "border-border/30 hover:border-border/60 hover:shadow-md hover:scale-105"
               )}
               title={color}
             >
               {isSelected && (
-                <Check className="h-5 w-5 text-white drop-shadow-lg" />
+                <Check className="h-4 w-4 text-white drop-shadow-lg" />
               )}
             </button>
           );

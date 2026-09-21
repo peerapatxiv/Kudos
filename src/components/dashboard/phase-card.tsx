@@ -36,9 +36,9 @@ export function PhaseCard({
 
   return (
     <>
-      <Card className="cursor-pointer hover:border-foreground/30 transition-colors group" onClick={() => setEditOpen(true)}>
-        <CardContent className="pt-5 space-y-3">
-          <div className="flex items-center justify-between gap-2">
+      <Card className="overflow-hidden hover:border-foreground/30 transition-colors flex flex-col">
+        <CardContent className="pt-5 space-y-3 flex-1">
+          <div className="flex items-start justify-between gap-2">
             <span
               className={cn(
                 "rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide",
@@ -47,24 +47,10 @@ export function PhaseCard({
             >
               {phase.label}
             </span>
-            <div className="flex items-center gap-2 min-w-fit">
-              <span className="text-xs text-muted">
-                {format(new Date(`${phase.startDate}T00:00:00`), "MMM d")} –{" "}
-                {format(new Date(`${phase.endDate}T00:00:00`), "MMM d")}
-              </span>
-              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <PencilLine className="h-4 w-4 text-muted flex-shrink-0" />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleDelete}
-                  disabled={deleting}
-                  className="h-4 w-4 p-0 text-muted hover:text-danger hover:bg-transparent"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+            <span className="text-xs text-muted whitespace-nowrap">
+              {format(new Date(`${phase.startDate}T00:00:00`), "MMM d")} –{" "}
+              {format(new Date(`${phase.endDate}T00:00:00`), "MMM d")}
+            </span>
           </div>
           <p className="text-sm text-muted">{phase.description}</p>
           {stats && (
@@ -75,6 +61,28 @@ export function PhaseCard({
             </div>
           )}
         </CardContent>
+
+        <div className="flex gap-2 border-t border-border/50 p-3 bg-surface-2/30">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setEditOpen(true)}
+            className="flex-1 h-8 gap-2"
+          >
+            <PencilLine className="h-4 w-4" />
+            Edit
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleDelete}
+            disabled={deleting}
+            className="flex-1 h-8 gap-2 hover:bg-danger/10 hover:text-danger"
+          >
+            <Trash2 className="h-4 w-4" />
+            Delete
+          </Button>
+        </div>
       </Card>
 
       <EditPhaseDialog phase={phase} open={editOpen} onOpenChange={setEditOpen} />

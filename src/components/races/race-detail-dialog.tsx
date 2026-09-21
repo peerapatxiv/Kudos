@@ -68,7 +68,7 @@ export function RaceDetailDialog({ race }: { race: Race }) {
             />
 
             <div className="border-t border-border pt-4">
-              <EditRaceDialog race={race} />
+              <EditRaceDialog race={race} buttonVariant="full" />
             </div>
           </div>
         </DialogContent>

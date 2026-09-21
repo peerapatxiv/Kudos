@@ -11,8 +11,14 @@ import { deleteRace, updateRace } from "@/lib/training/actions";
 import { formatDuration, parseDurationToSeconds, paceTextToSeconds, secondsToPaceText } from "@/lib/training/pace";
 import type { Race, RacePriority } from "@/lib/training/types";
 import { PencilLine, Trash2 } from "lucide-react";
+import type { BadgeProps } from "@/components/ui/badge";
 
-export function EditRaceDialog({ race }: { race: Race }) {
+interface EditRaceDialogProps {
+  race: Race;
+  buttonVariant?: "icon" | "full";
+}
+
+export function EditRaceDialog({ race, buttonVariant = "icon" }: EditRaceDialogProps) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(race.name);
   const [date, setDate] = useState(race.date);
@@ -83,9 +89,16 @@ export function EditRaceDialog({ race }: { race: Race }) {
 
   return (
     <>
-      <Button variant="outline" size="icon" onClick={() => setOpen(true)} title="Edit race">
-        <PencilLine className="h-4 w-4" />
-      </Button>
+      {buttonVariant === "icon" ? (
+        <Button variant="outline" size="icon" onClick={() => setOpen(true)} title="Edit race">
+          <PencilLine className="h-4 w-4" />
+        </Button>
+      ) : (
+        <Button variant="outline" className="w-full" onClick={() => setOpen(true)}>
+          <PencilLine className="h-4 w-4" />
+          Edit race
+        </Button>
+      )}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>

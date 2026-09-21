@@ -171,9 +171,13 @@ export default async function DashboardPage() {
       {/* Training Zones */}
       <div className="space-y-4">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Training zones</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <HrZoneCard maxHr={latestBodyMetric?.resting_hr ?? null} />
-          <PaceZoneCard />
+        <div className="grid gap-4 lg:grid-cols-2">
+          <div>
+            <HrZoneCard maxHr={latestBodyMetric?.resting_hr ?? null} />
+          </div>
+          <div>
+            <PaceZoneCard />
+          </div>
         </div>
       </div>
 

@@ -55,7 +55,7 @@ export function HrZoneCard({ maxHr, compact = false, className }: { maxHr: numbe
           return (
             <div
               key={zone.id}
-              className="flex items-center justify-between gap-3 rounded-md border border-border bg-surface-2/60 px-3 py-2.5"
+              className="flex items-center justify-between gap-3 rounded-md border border-border bg-surface-2/60 px-3 py-3"
             >
               <div className="flex items-center gap-2.5">
                 <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", ZONE_COLOR[zone.id])} />

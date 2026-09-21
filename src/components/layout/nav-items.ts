@@ -24,6 +24,5 @@ export const DESKTOP_NAV: NavItem[] = [
 ];
 
 export const MORE_NAV: NavItem[] = [
-  { href: "/progress", label: "Progress", icon: TrendingUp },
   { href: "/settings", label: "Settings", icon: Settings },
 ];

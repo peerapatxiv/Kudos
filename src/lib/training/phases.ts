@@ -29,6 +29,7 @@ export const PHASES: PhaseDefinition[] = [
     endDate: "2026-09-21",
     description:
       "Easing into the plan. Controlled MP-pace and easy running — not yet race preparation.",
+    color: "easy",
   },
   {
     id: "base",
@@ -37,6 +38,7 @@ export const PHASES: PhaseDefinition[] = [
     endDate: "2026-10-05",
     description:
       "Aerobic foundation: speed touches, tempo, and a steadily growing long run.",
+    color: "tempo",
   },
   {
     id: "build",
@@ -45,6 +47,7 @@ export const PHASES: PhaseDefinition[] = [
     endDate: "2026-11-02",
     description:
       "Half-marathon-pace repeats and longer tempos layered onto a growing long run.",
+    color: "interval",
   },
   {
     id: "peak",
@@ -53,6 +56,7 @@ export const PHASES: PhaseDefinition[] = [
     endDate: "2026-11-16",
     description:
       "Highest training load of the block — longest runs and sharpest race-pace work.",
+    color: "secondary-race",
   },
   {
     id: "taper",
@@ -61,6 +65,7 @@ export const PHASES: PhaseDefinition[] = [
     endDate: "2026-11-28",
     description:
       "Volume drops, intensity stays sharp. Includes the Khao Yai tune-up race before the A-race.",
+    color: "rest",
   },
   {
     id: "recovery_bridge",
@@ -69,6 +74,7 @@ export const PHASES: PhaseDefinition[] = [
     endDate: "2026-12-06",
     description:
       "8 days between the half marathon and the full marathon. Do not add fitness here — recover.",
+    color: "recovery",
   },
 ];
 

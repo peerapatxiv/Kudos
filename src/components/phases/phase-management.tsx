@@ -152,7 +152,7 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
                     type="date"
                     value={newPhase.startDate}
                     onChange={(e) => setNewPhase({ ...newPhase, startDate: e.target.value })}
-                    className="h-10"
+                    className="h-10 rounded-lg text-base font-medium"
                   />
                 </div>
                 <div className="space-y-2">
@@ -161,7 +161,7 @@ export function PhaseManagement({ phases }: { phases: PhaseDefinition[] }) {
                     type="date"
                     value={newPhase.endDate}
                     onChange={(e) => setNewPhase({ ...newPhase, endDate: e.target.value })}
-                    className="h-10"
+                    className="h-10 rounded-lg text-base font-medium"
                   />
                 </div>
               </div>

@@ -617,9 +617,10 @@ export async function updatePhase(input: UpdatePhaseInput): Promise<ActionResult
       return { ok: false, error: error.message };
     }
 
-    revalidatePath("/plan");
-    revalidatePath("/dashboard");
-    revalidatePath("/calendar");
+    revalidatePath("/");
+    revalidatePath("/(app)/plan");
+    revalidatePath("/(app)/dashboard");
+    revalidatePath("/(app)/calendar");
     return { ok: true };
   } catch (err) {
     return {
@@ -726,9 +727,10 @@ export async function createPhase(input: CreatePhaseInput): Promise<ActionResult
 
   if (error) return { ok: false, error: error.message };
 
-  revalidatePath("/plan");
-  revalidatePath("/dashboard");
-  revalidatePath("/calendar");
+  revalidatePath("/");
+  revalidatePath("/(app)/plan");
+  revalidatePath("/(app)/dashboard");
+  revalidatePath("/(app)/calendar");
   return { ok: true };
 }
 

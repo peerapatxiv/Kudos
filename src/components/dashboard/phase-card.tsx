@@ -36,25 +36,27 @@ export function PhaseCard({
 
   return (
     <>
-      <Card className="overflow-hidden hover:border-foreground/30 transition-colors flex flex-col">
-        <CardContent className="pt-5 space-y-3 flex-1">
-          <div className="flex items-start justify-between gap-2">
-            <span
-              className={cn(
-                "rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide",
-                PHASE_COLORS[(phase.color as PhaseColor) || "rest"],
-              )}
-            >
-              {phase.label}
-            </span>
-            <span className="text-xs text-muted whitespace-nowrap">
-              {format(new Date(`${phase.startDate}T00:00:00`), "MMM d")} –{" "}
-              {format(new Date(`${phase.endDate}T00:00:00`), "MMM d")}
-            </span>
+      <Card className="overflow-hidden hover:border-foreground/30 transition-all hover:shadow-lg flex flex-col bg-gradient-to-br from-surface to-surface-2/50 border border-border/50">
+        <CardContent className="pt-5 space-y-4 flex-1">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between gap-3">
+              <span
+                className={cn(
+                  "rounded-lg px-3 py-1.5 text-sm font-bold uppercase tracking-wider",
+                  PHASE_COLORS[(phase.color as PhaseColor) || "rest"],
+                )}
+              >
+                {phase.label}
+              </span>
+              <span className="text-sm font-medium text-muted-foreground whitespace-nowrap bg-surface-2/50 px-2.5 py-1 rounded-md">
+                {format(new Date(`${phase.startDate}T00:00:00`), "MMM d")} – {format(new Date(`${phase.endDate}T00:00:00`), "MMM d")}
+              </span>
+            </div>
+            <p className="text-sm leading-relaxed text-muted/80">{phase.description}</p>
           </div>
-          <p className="text-sm text-muted">{phase.description}</p>
+
           {stats && (
-            <div className="grid grid-cols-3 gap-3 pt-1 text-center">
+            <div className="grid grid-cols-3 gap-3 pt-2">
               <Stat label="Planned" value={`${stats.totalPlannedKm} km`} />
               <Stat label="Workouts" value={String(stats.workoutCount)} />
               <Stat label="Long run" value={stats.longRunKm ? `${stats.longRunKm} km` : "—"} />
@@ -62,12 +64,12 @@ export function PhaseCard({
           )}
         </CardContent>
 
-        <div className="flex gap-2 border-t border-border/50 p-3 bg-surface-2/30">
+        <div className="flex gap-2 border-t border-border/30 p-3 bg-surface-2/40">
           <Button
             variant="outline"
             size="sm"
             onClick={() => setEditOpen(true)}
-            className="flex-1 h-8 gap-2"
+            className="flex-1 h-9 gap-2 font-medium"
           >
             <PencilLine className="h-4 w-4" />
             Edit
@@ -77,7 +79,7 @@ export function PhaseCard({
             size="sm"
             onClick={handleDelete}
             disabled={deleting}
-            className="flex-1 h-8 gap-2 hover:bg-danger/10 hover:text-danger"
+            className="flex-1 h-9 gap-2 font-medium hover:bg-danger/10 hover:text-danger text-muted-foreground"
           >
             <Trash2 className="h-4 w-4" />
             Delete

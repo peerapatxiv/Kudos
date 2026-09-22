@@ -53,7 +53,7 @@ export function PhaseCard({
                 {format(new Date(`${phase.startDate}T00:00:00`), "MMM d")} – {format(new Date(`${phase.endDate}T00:00:00`), "MMM d")}
               </span>
             </div>
-            <p className="text-sm leading-relaxed text-muted/80">{phase.description}</p>
+            <p className="text-sm leading-relaxed text-muted">{phase.description}</p>
           </div>
 
           {stats && (

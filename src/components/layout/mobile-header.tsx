@@ -36,7 +36,7 @@ export function MobileHeader({ title }: { title: string }) {
 
   return (
     <header
-      className={`sticky top-0 z-30 mx-3 mt-2 flex items-center justify-between rounded-2xl border border-white/15 bg-gradient-to-br from-surface/60 via-surface/50 to-surface/40 px-4 py-4 pt-[max(1rem,env(safe-area-inset-top))] backdrop-blur-3xl md:hidden shadow-xl shadow-black/30 transition-transform duration-300 ease-out ${
+      className={`sticky top-0 z-30 mx-3 mt-2 flex items-center justify-between rounded-2xl border border-white/15 bg-gradient-to-br from-surface/60 via-surface/50 to-surface/40 px-4 py-4 pt-[max(1rem,env(safe-area-inset-top))] backdrop-blur-3xl md:hidden shadow-sm shadow-black/15 transition-transform duration-300 ease-out ${
         isVisible ? "translate-y-0" : "-translate-y-full"
       }`}
     >

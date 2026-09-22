@@ -14,7 +14,7 @@ export function BottomNav() {
       aria-label="Primary navigation"
       role="navigation"
     >
-      <div className="flex items-center justify-around px-2 py-3">
+      <div className="flex w-full items-end justify-around px-2 py-3">
         {MOBILE_NAV.map((item) => {
           const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
           const Icon = item.icon;
@@ -23,7 +23,7 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center justify-center p-2 rounded-lg transition-all duration-200",
+                "flex flex-col items-center gap-1 py-2 px-2 rounded-lg transition-all duration-200",
                 active
                   ? "text-a-race"
                   : "text-muted-foreground hover:text-foreground"
@@ -39,6 +39,7 @@ export function BottomNav() {
                 )}
                 strokeWidth={active ? 2.3 : 2}
               />
+              <span className="text-xs font-medium">{item.label}</span>
             </Link>
           );
         })}

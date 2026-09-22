@@ -11,7 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { todayIso } from "@/lib/training/dates";
 import { phaseForDate } from "@/lib/training/phases";
 import { summarizeWeek } from "@/lib/training/aggregate";
-import { Heart, Gauge, Zap, Ruler } from "lucide-react";
+import { Heart, Gauge, Zap, Ruler, Target, Calendar } from "lucide-react";
 import { format, addDays } from "date-fns";
 
 export default async function DashboardPage() {
@@ -64,13 +64,19 @@ export default async function DashboardPage() {
         <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground/70 mb-2">
           {format(new Date(`${today}T00:00:00`), "EEEE, MMMM d, yyyy")}
         </p>
-        <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground">
-          {phase ? phase.label : "Training"}
-        </h1>
+        <div className="flex items-center gap-3">
+          <Target className="h-8 w-8 text-a-race/60" />
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground">
+            {phase ? phase.label : "Training"}
+          </h1>
+        </div>
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Today</h2>
+        <div className="flex items-center gap-2">
+          <Calendar className="h-5 w-5 text-a-race/60" />
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Today</h2>
+        </div>
         <TodayWorkoutCard workout={todayWorkout} phase={phase} />
       </div>
 

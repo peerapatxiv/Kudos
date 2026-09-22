@@ -35,9 +35,9 @@ export function BottomNav() {
               <Icon
                 className={cn(
                   "h-6 w-6 transition-all duration-200",
-                  active ? "fill-current" : "fill-transparent"
+                  active && "fill-current"
                 )}
-                strokeWidth={active ? 2.3 : 2}
+                strokeWidth={active ? 2.5 : 2.1}
               />
               <span className="text-xs font-medium">{item.label}</span>
             </Link>

@@ -88,9 +88,12 @@ export function TodayWorkoutCard({
         </div>
 
         <div className="space-y-3">
-          <h2 className="text-2xl font-bold text-foreground">
-            {workout.is_rest_day ? "Rest day" : workout.title}
-          </h2>
+          <div className="flex items-center gap-2">
+            {!workout.is_rest_day && <meta.icon className="h-6 w-6 text-a-race/70" />}
+            <h2 className="text-2xl font-bold text-foreground">
+              {workout.is_rest_day ? "Rest day" : workout.title}
+            </h2>
+          </div>
           {!workout.is_rest_day && (
             <div className="flex flex-wrap items-center gap-6">
               {workout.distance_km && (

@@ -54,20 +54,20 @@ export function PaceCalculator({
         <CardTitle>Pace Calculator</CardTitle>
         <CardDescription>Convert between pace, distance, and time — and see split targets.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3 pt-4">
+      <CardContent className="space-y-4 pt-4">
         <Tabs value={mode} onValueChange={(v) => setMode(v as typeof mode)}>
-          <TabsList className="grid grid-cols-2">
-            <TabsTrigger value="pace-to-time">Pace → Time</TabsTrigger>
-            <TabsTrigger value="goal-to-pace">Goal Time → Pace</TabsTrigger>
+          <TabsList className="grid grid-cols-2 w-full">
+            <TabsTrigger value="pace-to-time" className="text-xs sm:text-sm">Pace → Time</TabsTrigger>
+            <TabsTrigger value="goal-to-pace" className="text-xs sm:text-sm">Goal Time → Pace</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="pace-to-time" className="space-y-2.5 mt-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
+          <TabsContent value="pace-to-time" className="space-y-3 mt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
                 <Label htmlFor="pc-distance">Distance (km)</Label>
                 <Input id="pc-distance" inputMode="decimal" value={distance} onChange={(e) => setDistance(e.target.value)} />
               </div>
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <Label htmlFor="pc-pace">Pace (min:sec /km)</Label>
                 <Input id="pc-pace" value={pace} onChange={(e) => setPace(e.target.value)} placeholder="4:30" />
               </div>
@@ -79,13 +79,13 @@ export function PaceCalculator({
             )}
           </TabsContent>
 
-          <TabsContent value="goal-to-pace" className="space-y-2.5 mt-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
+          <TabsContent value="goal-to-pace" className="space-y-3 mt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
                 <Label htmlFor="pc-distance-2">Distance (km)</Label>
                 <Input id="pc-distance-2" inputMode="decimal" value={distance} onChange={(e) => setDistance(e.target.value)} />
               </div>
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <Label htmlFor="pc-goal">Goal time (h:mm:ss)</Label>
                 <Input id="pc-goal" value={goalTime} onChange={(e) => setGoalTime(e.target.value)} placeholder="1:35:00" />
               </div>
@@ -99,11 +99,11 @@ export function PaceCalculator({
         </Tabs>
 
         {splits.length > 0 && (
-          <div className="space-y-1.5 border-t border-border pt-2.5">
+          <div className="space-y-2.5 border-t border-border pt-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted">Splits</p>
-            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-2.5">
               {splits.map((split) => (
-                <div key={split.distanceKm} className="rounded-md bg-surface-2/60 px-2.5 py-1.5 text-center">
+                <div key={split.distanceKm} className="rounded-md bg-surface-2/60 px-3 py-2 text-center">
                   <p className="text-xs text-muted">{split.distanceKm} km</p>
                   <p className="text-sm font-semibold tabular-nums text-foreground">{split.elapsedLabel}</p>
                 </div>

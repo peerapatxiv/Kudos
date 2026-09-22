@@ -60,16 +60,15 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6 animate-fade-in-up">
       {/* Header */}
-      <div>
-        <p className="text-xs font-medium uppercase tracking-wide text-muted">
+      <div className="rounded-lg border border-border/50 bg-gradient-to-br from-surface-2/40 to-surface-2/20 p-6 sm:p-7">
+        <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground/70 mb-2">
           {format(new Date(`${today}T00:00:00`), "EEEE, MMMM d, yyyy")}
         </p>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+        <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground">
           {phase ? phase.label : "Training"}
         </h1>
       </div>
 
-      {/* Today's Focus */}
       <div className="space-y-4">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Today</h2>
         <TodayWorkoutCard workout={todayWorkout} phase={phase} />

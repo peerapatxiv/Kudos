@@ -22,15 +22,12 @@ export function WeeklySummary({ week, stats }: { week: TrainingWeek; stats: Week
 
         <div className="space-y-3 text-sm">
           {/* Planned - Full Width */}
-          <div className="col-span-full">
-            <MetricBlock label="Planned" value={`${stats.plannedKm} km`} />
-          </div>
+          <MetricBlock label="Planned" value={`${stats.plannedKm} km`} />
 
-          {/* Other metrics - 2 columns */}
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {/* Workouts & Long run - 2 columns */}
+          <div className="grid grid-cols-2 gap-3">
             <MetricBlock label="Workouts" value={String(stats.workoutsPlanned)} />
             <MetricBlock label="Long run" value={stats.longRunKm ? `${stats.longRunKm} km` : "—"} />
-            <MetricBlock label="Completed" value={`${stats.completedKm} km`} />
           </div>
         </div>
 

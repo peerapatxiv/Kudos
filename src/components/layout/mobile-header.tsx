@@ -36,7 +36,7 @@ export function MobileHeader({ title }: { title: string }) {
 
   return (
     <header
-      className={`sticky top-0 z-30 mx-2 mt-2 flex items-center justify-between rounded-lg border border-white/10 bg-surface px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] md:hidden transition-transform duration-300 ease-out ${
+      className={`sticky top-0 z-30 flex items-center justify-between border-b border-border/30 bg-surface px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] md:hidden transition-transform duration-300 ease-out ${
         isVisible ? "translate-y-0" : "-translate-y-full"
       }`}
     >

@@ -33,11 +33,8 @@ export function BottomNav() {
               aria-current={active ? "page" : undefined}
             >
               <Icon
-                className={cn(
-                  "h-6 w-6 transition-all duration-200",
-                  active && "fill-current"
-                )}
-                strokeWidth={active ? 2.5 : 2.1}
+                className="h-6 w-6 transition-all duration-200"
+                strokeWidth={2}
               />
               <span className="text-xs font-medium">{item.label}</span>
             </Link>

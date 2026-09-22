@@ -54,14 +54,14 @@ export function PaceCalculator({
         <CardTitle>Pace Calculator</CardTitle>
         <CardDescription>Convert between pace, distance, and time — and see split targets.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3 pt-4">
         <Tabs value={mode} onValueChange={(v) => setMode(v as typeof mode)}>
           <TabsList className="grid grid-cols-2">
             <TabsTrigger value="pace-to-time">Pace → Time</TabsTrigger>
             <TabsTrigger value="goal-to-pace">Goal Time → Pace</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="pace-to-time" className="space-y-3">
+          <TabsContent value="pace-to-time" className="space-y-2.5 mt-3">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="pc-distance">Distance (km)</Label>
@@ -79,7 +79,7 @@ export function PaceCalculator({
             )}
           </TabsContent>
 
-          <TabsContent value="goal-to-pace" className="space-y-3">
+          <TabsContent value="goal-to-pace" className="space-y-2.5 mt-3">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="pc-distance-2">Distance (km)</Label>
@@ -99,11 +99,11 @@ export function PaceCalculator({
         </Tabs>
 
         {splits.length > 0 && (
-          <div className="space-y-1.5 border-t border-border pt-3">
+          <div className="space-y-1.5 border-t border-border pt-2.5">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted">Splits</p>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
               {splits.map((split) => (
-                <div key={split.distanceKm} className="rounded-md bg-surface-2/60 px-3 py-2 text-center">
+                <div key={split.distanceKm} className="rounded-md bg-surface-2/60 px-2.5 py-1.5 text-center">
                   <p className="text-xs text-muted">{split.distanceKm} km</p>
                   <p className="text-sm font-semibold tabular-nums text-foreground">{split.elapsedLabel}</p>
                 </div>

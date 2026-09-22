@@ -18,10 +18,15 @@ export function AdaptiveZonesCard({ recentRaces }: AdaptiveZonesProps) {
 
   if (recentRaces.length === 0) {
     return (
-      <Card>
-        <CardContent className="flex items-center gap-2 pt-6 text-sm text-muted">
-          <Zap className="h-4 w-4" />
-          Complete a race to see suggested pace zone adjustments
+      <Card className="border-l-4 border-l-amber-500/40 border-amber-500/20 bg-gradient-to-br from-amber-500/5 to-transparent">
+        <CardContent className="flex flex-col items-center gap-2.5 py-6 px-4 text-center sm:py-7">
+          <div className="rounded-lg bg-amber-500/10 p-2.5">
+            <Zap className="h-4 w-4 text-amber-600" />
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-foreground">Complete a race to unlock adaptive zones</p>
+            <p className="text-xs text-muted-foreground max-w-sm">Log a race result to get personalized pace zone suggestions</p>
+          </div>
         </CardContent>
       </Card>
     );
@@ -51,35 +56,19 @@ export function AdaptiveZonesCard({ recentRaces }: AdaptiveZonesProps) {
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid gap-2 text-sm">
-          <div className="flex justify-between rounded-md bg-surface/50 p-2">
-            <span className="text-muted">Half Marathon Pace</span>
-            <span className="font-semibold">{secondsToPaceText(Math.round(suggestedPaces.halfMarathonSeconds / 21.0975))}/km</span>
-          </div>
-          <div className="flex justify-between rounded-md bg-surface/50 p-2">
-            <span className="text-muted">Marathon Pace</span>
-            <span className="font-semibold">{secondsToPaceText(Math.round(suggestedPaces.marathonSeconds / 42.195))}/km</span>
-          </div>
-          <div className="flex justify-between rounded-md bg-surface/50 p-2">
-            <span className="text-muted">Tempo Pace</span>
-            <span className="font-semibold">{secondsToPaceText(suggestedPaces.tempoPaceSecondsPerKm)}/km</span>
-          </div>
-          <div className="flex justify-between rounded-md bg-surface/50 p-2">
-            <span className="text-muted">Threshold Pace</span>
-            <span className="font-semibold">{secondsToPaceText(suggestedPaces.thresholdPaceSecondsPerKm)}/km</span>
-          </div>
-          <div className="flex justify-between rounded-md bg-surface/50 p-2">
-            <span className="text-muted">Interval Pace</span>
-            <span className="font-semibold">{secondsToPaceText(suggestedPaces.intervalPaceSecondsPerKm)}/km</span>
-          </div>
+      <CardContent className="space-y-3">
+        <div className="grid gap-2.5 text-sm">
+          <PaceRow label="Half Marathon Pace" pace={secondsToPaceText(Math.round(suggestedPaces.halfMarathonSeconds / 21.0975))} />
+          <PaceRow label="Marathon Pace" pace={secondsToPaceText(Math.round(suggestedPaces.marathonSeconds / 42.195))} />
+          <PaceRow label="Tempo Pace" pace={secondsToPaceText(suggestedPaces.tempoPaceSecondsPerKm)} />
+          <PaceRow label="Threshold Pace" pace={secondsToPaceText(suggestedPaces.thresholdPaceSecondsPerKm)} />
+          <PaceRow label="Interval Pace" pace={secondsToPaceText(suggestedPaces.intervalPaceSecondsPerKm)} />
         </div>
 
-        <div className="rounded-md border border-amber-500/30 bg-amber-500/5 p-3 text-sm">
-          <p className="text-xs font-semibold text-amber-700">💡 How this works</p>
-          <p className="mt-1 text-xs text-muted">
-            Your {latestRace.title} performance suggests these target paces for different training zones. Update your training plan
-            with these suggestions to stay aligned with your current fitness.
+        <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 text-sm">
+          <p className="text-xs font-semibold text-amber-700">💡 How it works</p>
+          <p className="mt-1.5 text-xs text-muted-foreground">
+            Based on your {latestRace.title} result, these are your optimal paces for each training zone. Update your Pace Zones to match.
           </p>
         </div>
 
@@ -88,7 +77,7 @@ export function AdaptiveZonesCard({ recentRaces }: AdaptiveZonesProps) {
         </Button>
 
         {expanded && (
-          <div className="space-y-2 rounded-md bg-surface/50 p-3 text-xs text-muted">
+          <div className="space-y-2 rounded-md bg-surface/50 p-3 text-xs text-muted-foreground">
             <p>
               <strong>VDOT</strong> (VO2max proxy) is calculated from your race performance using Jack Daniels' Running Formula. It represents
               your aerobic capacity and can be used to predict race times and optimal training paces.
@@ -101,5 +90,14 @@ export function AdaptiveZonesCard({ recentRaces }: AdaptiveZonesProps) {
         )}
       </CardContent>
     </Card>
+  );
+}
+
+function PaceRow({ label, pace }: { label: string; pace: string }) {
+  return (
+    <div className="flex items-center justify-between rounded-lg border border-border/30 bg-surface-2/50 p-3 hover:border-foreground/20 hover:shadow-sm transition-all">
+      <span className="text-sm text-muted-foreground">{label}</span>
+      <span className="font-semibold text-foreground tabular-nums">{pace}/km</span>
+    </div>
   );
 }

@@ -12,6 +12,7 @@ import { raceTypeMeta } from "@/components/races/race-meta";
 import { daysUntil } from "@/lib/training/dates";
 import { secondsToPaceText, formatDuration } from "@/lib/training/pace";
 import type { Race } from "@/lib/training/types";
+import { cn } from "@/lib/utils";
 
 export function RaceDetailDialog({ race }: { race: Race }) {
   const [open, setOpen] = useState(false);
@@ -35,28 +36,28 @@ export function RaceDetailDialog({ race }: { race: Race }) {
             <DialogDescription>{format(new Date(`${race.date}T00:00:00`), "EEEE, MMMM d, yyyy")}</DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-5 pt-4">
-            <Card style={{ borderColor: `color-mix(in oklab, ${meta.colorVar} 30%, transparent)` }}>
-              <CardContent className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-5 text-center">
-                <Metric label="Distance" value={`${race.distance_km} km`} />
-                <Metric
+          <div className="space-y-4 pt-3">
+            <Card className="border-l-4" style={{ borderColor: `color-mix(in oklab, ${meta.colorVar} 30%, transparent)`, borderLeftColor: `${meta.colorVar}` }}>
+              <CardContent className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 p-4 sm:p-5">
+                <MetricItem label="Distance" value={`${race.distance_km} km`} />
+                <MetricItem
                   label="Goal"
                   value={race.goal_time_seconds ? formatDuration(race.goal_time_seconds) : "—"}
-                  color={meta.colorVar}
+                  highlight
                 />
-                <Metric
+                <MetricItem
                   label="Goal pace"
                   value={race.goal_pace_seconds_per_km ? `${secondsToPaceText(race.goal_pace_seconds_per_km)}/km` : "—"}
-                  color={meta.colorVar}
+                  highlight
                 />
               </CardContent>
             </Card>
 
             {race.notes && (
               <Card>
-                <CardContent className="pt-5">
+                <CardContent className="pt-4">
                   <p className="text-xs font-semibold uppercase tracking-wide text-muted">Race plan</p>
-                  <p className="mt-2 text-sm text-foreground">{race.notes}</p>
+                  <p className="mt-1.5 text-sm text-foreground">{race.notes}</p>
                 </CardContent>
               </Card>
             )}
@@ -77,16 +78,13 @@ export function RaceDetailDialog({ race }: { race: Race }) {
   );
 }
 
-function Metric({ label, value, color }: { label: string; value: string; color?: string }) {
+function MetricItem({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
-    <div>
-      <p
-        className="text-lg font-bold tabular-nums text-foreground"
-        style={color ? { color } : undefined}
-      >
+    <div className="flex flex-col items-center gap-1">
+      <p className={cn("text-sm sm:text-base font-semibold tabular-nums", highlight ? "text-a-race" : "text-foreground")}>
         {value}
       </p>
-      <p className="mt-1 text-xs uppercase tracking-wide text-muted">{label}</p>
+      <p className="text-xs text-muted-foreground uppercase tracking-wide">{label}</p>
     </div>
   );
 }

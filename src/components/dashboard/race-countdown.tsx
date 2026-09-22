@@ -20,47 +20,52 @@ export function RaceCountdownCard({ race }: { race: Race }) {
         : "RACE";
   const badgeVariant = isA ? "a-race" : race.priority === "tune_up" ? "tune-up" : isSecondary ? "secondary" : "neutral";
   const accentClass = isA ? "text-a-race" : isSecondary ? "text-secondary-race" : "text-foreground";
+  const borderClass = isA ? "border-l-a-race" : isSecondary ? "border-l-secondary-race" : "border-l-muted";
 
   return (
     <Card
       className={cn(
-        "relative overflow-hidden transition-transform hover:-translate-y-0.5",
-        isA && "border-a-race/40",
+        "relative overflow-hidden cursor-pointer transition-all hover:-translate-y-1 hover:shadow-lg hover:border-foreground/20 border-l-4 bg-surface",
+        borderClass,
       )}
     >
-      <div
-        className={cn("absolute inset-0 opacity-[0.06]", isA ? "bg-a-race" : isSecondary ? "bg-secondary-race" : "bg-muted")}
-        aria-hidden
-      />
-      <CardContent className="relative pt-5 space-y-3">
-        <div className="flex items-center justify-between">
+      <CardContent className="relative px-4 py-4 sm:px-5 sm:py-5 flex flex-col gap-3">
+        {/* Header: Badge + Date */}
+        <div className="flex items-center justify-between gap-2">
           <Badge variant={badgeVariant}>{label}</Badge>
-          <span className="text-xs text-muted">{format(new Date(`${race.date}T00:00:00`), "MMM d, yyyy")}</span>
-        </div>
-
-        <div>
-          <p className="text-sm font-medium text-foreground">{race.name}</p>
-          <div className="mt-1 flex items-baseline gap-1.5">
-            <span className={cn("text-3xl font-bold tabular-nums", accentClass)}>
-              {days}
-            </span>
-            <span className="text-sm text-muted">day{days === 1 ? "" : "s"} to go</span>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-muted">
-          <span>
-            <strong className="text-foreground">{race.distance_km}</strong> km
+          <span className="text-xs text-muted-foreground whitespace-nowrap">
+            {format(new Date(`${race.date}T00:00:00`), "MMM d, yyyy")}
           </span>
+        </div>
+
+        {/* Race Name */}
+        <p className="text-sm font-semibold text-foreground line-clamp-2">{race.name}</p>
+
+        {/* Countdown - Hero Element */}
+        <div className="flex items-baseline gap-2">
+          <span className={cn("text-4xl sm:text-5xl font-bold tabular-nums", accentClass)}>
+            {days}
+          </span>
+          <span className="text-sm text-muted-foreground">day{days === 1 ? "" : "s"} to go</span>
+        </div>
+
+        {/* Details */}
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground pt-1">
+          <div className="flex items-baseline gap-1">
+            <span className="font-medium text-foreground">{race.distance_km}</span>
+            <span>km</span>
+          </div>
           {race.goal_time_seconds ? (
-            <span>
-              Goal <strong className="text-foreground">{formatGoal(race.goal_time_seconds)}</strong>
-            </span>
+            <div className="flex items-baseline gap-1">
+              <span>Goal</span>
+              <span className="font-medium text-foreground">{formatGoal(race.goal_time_seconds)}</span>
+            </div>
           ) : null}
           {race.goal_pace_seconds_per_km ? (
-            <span>
-              Pace <strong className="text-foreground">{secondsToPaceText(race.goal_pace_seconds_per_km)}/km</strong>
-            </span>
+            <div className="flex items-baseline gap-1">
+              <span>Pace</span>
+              <span className="font-medium text-foreground">{secondsToPaceText(race.goal_pace_seconds_per_km)}/km</span>
+            </div>
           ) : null}
         </div>
       </CardContent>

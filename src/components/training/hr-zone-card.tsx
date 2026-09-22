@@ -55,13 +55,13 @@ export function HrZoneCard({ maxHr, compact = false, className }: { maxHr: numbe
           return (
             <div
               key={zone.id}
-              className="space-y-2 rounded-lg border border-border/30 bg-gradient-to-br from-surface-2/50 to-surface-2/30 p-3 sm:p-4 hover:border-foreground/20 transition-colors"
+              className="space-y-1 rounded-lg border border-border/30 bg-gradient-to-br from-surface-2/50 to-surface-2/30 p-2 sm:p-3 hover:border-foreground/30 hover:shadow-sm transition-all"
             >
-              <div className="flex items-center gap-2">
-                <span className={cn("h-3 w-3 shrink-0 rounded-full", ZONE_COLOR[zone.id])} />
-                <p className="text-xs sm:text-sm font-semibold text-foreground">{zone.label}</p>
+              <div className="flex items-center gap-1.5">
+                <span className={cn("h-2 w-2 shrink-0 rounded-full", ZONE_COLOR[zone.id])} />
+                <p className="text-xs font-semibold text-foreground">{zone.label}</p>
               </div>
-              <p className="text-base sm:text-lg font-bold text-foreground">
+              <p className="text-sm sm:text-base font-bold text-foreground">
                 {range.low}–{range.high}
                 <span className="text-xs font-normal text-muted"> bpm</span>
               </p>

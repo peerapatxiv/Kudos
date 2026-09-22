@@ -41,7 +41,7 @@ export function TodayWorkoutCard({
           </div>
           <Button
             variant="primary"
-            className="w-full h-14 text-lg font-bold"
+            className="w-full h-14 text-lg font-bold shadow-lg shadow-a-race/40 hover:shadow-xl hover:shadow-a-race/50 hover:opacity-95 transition-all duration-200 active:scale-95"
             onClick={() => setQuickAddOpen(true)}
           >
             <Plus className="h-6 w-6" />
@@ -116,10 +116,10 @@ export function TodayWorkoutCard({
           </div>
         )}
 
-        <div className="flex flex-col gap-3 sm:gap-2 sm:flex-row pt-2">
+        <div className="flex flex-col gap-3 sm:gap-2 sm:flex-row pt-4">
           <Button
             variant="outline"
-            className="flex-1 h-13 sm:h-10 text-base sm:text-sm font-medium"
+            className="flex-1 h-13 sm:h-10 text-base sm:text-sm font-medium border-border/60 hover:border-foreground/40 hover:bg-surface-2/50 shadow-sm transition-all duration-200"
             onClick={async () => {
               const result = await fetchWorkoutDetails(workout.date);
               if (result.status === "ok" && result.data) {
@@ -134,7 +134,7 @@ export function TodayWorkoutCard({
           {!workout.is_rest_day && !workout.completed && (
             <Button
               variant="primary"
-              className="flex-1 h-14 sm:h-10 text-lg sm:text-base font-bold sm:font-semibold"
+              className="flex-1 h-14 sm:h-10 text-lg sm:text-base font-bold sm:font-semibold shadow-lg shadow-a-race/40 hover:shadow-xl hover:shadow-a-race/50 hover:opacity-95 transition-all duration-200 active:scale-95"
               onClick={() => setLoggerOpen(true)}
             >
               <PlayCircle className="h-6 w-6 sm:h-5 sm:w-5" />
@@ -143,7 +143,7 @@ export function TodayWorkoutCard({
           )}
           <Button
             variant="outline"
-            className="h-13 sm:h-10 w-13 sm:w-auto px-3 hover:bg-foreground/5 hover:border-foreground/30 transition-all flex items-center justify-center"
+            className="h-13 sm:h-10 w-13 sm:w-auto px-3 border-border/60 hover:border-foreground/40 hover:bg-surface-2/50 shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center"
             onClick={() => setQuickAddOpen(true)}
             title="Add another activity for today"
           >

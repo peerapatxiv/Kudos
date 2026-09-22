@@ -20,11 +20,18 @@ export function WeeklySummary({ week, stats }: { week: TrainingWeek; stats: Week
       <CardContent className="space-y-4">
         <Progress value={stats.completionPct} />
 
-        <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-          <MetricBlock label="Planned" value={`${stats.plannedKm} km`} />
-          <MetricBlock label="Completed" value={`${stats.completedKm} km`} />
-          <MetricBlock label="Long run" value={stats.longRunKm ? `${stats.longRunKm} km` : "—"} />
-          <MetricBlock label="Rest days" value={String(stats.restDays)} />
+        <div className="space-y-3 text-sm">
+          {/* Planned - Full Width */}
+          <div className="col-span-full">
+            <MetricBlock label="Planned" value={`${stats.plannedKm} km`} />
+          </div>
+
+          {/* Other metrics - 2 columns */}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <MetricBlock label="Workouts" value={String(stats.workoutsPlanned)} />
+            <MetricBlock label="Long run" value={stats.longRunKm ? `${stats.longRunKm} km` : "—"} />
+            <MetricBlock label="Completed" value={`${stats.completedKm} km`} />
+          </div>
         </div>
 
         <div className="flex items-center justify-between border-t border-border pt-3 text-xs text-muted">

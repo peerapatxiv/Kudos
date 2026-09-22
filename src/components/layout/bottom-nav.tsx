@@ -21,14 +21,14 @@ export function BottomNav() {
             key={item.href}
             href={item.href}
             className={cn(
-              "flex flex-1 flex-col items-center justify-center gap-1 py-3 px-2 rounded-2xl text-xs font-semibold transition-all duration-300 ease-out",
+              "flex flex-1 flex-col items-center justify-center py-3 px-2 rounded-2xl transition-all duration-300 ease-out",
               active
                 ? "text-white bg-gradient-to-b from-a-race/90 to-a-race/70 shadow-lg shadow-a-race/40 scale-105"
                 : "text-muted-foreground hover:text-foreground hover:bg-white/5 hover:scale-105",
             )}
+            title={item.label}
           >
             <Icon className={cn("h-6 w-6 transition-all duration-300", active ? "drop-shadow-lg scale-110" : "")} strokeWidth={active ? 2.5 : 2.2} />
-            <span className={cn("transition-all duration-300", active ? "font-bold tracking-tight" : "")}>{item.label}</span>
           </Link>
         );
       })}

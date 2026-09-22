@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Calendar, Gauge, LayoutDashboard, MoreHorizontal, Settings, TrendingUp } from "lucide-react";
+import { Calendar, Gauge, LayoutDashboard, Settings, TrendingUp } from "lucide-react";
 
 export interface NavItem {
   href: string;
@@ -12,7 +12,7 @@ export const MOBILE_NAV: NavItem[] = [
   { href: "/plan", label: "Plan", icon: Gauge },
   { href: "/calendar", label: "Calendar", icon: Calendar },
   { href: "/progress", label: "Progress", icon: TrendingUp },
-  { href: "/more", label: "More", icon: MoreHorizontal },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 export const DESKTOP_NAV: NavItem[] = [

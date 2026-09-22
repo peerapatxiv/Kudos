@@ -5,10 +5,10 @@ create table if not exists public.training_phases (
   id text primary key,
   user_id uuid not null references auth.users (id) on delete cascade,
   label text not null,
-  description text,
+  description text, 
+  color text default 'rest',
   start_date date not null,
   end_date date not null,
-  color text default 'rest',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

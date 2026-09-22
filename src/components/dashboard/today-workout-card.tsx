@@ -134,10 +134,10 @@ export function TodayWorkoutCard({
           {!workout.is_rest_day && !workout.completed && (
             <Button
               variant="primary"
-              className="flex-1 h-10"
+              className="flex-1 h-12 text-base font-semibold"
               onClick={() => setLoggerOpen(true)}
             >
-              <PlayCircle className="h-4 w-4" />
+              <PlayCircle className="h-5 w-5" />
               Start
             </Button>
           )}

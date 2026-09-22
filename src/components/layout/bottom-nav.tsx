@@ -10,7 +10,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 flex items-stretch rounded-3xl border border-white/15 bg-gradient-to-b from-surface/70 via-surface/60 to-surface/50 backdrop-blur-3xl pb-[env(safe-area-inset-bottom)] md:hidden shadow-2xl shadow-black/50 mx-2 mb-2 gap-2 px-2 py-2"
+      className="fixed left-2 right-2 bottom-2 z-40 flex items-stretch justify-center rounded-3xl border border-white/15 bg-gradient-to-b from-surface/70 via-surface/60 to-surface/50 backdrop-blur-3xl pb-[env(safe-area-inset-bottom)] md:hidden shadow-2xl shadow-black/50 gap-1 px-2 py-2"
       aria-label="Primary"
     >
       {MOBILE_NAV.map((item) => {

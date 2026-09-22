@@ -12,7 +12,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <Sidebar displayName={profile?.display_name ?? null} />
       <div className="md:pl-64">
         <MobileHeaderBar />
-        <main className="mx-auto max-w-6xl px-4 pb-32 pt-4 md:px-8 md:pb-12 md:pt-8">{children}</main>
+        <main className="mx-auto max-w-6xl px-3 py-4 pb-32 sm:px-4 md:px-8 md:py-8 md:pb-12">{children}</main>
       </div>
       <BottomNav />
       <OfflineQueueSync />

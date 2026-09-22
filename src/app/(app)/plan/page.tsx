@@ -55,7 +55,7 @@ export default async function PlanPage() {
           <p className="text-xs text-muted">Click the "+ Add phase" button above to create your first training phase</p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:gap-6 md:gap-8 sm:grid-cols-2">
           {phases.map((phase) => {
             const weekIds = weekIdsByPhase.get(phase.id as TrainingPhaseId) ?? new Set();
             const phaseWorkouts = workouts.filter((w) => w.training_week_id && weekIds.has(w.training_week_id));
@@ -68,7 +68,7 @@ export default async function PlanPage() {
       {/* Training Zones - Always Show */}
       <div className="space-y-4">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Training zones</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:gap-6 md:gap-8 sm:grid-cols-2">
           <HrZoneCard maxHr={latestBodyMetric?.resting_hr ?? null} />
           <PaceZoneCard />
         </div>

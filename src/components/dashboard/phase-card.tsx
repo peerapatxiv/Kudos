@@ -57,10 +57,15 @@ export function PhaseCard({
           </div>
 
           {stats && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
+            <div className="space-y-2 pt-1">
+              {/* Planned - Full Width */}
               <Stat label="Planned" value={`${stats.totalPlannedKm} km`} />
-              <Stat label="Workouts" value={String(stats.workoutCount)} />
-              <Stat label="Long run" value={stats.longRunKm ? `${stats.longRunKm} km` : "—"} />
+
+              {/* Workouts & Long run - 2 columns */}
+              <div className="grid grid-cols-2 gap-2">
+                <Stat label="Workouts" value={String(stats.workoutCount)} />
+                <Stat label="Long run" value={stats.longRunKm ? `${stats.longRunKm} km` : "—"} />
+              </div>
             </div>
           )}
         </CardContent>

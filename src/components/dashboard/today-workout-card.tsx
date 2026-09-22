@@ -41,10 +41,10 @@ export function TodayWorkoutCard({
           </div>
           <Button
             variant="primary"
-            className="w-full h-11 text-base font-semibold"
+            className="w-full h-14 text-lg font-bold"
             onClick={() => setQuickAddOpen(true)}
           >
-            <Plus className="h-5 w-5" />
+            <Plus className="h-6 w-6" />
             Add activity
           </Button>
         </div>
@@ -116,10 +116,10 @@ export function TodayWorkoutCard({
           </div>
         )}
 
-        <div className="flex flex-col gap-2 sm:flex-row pt-2">
+        <div className="flex flex-col gap-3 sm:gap-2 sm:flex-row pt-2">
           <Button
             variant="outline"
-            className="flex-1 h-10"
+            className="flex-1 h-13 sm:h-10 text-base sm:text-sm font-medium"
             onClick={async () => {
               const result = await fetchWorkoutDetails(workout.date);
               if (result.status === "ok" && result.data) {
@@ -134,20 +134,20 @@ export function TodayWorkoutCard({
           {!workout.is_rest_day && !workout.completed && (
             <Button
               variant="primary"
-              className="flex-1 h-12 text-base font-semibold"
+              className="flex-1 h-14 sm:h-10 text-lg sm:text-base font-bold sm:font-semibold"
               onClick={() => setLoggerOpen(true)}
             >
-              <PlayCircle className="h-5 w-5" />
+              <PlayCircle className="h-6 w-6 sm:h-5 sm:w-5" />
               Start
             </Button>
           )}
           <Button
             variant="outline"
-            className="h-10 px-3 hover:bg-foreground/5 hover:border-foreground/30 transition-all"
+            className="h-13 sm:h-10 w-13 sm:w-auto px-3 hover:bg-foreground/5 hover:border-foreground/30 transition-all flex items-center justify-center"
             onClick={() => setQuickAddOpen(true)}
             title="Add another activity for today"
           >
-            <Plus className="h-5 w-5" />
+            <Plus className="h-6 w-6 sm:h-5 sm:w-5" />
           </Button>
         </div>
       </div>

@@ -100,7 +100,7 @@ export function PhaseCard({
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md bg-surface-2/60 py-1.5 px-2">
+    <div className="w-full rounded-md bg-surface-2/60 py-1.5 px-2">
       <p className="text-xs font-semibold text-foreground tabular-nums">{value}</p>
       <p className="text-xs uppercase tracking-wide text-muted">{label}</p>
     </div>

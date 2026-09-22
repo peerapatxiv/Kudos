@@ -111,7 +111,7 @@ export default async function DashboardPage() {
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <p className="text-lg sm:text-3xl font-bold text-foreground">{latestBodyMetric.resting_hr}</p>
-                    <p className="mt-1 text-xs uppercase tracking-wide text-muted leading-tight">Max HR</p>
+                    <p className="mt-1 text-xs uppercase tracking-wide text-muted leading-tight">Resting HR</p>
                   </div>
                   <Heart className="h-5 w-5 sm:h-8 sm:w-8 text-muted-foreground/40 flex-shrink-0" />
                 </div>

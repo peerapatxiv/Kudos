@@ -7,13 +7,13 @@ import {
   CompletionChart,
   LongRunChart,
   PaceChart,
-  MaxHrChart,
+  RestingHrChart,
   Vo2MaxChart,
   WeeklyMileageChart,
   WeightChart,
   type LongRunPoint,
   type PacePoint,
-  type MaxHrPoint,
+  type RestingHrPoint,
   type Vo2MaxPoint,
   type WeeklyMileagePoint,
   type WeightPoint,
@@ -45,15 +45,36 @@ export default async function ProgressPage() {
     );
   }
 
-  const mileage: WeeklyMileagePoint[] = weeks.map((week) => {
+  const phaseLabels: Record<string, string> = {
+    pre_plan: "Pre-Plan",
+    lead_in: "Lead-in",
+    base: "Base",
+    build: "Build",
+    peak: "Peak",
+    taper: "Taper",
+    recovery_bridge: "Recovery",
+  };
+
+  const mileageByPhase = new Map<string, { phase: string; plannedKm: number; completedKm: number }>();
+  for (const week of weeks) {
     const weekWorkouts = workouts.filter((w) => w.training_week_id === week.id);
     const stats = summarizeWeek(weekWorkouts);
-    return {
-      label: week.week_number === 0 ? "Lead-in" : `W${week.week_number}`,
-      planned: stats.plannedKm,
-      completed: stats.completedKm,
-    };
-  });
+    const existing = mileageByPhase.get(week.phase) ?? { phase: week.phase, plannedKm: 0, completedKm: 0 };
+    existing.plannedKm += stats.plannedKm;
+    existing.completedKm += stats.completedKm;
+    mileageByPhase.set(week.phase, existing);
+  }
+
+  const mileage: WeeklyMileagePoint[] = Array.from(mileageByPhase.values())
+    .sort((a, b) => {
+      const phaseOrder = ["pre_plan", "lead_in", "base", "build", "peak", "taper", "recovery_bridge"];
+      return phaseOrder.indexOf(a.phase) - phaseOrder.indexOf(b.phase);
+    })
+    .map((p) => ({
+      label: phaseLabels[p.phase] || p.phase,
+      planned: p.plannedKm,
+      completed: p.completedKm,
+    }));
 
   const pacePoints: PacePoint[] = workouts
     .filter((w) => w.completed && w.actual_pace_seconds_per_km)
@@ -82,9 +103,9 @@ export default async function ProgressPage() {
   const weightPoints: WeightPoint[] = bodyMetrics
     .filter((m) => m.weight_kg != null)
     .map((m) => ({ date: m.date, label: format(new Date(`${m.date}T00:00:00`), "MMM d"), weightKg: m.weight_kg! }));
-  const maxHrPoints: MaxHrPoint[] = bodyMetrics
+  const restingHrPoints: RestingHrPoint[] = bodyMetrics
     .filter((m) => m.resting_hr != null)
-    .map((m) => ({ date: m.date, label: format(new Date(`${m.date}T00:00:00`), "MMM d"), maxHr: m.resting_hr! }));
+    .map((m) => ({ date: m.date, label: format(new Date(`${m.date}T00:00:00`), "MMM d"), restingHr: m.resting_hr! }));
   const vo2maxPoints: Vo2MaxPoint[] = bodyMetrics
     .filter((m) => m.vo2max != null)
     .map((m) => ({ date: m.date, label: format(new Date(`${m.date}T00:00:00`), "MMM d"), vo2max: m.vo2max! }));
@@ -123,13 +144,13 @@ export default async function ProgressPage() {
 
       {weightPoints.length > 0 && <WeightChart data={weightPoints} />}
 
-      {maxHrPoints.length > 0 && <MaxHrChart data={maxHrPoints} />}
+      {restingHrPoints.length > 0 && <RestingHrChart data={restingHrPoints} />}
 
       {bestVo2maxEstimate && (
         <Card>
           <CardContent className="pt-5">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted">Estimated VO2max</p>
-            <p className="text-2xl font-bold tabular-nums text-foreground">{bestVo2maxEstimate.estimate}</p>
+            <p className="text-2xl font-bold tabular-nums text-foreground">{bestVo2maxEstimate.estimate.toFixed(1)} <span className="text-sm font-normal text-muted">ml/kg/min</span></p>
             <p className="text-xs text-muted">
               From {bestVo2maxEstimate.workout.title} ·{" "}
               {format(new Date(`${bestVo2maxEstimate.workout.date}T00:00:00`), "MMM d, yyyy")}

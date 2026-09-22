@@ -122,11 +122,11 @@ export function TrainingCalendar({
 
   const days = useMemo(() => {
     if (view === "week") {
-      const start = startOfWeek(cursor);
+      const start = startOfWeek(cursor, { weekStartsOn: 0 });
       return Array.from({ length: 7 }, (_, i) => addDays(start, i));
     }
-    const start = startOfWeek(startOfMonth(cursor));
-    const end = endOfWeek(endOfMonth(cursor));
+    const start = startOfWeek(startOfMonth(cursor), { weekStartsOn: 0 });
+    const end = endOfWeek(endOfMonth(cursor), { weekStartsOn: 0 });
     const result: Date[] = [];
     for (let d = start; d <= end; d = addDays(d, 1)) result.push(d);
     return result;
@@ -246,9 +246,6 @@ export function TrainingCalendar({
                     );
                   })}
                 </div>
-              )}
-              {workoutsForDay.length > 1 && (
-                <span className="text-xs text-muted">{workoutsForDay.length} workouts</span>
               )}
               {workoutsForDay.some(w => w.completed) && <span className="h-0.5 w-1 rounded-full bg-completed" />}
             </button>

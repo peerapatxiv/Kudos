@@ -34,8 +34,8 @@ export function WeeklyMileageChart({ data }: { data: WeeklyMileagePoint[] }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Weekly Mileage</CardTitle>
-        <CardDescription>Planned vs actual, by training week.</CardDescription>
+        <CardTitle>Mileage by Phase</CardTitle>
+        <CardDescription>Planned vs actual, by training phase.</CardDescription>
       </CardHeader>
       <CardContent className="h-48 sm:h-56 md:h-64">
         <ResponsiveContainer width="100%" height="100%">
@@ -189,18 +189,18 @@ export function WeightChart({ data }: { data: WeightPoint[] }) {
   );
 }
 
-export interface MaxHrPoint {
+export interface RestingHrPoint {
   date: string;
   label: string;
-  maxHr: number;
+  restingHr: number;
 }
 
-export function MaxHrChart({ data }: { data: MaxHrPoint[] }) {
+export function RestingHrChart({ data }: { data: RestingHrPoint[] }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Max Heart Rate</CardTitle>
-        <CardDescription>Logged max HR over time.</CardDescription>
+        <CardTitle>Resting Heart Rate</CardTitle>
+        <CardDescription>Logged resting HR over time.</CardDescription>
       </CardHeader>
       <CardContent className="h-48 sm:h-56 md:h-64">
         <ResponsiveContainer width="100%" height="100%">
@@ -208,8 +208,8 @@ export function MaxHrChart({ data }: { data: MaxHrPoint[] }) {
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
             <XAxis dataKey="label" tick={AXIS_STYLE} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
             <YAxis tick={AXIS_STYLE} axisLine={false} tickLine={false} unit="bpm" domain={["dataMin - 2", "dataMax + 2"]} />
-            <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v) => [`${v} bpm`, "Max HR"]} />
-            <Line type="monotone" dataKey="maxHr" stroke="var(--interval)" strokeWidth={2} dot={{ r: 3 }} />
+            <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v) => [`${v} bpm`, "Resting HR"]} />
+            <Line type="monotone" dataKey="restingHr" stroke="var(--interval)" strokeWidth={2} dot={{ r: 3 }} />
           </LineChart>
         </ResponsiveContainer>
       </CardContent>
@@ -235,8 +235,8 @@ export function Vo2MaxChart({ data }: { data: Vo2MaxPoint[] }) {
           <LineChart data={data} margin={{ left: -20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
             <XAxis dataKey="label" tick={AXIS_STYLE} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
-            <YAxis tick={AXIS_STYLE} axisLine={false} tickLine={false} domain={["dataMin - 1", "dataMax + 1"]} />
-            <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v) => [`${v}`, "VO2max"]} />
+            <YAxis tick={AXIS_STYLE} axisLine={false} tickLine={false} domain={["dataMin - 1", "dataMax + 1"]} unit="ml/kg/min" />
+            <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v) => [`${v} ml/kg/min`, "VO2max"]} />
             <Line type="monotone" dataKey="vo2max" stroke="var(--recovery)" strokeWidth={2} dot={{ r: 3 }} />
           </LineChart>
         </ResponsiveContainer>

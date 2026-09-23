@@ -122,9 +122,9 @@ export default async function ProgressPage() {
       : null;
 
   return (
-    <div className="space-y-6 animate-fade-in-up">
+    <div className="space-y-4 sm:space-y-5 md:space-y-6 animate-fade-in-up px-3 sm:px-4 md:px-8 py-4 sm:py-5 md:py-8 pb-32 sm:pb-24 md:pb-12">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Progress</h1>
+        <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground">Progress</h1>
         <p className="text-sm text-muted">
           Training trends only — not medical or physiological advice.
         </p>

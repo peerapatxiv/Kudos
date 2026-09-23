@@ -21,8 +21,11 @@ export function WeeklySummary({ week, stats }: { week: TrainingWeek; stats: Week
         <Progress value={stats.completionPct} />
 
         <div className="space-y-3 text-sm">
-          {/* Planned - Full Width */}
-          <MetricBlock label="Planned" value={`${stats.plannedKm} km`} />
+          {/* Completed & Planned - 2 columns */}
+          <div className="grid grid-cols-2 gap-3">
+            <MetricBlock label="Completed" value={`${stats.completedKm} km`} />
+            <MetricBlock label="Planned" value={`${stats.plannedKm} km`} />
+          </div>
 
           {/* Workouts & Long run - 2 columns */}
           <div className="grid grid-cols-2 gap-3">

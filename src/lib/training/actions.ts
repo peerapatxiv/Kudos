@@ -5,6 +5,15 @@ import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { paceFromDistanceAndTime } from "@/lib/training/pace";
 import type { RacePriority } from "@/lib/training/types";
 import { SEED_WORKOUTS, SEED_WEEKS } from "@/lib/training/plan-data";
+import { HR_ZONES } from "@/lib/training/hr-zones";
+import { PACE_ZONES } from "@/lib/training/pace-zones";
+import {
+  pickKnownZones,
+  validateHrZones,
+  validatePaceZones,
+  type HrZoneOverrides,
+  type PaceZoneOverrides,
+} from "@/lib/training/zones";
 
 export interface ActionResult {
   ok: boolean;
@@ -1123,5 +1132,46 @@ export async function seedCompleteTrainingPlan(): Promise<ActionResult> {
   revalidatePath("/plan");
   revalidatePath("/calendar");
   revalidatePath("/dashboard");
+  return { ok: true };
+}
+
+/**
+ * Saves the athlete's own training zones. Pass `null` to reset that set to the
+ * defaults; leave a key out to keep what's saved.
+ */
+export async function updateTrainingZones(input: {
+  hrZones?: HrZoneOverrides | null;
+  paceZones?: PaceZoneOverrides | null;
+}): Promise<ActionResult> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const update: { user_id: string; hr_zones?: HrZoneOverrides | null; pace_zones?: PaceZoneOverrides | null } = {
+    user_id: user.id,
+  };
+
+  if (input.hrZones !== undefined) {
+    const zones = input.hrZones && pickKnownZones(input.hrZones, HR_ZONES.map((z) => z.id));
+    const invalid = zones && validateHrZones(zones);
+    if (invalid) return { ok: false, error: invalid };
+    update.hr_zones = zones;
+  }
+
+  if (input.paceZones !== undefined) {
+    const zones = input.paceZones && pickKnownZones(input.paceZones, PACE_ZONES.map((z) => z.id));
+    const invalid = zones && validatePaceZones(zones);
+    if (invalid) return { ok: false, error: invalid };
+    update.pace_zones = zones;
+  }
+
+  const { error } = await supabase.from("profiles").upsert(update, { onConflict: "user_id" });
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/plan");
   return { ok: true };
 }

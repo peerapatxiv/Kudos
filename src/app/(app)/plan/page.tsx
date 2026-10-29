@@ -1,10 +1,10 @@
-import { getAllWorkouts, getTrainingWeeks, getLatestBodyMetric, getPhases } from "@/lib/training/queries";
+import { getAllWorkouts, getTrainingWeeks, getLatestBodyMetric, getPhases, getProfile } from "@/lib/training/queries";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { SupabaseNotConfigured } from "@/components/shared/error-state";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PhaseCard } from "@/components/dashboard/phase-card";
 import { AddPhaseButton } from "@/components/phases/add-phase-button";
-import { PACE_ZONES } from "@/lib/training/pace-zones";
+import { resolveHrZones, resolvePaceZones } from "@/lib/training/zones";
 import { PaceZoneCard } from "@/components/pace/pace-zone-card";
 import { HrZoneCard } from "@/components/training/hr-zone-card";
 import { AdaptiveZonesCard } from "@/components/training/adaptive-zones-card";
@@ -14,12 +14,19 @@ import type { TrainingPhaseId } from "@/lib/training/types";
 export default async function PlanPage() {
   if (!isSupabaseConfigured) return <SupabaseNotConfigured />;
 
-  const [weeksResult, workoutsResult, latestBodyMetric, phasesResult] = await Promise.all([
+  const [weeksResult, workoutsResult, latestBodyMetric, phasesResult, profile] = await Promise.all([
     getTrainingWeeks(),
     getAllWorkouts(),
     getLatestBodyMetric(),
     getPhases(),
+    getProfile(),
   ]);
+
+  // The body-metrics "Max HR" value is stored in resting_hr.
+  const hrZones = resolveHrZones(latestBodyMetric?.resting_hr ?? null, profile?.hr_zones ?? null);
+  const paceZones = resolvePaceZones(profile?.pace_zones ?? null);
+  const easyZone = paceZones.find((z) => z.id === "easy");
+  const halfZone = paceZones.find((z) => z.id === "half");
 
   // Always show page - use empty arrays as fallback for failed queries
   const phases = phasesResult.status === "ok" ? phasesResult.data : [];
@@ -69,8 +76,8 @@ export default async function PlanPage() {
       <div className="space-y-4">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Training zones</h2>
         <div className="grid gap-4 sm:gap-6 md:gap-8 sm:grid-cols-2">
-          <HrZoneCard maxHr={latestBodyMetric?.resting_hr ?? null} />
-          <PaceZoneCard />
+          <HrZoneCard zones={hrZones} editable />
+          <PaceZoneCard zones={paceZones} editable />
         </div>
       </div>
 
@@ -79,8 +86,8 @@ export default async function PlanPage() {
 
       {/* Pace Info - Always Show */}
       <p className="text-xs text-muted">
-        Pace zones: Easy {PACE_ZONES[0].paceLow}–{PACE_ZONES[0].paceHigh}/km · Half pace {PACE_ZONES[2].paceLow}/km is
-        the A-race goal pace.
+        Pace zones: Easy {easyZone?.paceLow}
+        {easyZone?.paceHigh ? `–${easyZone.paceHigh}` : ""}/km · Half pace {halfZone?.paceLow}/km is the A-race goal pace.
       </p>
     </div>
   );

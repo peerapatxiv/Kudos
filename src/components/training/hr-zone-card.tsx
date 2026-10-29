@@ -1,7 +1,9 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { HR_ZONES, calculateHrZoneRange } from "@/lib/training/hr-zones";
+import { HR_ZONES } from "@/lib/training/hr-zones";
+import type { ResolvedHrZone } from "@/lib/training/zones";
+import { EditHrZonesButton } from "./edit-zones-dialog";
 import { cn } from "@/lib/utils";
 import { AlertCircle } from "lucide-react";
 
@@ -13,13 +15,42 @@ const ZONE_COLOR: Record<string, string> = {
   maximum: "bg-a-race",
 };
 
-export function HrZoneCard({ maxHr, compact = false, className }: { maxHr: number | null; compact?: boolean; className?: string }) {
-  if (!maxHr) {
+export function HrZoneCard({
+  zones,
+  editable = false,
+  compact = false,
+  className,
+}: {
+  zones: ResolvedHrZone[] | null;
+  editable?: boolean;
+  compact?: boolean;
+  className?: string;
+}) {
+  const editButton = editable ? (
+    <EditHrZonesButton
+      zones={HR_ZONES.map((zone) => {
+        const current = zones?.find((z) => z.id === zone.id);
+        return {
+          id: zone.id,
+          label: zone.label,
+          colorClass: ZONE_COLOR[zone.id],
+          low: current ? String(current.low) : "",
+          high: current ? String(current.high) : "",
+        };
+      })}
+    />
+  ) : null;
+
+  if (!zones) {
     return (
       <Card className={className}>
-        <CardContent className="flex items-center gap-2 pt-6 text-sm text-muted">
-          <AlertCircle className="h-4 w-4" />
-          Add your Max HR in Body Metrics to view Heart Rate zones
+        <CardHeader className="flex-row items-center justify-between">
+          <CardTitle>Heart Rate Zones</CardTitle>
+          {editButton}
+        </CardHeader>
+        <CardContent className="flex items-center gap-2 text-sm text-muted">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          Add your Max HR in Body Metrics, or tap the pencil to set your zones.
         </CardContent>
       </Card>
     );
@@ -28,8 +59,8 @@ export function HrZoneCard({ maxHr, compact = false, className }: { maxHr: numbe
   if (compact) {
     return (
       <div className={cn("space-y-2", className)}>
-        {HR_ZONES.map((zone) => {
-          const range = calculateHrZoneRange(maxHr, zone);
+        {zones.map((range) => {
+          const zone = range;
           return (
             <div key={zone.id} className="flex items-center gap-3 text-sm">
               <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", ZONE_COLOR[zone.id])} />
@@ -46,12 +77,13 @@ export function HrZoneCard({ maxHr, compact = false, className }: { maxHr: numbe
 
   return (
     <Card className={className}>
-      <CardHeader>
+      <CardHeader className="flex-row items-center justify-between">
         <CardTitle>Heart Rate Zones</CardTitle>
+        {editButton}
       </CardHeader>
       <CardContent className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
-        {HR_ZONES.map((zone) => {
-          const range = calculateHrZoneRange(maxHr, zone);
+        {zones.map((range) => {
+          const zone = range;
           return (
             <div
               key={zone.id}

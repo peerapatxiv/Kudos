@@ -13,6 +13,8 @@ export interface Database {
           user_id: string;
           display_name: string | null;
           height_cm: number | null;
+          hr_zones: Record<string, { low: number; high: number }> | null;
+          pace_zones: Record<string, { low: string; high: string | null }> | null;
           created_at: string;
           updated_at: string;
         };

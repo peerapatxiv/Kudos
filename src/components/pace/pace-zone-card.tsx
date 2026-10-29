@@ -1,5 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PACE_ZONES } from "@/lib/training/pace-zones";
+import type { PaceZone } from "@/lib/training/types";
+import { EditPaceZonesButton } from "@/components/training/edit-zones-dialog";
 import { cn } from "@/lib/utils";
 
 const ZONE_COLOR: Record<string, string> = {
@@ -10,11 +12,21 @@ const ZONE_COLOR: Record<string, string> = {
   intervals: "bg-interval",
 };
 
-export function PaceZoneCard({ compact = false, className }: { compact?: boolean; className?: string }) {
+export function PaceZoneCard({
+  zones = PACE_ZONES,
+  editable = false,
+  compact = false,
+  className,
+}: {
+  zones?: PaceZone[];
+  editable?: boolean;
+  compact?: boolean;
+  className?: string;
+}) {
   if (compact) {
     return (
       <div className={cn("space-y-2", className)}>
-        {PACE_ZONES.map((zone) => (
+        {zones.map((zone) => (
           <div key={zone.id} className="flex items-center gap-3 text-sm">
             <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", ZONE_COLOR[zone.id])} />
             <span className="flex-1 text-foreground">{zone.label}</span>
@@ -29,11 +41,22 @@ export function PaceZoneCard({ compact = false, className }: { compact?: boolean
 
   return (
     <Card className={className}>
-      <CardHeader>
+      <CardHeader className="flex-row items-center justify-between">
         <CardTitle>Pace Zones</CardTitle>
+        {editable && (
+          <EditPaceZonesButton
+            zones={zones.map((zone) => ({
+              id: zone.id,
+              label: zone.label,
+              colorClass: ZONE_COLOR[zone.id],
+              low: zone.paceLow,
+              high: zone.paceHigh ?? "",
+            }))}
+          />
+        )}
       </CardHeader>
       <CardContent className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
-        {PACE_ZONES.map((zone) => (
+        {zones.map((zone) => (
           <div
             key={zone.id}
             className="space-y-1 rounded-lg border border-border/30 bg-gradient-to-br from-surface-2/50 to-surface-2/30 p-2 sm:p-3 hover:border-foreground/30 hover:shadow-sm transition-all"

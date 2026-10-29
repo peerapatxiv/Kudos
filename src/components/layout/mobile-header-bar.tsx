@@ -8,6 +8,7 @@ const TITLES: [string, string][] = [
   ["/plan", "Training Plan"],
   ["/calendar", "Calendar"],
   ["/progress", "Progress"],
+  ["/pace", "Pace Calculator"],
   ["/settings", "Settings"],
   ["/more", "More"],
 ];

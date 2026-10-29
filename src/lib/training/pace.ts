@@ -91,3 +91,57 @@ export function buildSplits(
     };
   });
 }
+
+export interface FinishTimeDistance {
+  label: string;
+  distanceKm: number;
+  /** Race distances (5k, 10k, half, marathon) get emphasis in the table. */
+  isRace: boolean;
+}
+
+const HALF_MARATHON_KM = 21.0975;
+const MARATHON_KM = 42.195;
+
+/** Rows for the finish-time table: every whole km up to 42, plus half and full marathon. */
+export function finishTimeDistances(): FinishTimeDistance[] {
+  const rows: FinishTimeDistance[] = [];
+  for (let km = 1; km <= 42; km++) {
+    const isRace = km === 5 || km === 10;
+    rows.push({ label: isRace ? `${km}k` : `${km} km`, distanceKm: km, isRace });
+    if (km === 21) rows.push({ label: "Half", distanceKm: HALF_MARATHON_KM, isRace: true });
+  }
+  rows.push({ label: "Marathon", distanceKm: MARATHON_KM, isRace: true });
+  return rows;
+}
+
+
+export type PaceUnit = "km" | "mi";
+
+export const KM_PER_MILE = 1.609344;
+
+/** Convert a pace in the given unit (sec per km or sec per mile) to sec per km. */
+export function toSecondsPerKm(paceSeconds: number, unit: PaceUnit): number {
+  return unit === "mi" ? paceSeconds / KM_PER_MILE : paceSeconds;
+}
+
+const MINUTE = 60;
+
+/**
+ * Whole-km marks to take a gel during a race at a steady pace.
+ * Under 1 hour: none. Up to 2 hours: every 30 min. Longer: every 25 min.
+ * No gel in the last 15 minutes — it won't kick in before the finish.
+ */
+export function gelKms(raceKm: number, secondsPerKm: number): number[] {
+  if (raceKm <= 0 || secondsPerKm <= 0) return [];
+  const totalSeconds = raceKm * secondsPerKm;
+  if (totalSeconds < 60 * MINUTE) return [];
+
+  const interval = (totalSeconds <= 120 * MINUTE ? 30 : 25) * MINUTE;
+  const lastGelAt = totalSeconds - 15 * MINUTE;
+  const kms: number[] = [];
+  for (let t = interval; t <= lastGelAt; t += interval) {
+    const km = Math.max(1, Math.round(t / secondsPerKm));
+    if (km < raceKm && !kms.includes(km)) kms.push(km);
+  }
+  return kms;
+}

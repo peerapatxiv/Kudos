@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   buildSplits,
+  finishTimeDistances,
+  gelKms,
+  toSecondsPerKm,
+  KM_PER_MILE,
   formatDuration,
   paceFromDistanceAndTime,
   paceFromGoalTime,
@@ -72,5 +76,54 @@ describe("pace calculator splits", () => {
     expect(splits[0].elapsedLabel).toBe("22:30");
     expect(splits[3].elapsedLabel).toBe("1:30:00");
     expect(splits[4].distanceKm).toBe(21.1);
+  });
+});
+
+describe("finish-time table", () => {
+  it("lists every km to 42 plus half and marathon", () => {
+    const rows = finishTimeDistances();
+    expect(rows).toHaveLength(44);
+    expect(rows[0]).toEqual({ label: "1 km", distanceKm: 1, isRace: false });
+    expect(rows.find((r) => r.distanceKm === 5)).toEqual({ label: "5k", distanceKm: 5, isRace: true });
+    expect(rows[21]).toEqual({ label: "Half", distanceKm: 21.0975, isRace: true });
+    expect(rows.at(-1)).toEqual({ label: "Marathon", distanceKm: 42.195, isRace: true });
+  });
+
+
+  it("matches the example table values", () => {
+    expect(formatDuration(timeFromDistanceAndPace(10, 420))).toBe("1:10:00");
+    expect(formatDuration(timeFromDistanceAndPace(9, 450))).toBe("1:07:30");
+  });
+});
+
+describe("toSecondsPerKm", () => {
+  it("leaves km paces alone", () => {
+    expect(toSecondsPerKm(420, "km")).toBe(420);
+  });
+
+  it("converts mile paces to km", () => {
+    // 8:00/mi over a mile takes 8:00
+    expect(formatDuration(timeFromDistanceAndPace(KM_PER_MILE, toSecondsPerKm(480, "mi")))).toBe("8:00");
+  });
+});
+
+describe("gelKms", () => {
+  it("skips gels for races under an hour", () => {
+    expect(gelKms(10, 300)).toEqual([]);
+  });
+
+  it("plans a half marathon every 30 min", () => {
+    // 1:35 half at 4:30/km -> 30 and 60 min; 90 min is too close to the finish
+    expect(gelKms(21.0975, 270)).toEqual([7, 13]);
+  });
+
+  it("plans a marathon every 25 min", () => {
+    // ~3:31 at 5:00/km
+    expect(gelKms(42.195, 300)).toEqual([5, 10, 15, 20, 25, 30, 35]);
+  });
+
+  it("returns nothing for invalid input", () => {
+    expect(gelKms(0, 300)).toEqual([]);
+    expect(gelKms(21.1, 0)).toEqual([]);
   });
 });

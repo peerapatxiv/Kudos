@@ -14,7 +14,7 @@ export function BottomNav() {
       aria-label="Primary navigation"
       role="navigation"
     >
-      <div className="flex w-full items-end justify-around px-2 py-3">
+      <div className="grid w-full px-1 py-1.5" style={{ gridTemplateColumns: `repeat(${MOBILE_NAV.length}, minmax(0, 1fr))` }}>
         {MOBILE_NAV.map((item) => {
           const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
           const Icon = item.icon;
@@ -23,7 +23,7 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-col items-center gap-1 py-2 px-2 rounded-lg transition-all duration-200",
+                "relative flex min-w-0 flex-col items-center gap-1 rounded-lg px-0.5 py-2 transition-colors duration-200",
                 active
                   ? "text-a-race"
                   : "text-muted-foreground hover:text-foreground"
@@ -32,11 +32,11 @@ export function BottomNav() {
               aria-label={item.label}
               aria-current={active ? "page" : undefined}
             >
-              <Icon
-                className="h-6 w-6 transition-all duration-200"
-                strokeWidth={2}
-              />
-              <span className="text-xs font-medium">{item.label}</span>
+              {active && (
+                <span aria-hidden className="absolute top-0 h-0.5 w-6 rounded-full bg-a-race" />
+              )}
+              <Icon className="h-[22px] w-[22px]" strokeWidth={active ? 2.25 : 2} />
+              <span className="w-full truncate text-center text-[11px] font-medium leading-tight">{item.label}</span>
             </Link>
           );
         })}

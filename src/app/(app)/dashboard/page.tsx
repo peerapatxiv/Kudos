@@ -45,7 +45,9 @@ export default async function DashboardPage() {
   const weeks = weeksResult.status === "ok" ? weeksResult.data : [];
   const workouts = workoutsResult.status === "ok" ? workoutsResult.data : [];
 
-  const upcomingRaces = races.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const upcomingRaces = races
+    .filter((r) => r.date.slice(0, 10) >= today)
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   const todayWorkout = workouts.find((w) => w.date === today) ?? null;
   const phase = phaseForDate(today);

@@ -34,6 +34,9 @@ async function CalendarData() {
 
   // Get next 5 days workouts
   const today = todayIso();
+  const upcomingRaces = races
+    .filter((r) => r.date.slice(0, 10) >= today)
+    .sort((a, b) => a.date.localeCompare(b.date));
   const nextFiveDaysWorkouts = workouts
     .filter((w) => w.date > today && w.date <= format(addDays(new Date(`${today}T00:00:00`), 5), "yyyy-MM-dd"))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
@@ -59,7 +62,7 @@ async function CalendarData() {
 
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-foreground">Races</h2>
-        <RacesPanel races={races} />
+        <RacesPanel races={upcomingRaces} />
       </div>
     </div>
   );

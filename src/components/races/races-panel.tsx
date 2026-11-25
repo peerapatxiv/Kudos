@@ -8,7 +8,7 @@ export function RacesPanel({ races }: { races: Race[] }) {
   return (
     <div className="space-y-4">
       {races.length === 0 ? (
-        <EmptyState icon={Flag} title="No races yet" description="Add a race to get started." />
+        <EmptyState icon={Flag} title="No upcoming races" description="Add your next race to get started." />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {races.map((race) => (

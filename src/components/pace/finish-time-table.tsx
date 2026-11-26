@@ -111,7 +111,11 @@ export function FinishTimeTable({
           </div>
         </CardHeader>
         <CardContent className="space-y-5 pt-1">
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center gap-4 sm:gap-8">
+            <StepButton label="Faster by 1 second" onStep={() => step(-1)} disabled={hasPace && paceSeconds <= range.min}>
+              <Minus className="h-5 w-5" />
+            </StepButton>
+            <div className="flex items-center">
             <input
               aria-label="Pace minutes"
               inputMode="numeric"
@@ -137,28 +141,24 @@ export function FinishTimeTable({
               onBlur={() => setSecondsText(String(seconds).padStart(2, "0"))}
             />
             <span className="ml-2 self-end pb-1.5 text-base font-medium text-muted sm:pb-2">/{unit}</span>
+            </div>
+            <StepButton label="Slower by 1 second" onStep={() => step(1)} disabled={paceSeconds >= range.max}>
+              <Plus className="h-5 w-5" />
+            </StepButton>
           </div>
 
           <div className="space-y-1.5">
-            <div className="flex items-center gap-3">
-              <StepButton label="Faster by 1 second" onStep={() => step(-1)} disabled={hasPace && paceSeconds <= range.min}>
-                <Minus className="h-4 w-4" />
-              </StepButton>
-              <input
-                type="range"
-                aria-label="Pace slider"
-                min={range.min}
-                max={range.max}
-                step={1}
-                value={Math.min(Math.max(paceSeconds, range.min), range.max)}
-                onChange={setFromSlider}
-                className="h-1.5 min-w-0 flex-1 cursor-pointer accent-a-race"
-              />
-              <StepButton label="Slower by 1 second" onStep={() => step(1)} disabled={paceSeconds >= range.max}>
-                <Plus className="h-4 w-4" />
-              </StepButton>
-            </div>
-            <div className="flex justify-between px-12 text-xs text-muted tabular-nums">
+            <input
+              type="range"
+              aria-label="Pace slider"
+              min={range.min}
+              max={range.max}
+              step={1}
+              value={Math.min(Math.max(paceSeconds, range.min), range.max)}
+              onChange={setFromSlider}
+              className="h-1.5 w-full cursor-pointer accent-a-race"
+            />
+            <div className="flex justify-between text-xs text-muted tabular-nums">
               <span>{secondsToPaceText(range.min)} faster</span>
               <span>slower {secondsToPaceText(range.max)}</span>
             </div>
@@ -326,7 +326,7 @@ function StepButton({
       }}
       onContextMenu={(e) => e.preventDefault()}
       className={cn(
-        "flex h-9 w-9 shrink-0 touch-manipulation select-none items-center justify-center rounded-full border border-border bg-surface-2/50 text-foreground transition-all",
+        "flex h-11 w-11 shrink-0 touch-manipulation select-none items-center justify-center rounded-full border border-border bg-surface-2/50 text-foreground transition-all",
         "hover:border-a-race/60 hover:bg-a-race/10 hover:text-a-race active:scale-95 active:bg-a-race active:text-a-race-foreground",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-a-race/50",
         "disabled:pointer-events-none disabled:opacity-40",

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { Minus, Plus } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import {
@@ -61,6 +62,13 @@ export function FinishTimeTable({
 
   const setFromSlider = (e: ChangeEvent<HTMLInputElement>) => setPace(Number(e.target.value));
 
+  // Step by one second, clamped to the slider range.
+  const step = (delta: number) => {
+    const { min, max } = SLIDER_RANGE[unit];
+    const base = hasPace ? paceSeconds : min;
+    setPace(Math.min(Math.max(base + delta, min), max));
+  };
+
   // Switching unit keeps the same speed: 5:00/km becomes 8:03/mi.
   const changeUnit = (next: PaceUnit) => {
     if (next === unit) return;
@@ -78,7 +86,7 @@ export function FinishTimeTable({
         <CardHeader className="flex-row items-start justify-between gap-3">
           <div className="space-y-1">
             <CardTitle>Expected Pace</CardTitle>
-            <CardDescription>Type it or drag the slider.</CardDescription>
+            <CardDescription>Type it, tap − / +, or drag the slider.</CardDescription>
           </div>
           <div
             role="radiogroup"
@@ -132,17 +140,25 @@ export function FinishTimeTable({
           </div>
 
           <div className="space-y-1.5">
-            <input
-              type="range"
-              aria-label="Pace slider"
-              min={range.min}
-              max={range.max}
-              step={1}
-              value={Math.min(Math.max(paceSeconds, range.min), range.max)}
-              onChange={setFromSlider}
-              className="h-1.5 w-full cursor-pointer accent-a-race"
-            />
-            <div className="flex justify-between text-xs text-muted tabular-nums">
+            <div className="flex items-center gap-3">
+              <StepButton label="Faster by 1 second" onStep={() => step(-1)} disabled={hasPace && paceSeconds <= range.min}>
+                <Minus className="h-4 w-4" />
+              </StepButton>
+              <input
+                type="range"
+                aria-label="Pace slider"
+                min={range.min}
+                max={range.max}
+                step={1}
+                value={Math.min(Math.max(paceSeconds, range.min), range.max)}
+                onChange={setFromSlider}
+                className="h-1.5 min-w-0 flex-1 cursor-pointer accent-a-race"
+              />
+              <StepButton label="Slower by 1 second" onStep={() => step(1)} disabled={paceSeconds >= range.max}>
+                <Plus className="h-4 w-4" />
+              </StepButton>
+            </div>
+            <div className="flex justify-between px-12 text-xs text-muted tabular-nums">
               <span>{secondsToPaceText(range.min)} faster</span>
               <span>slower {secondsToPaceText(range.max)}</span>
             </div>
@@ -246,5 +262,77 @@ export function FinishTimeTable({
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+/** Round −/+ button that steps once on tap and repeats, speeding up, while held. */
+function StepButton({
+  label,
+  onStep,
+  disabled,
+  children,
+}: {
+  label: string;
+  onStep: () => void;
+  disabled?: boolean;
+  children: React.ReactNode;
+}) {
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Repeats read the newest onStep (it closes over the current pace), refreshed after each render.
+  const onStepRef = useRef(onStep);
+  useEffect(() => {
+    onStepRef.current = onStep;
+  });
+
+  const stop = () => {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = null;
+  };
+  useEffect(() => stop, []);
+  useEffect(() => {
+    if (disabled) stop();
+  }, [disabled]);
+
+  const start = () => {
+    stop();
+    onStepRef.current();
+    let delay = 400;
+    const repeat = () => {
+      onStepRef.current();
+      delay = Math.max(40, delay * 0.8);
+      timer.current = setTimeout(repeat, delay);
+    };
+    timer.current = setTimeout(repeat, delay);
+  };
+
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      disabled={disabled}
+      onPointerDown={(e) => {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        start();
+      }}
+      onPointerUp={stop}
+      onPointerLeave={stop}
+      onPointerCancel={stop}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onStepRef.current();
+        }
+      }}
+      onContextMenu={(e) => e.preventDefault()}
+      className={cn(
+        "flex h-9 w-9 shrink-0 touch-manipulation select-none items-center justify-center rounded-full border border-border bg-surface-2/50 text-foreground transition-all",
+        "hover:border-a-race/60 hover:bg-a-race/10 hover:text-a-race active:scale-95 active:bg-a-race active:text-a-race-foreground",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-a-race/50",
+        "disabled:pointer-events-none disabled:opacity-40",
+      )}
+    >
+      {children}
+    </button>
   );
 }

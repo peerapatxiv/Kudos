@@ -1,9 +1,12 @@
-import { getAllWorkouts, getTrainingWeeks, getLatestBodyMetric, getPhases, getProfile } from "@/lib/training/queries";
+import { getAllWorkouts, getTrainingWeeks, getLatestBodyMetric, getPhases, getProfile, getRaces } from "@/lib/training/queries";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { SupabaseNotConfigured } from "@/components/shared/error-state";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PhaseCard } from "@/components/dashboard/phase-card";
 import { AddPhaseButton } from "@/components/phases/add-phase-button";
+import { AiPromptButton } from "@/components/phases/ai-prompt-button";
+import { buildPlanContext } from "@/lib/training/ai-plan";
+import { todayIso } from "@/lib/training/dates";
 import { resolveHrZones, resolvePaceZones } from "@/lib/training/zones";
 import { PaceZoneCard } from "@/components/pace/pace-zone-card";
 import { HrZoneCard } from "@/components/training/hr-zone-card";
@@ -14,12 +17,13 @@ import type { TrainingPhaseId } from "@/lib/training/types";
 export default async function PlanPage() {
   if (!isSupabaseConfigured) return <SupabaseNotConfigured />;
 
-  const [weeksResult, workoutsResult, latestBodyMetric, phasesResult, profile] = await Promise.all([
+  const [weeksResult, workoutsResult, latestBodyMetric, phasesResult, profile, racesResult] = await Promise.all([
     getTrainingWeeks(),
     getAllWorkouts(),
     getLatestBodyMetric(),
     getPhases(),
     getProfile(),
+    getRaces(),
   ]);
 
   // The body-metrics "Max HR" value is stored in resting_hr.
@@ -32,6 +36,16 @@ export default async function PlanPage() {
   const phases = phasesResult.status === "ok" ? phasesResult.data : [];
   const weeks = weeksResult.status === "ok" ? weeksResult.data : [];
   const workouts = workoutsResult.status === "ok" ? workoutsResult.data : [];
+
+  const aiPromptContext = buildPlanContext({
+    today: todayIso(),
+    profile,
+    latestBodyMetric,
+    hrZones,
+    paceZones,
+    races: racesResult.status === "ok" ? racesResult.data : [],
+    workouts,
+  });
 
   const weekIdsByPhase = new Map<TrainingPhaseId, Set<string>>();
   const recentRaces = workouts
@@ -52,7 +66,10 @@ export default async function PlanPage() {
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">Training Plan</h1>
           <p className="text-sm text-muted">Training phases</p>
         </div>
-        <AddPhaseButton />
+        <div className="flex items-center gap-2">
+          <AiPromptButton context={aiPromptContext} />
+          <AddPhaseButton />
+        </div>
       </div>
 
       {/* Phases Section */}

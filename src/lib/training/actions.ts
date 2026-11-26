@@ -7,6 +7,7 @@ import type { RacePriority } from "@/lib/training/types";
 import { SEED_WORKOUTS, SEED_WEEKS } from "@/lib/training/plan-data";
 import { HR_ZONES } from "@/lib/training/hr-zones";
 import { PACE_ZONES } from "@/lib/training/pace-zones";
+import { parseAiPlan } from "@/lib/training/ai-plan";
 import {
   pickKnownZones,
   validateHrZones,
@@ -1169,4 +1170,135 @@ export async function updateTrainingZones(input: {
 
   revalidatePath("/plan");
   return { ok: true };
+}
+
+export interface ImportAiPlanInput {
+  /** The AI's reply, pasted as-is. Re-parsed here; the client preview isn't trusted. */
+  text: string;
+  /**
+   * Remove phases, weeks, and not-yet-completed workouts from the plan's start
+   * date onwards before saving. Completed workouts are always kept.
+   */
+  replaceExisting: boolean;
+}
+
+export async function importAiPlan(input: ImportAiPlanInput): Promise<ActionResult & { workouts?: number }> {
+  const supabase = await getSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase is not configured." };
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const phasesTable = supabase.from("training_phases") as any;
+  const { data: existingPhases, error: phaseReadError } = await phasesTable
+    .select("id, end_date")
+    .eq("user_id", user.id);
+  if (phaseReadError) return { ok: false, error: phaseReadError.message };
+
+  const existing = (existingPhases ?? []) as { id: string; end_date: string }[];
+  const parsed = parseAiPlan(input.text, existing.map((p) => p.id));
+  if (!parsed.ok) return { ok: false, error: parsed.errors.join("\n") };
+  const { plan } = parsed;
+
+  if (input.replaceExisting) {
+    const { error: workoutDeleteError } = await supabase
+      .from("workouts")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("completed", false)
+      .gte("date", plan.startDate);
+    if (workoutDeleteError) return { ok: false, error: `Couldn't clear planned workouts: ${workoutDeleteError.message}` };
+
+    const { data: oldWeeks, error: weekReadError } = await supabase
+      .from("training_weeks")
+      .select("id")
+      .eq("user_id", user.id)
+      .gte("end_date", plan.startDate);
+    if (weekReadError) return { ok: false, error: weekReadError.message };
+    const oldWeekIds = (oldWeeks ?? []).map((w) => w.id);
+
+    if (oldWeekIds.length > 0) {
+      // Completed workouts survive; detach them so their old week can go.
+      const { error: detachError } = await supabase
+        .from("workouts")
+        .update({ training_week_id: null })
+        .eq("user_id", user.id)
+        .in("training_week_id", oldWeekIds);
+      if (detachError) return { ok: false, error: detachError.message };
+
+      const { error: weekDeleteError } = await supabase.from("training_weeks").delete().in("id", oldWeekIds).eq("user_id", user.id);
+      if (weekDeleteError) return { ok: false, error: `Couldn't clear old weeks: ${weekDeleteError.message}` };
+    }
+
+    const { error: phaseDeleteError } = await phasesTable.delete().eq("user_id", user.id).gte("end_date", plan.startDate);
+    if (phaseDeleteError) return { ok: false, error: `Couldn't clear old phases: ${phaseDeleteError.message}` };
+  }
+
+  const { error: phaseError } = await phasesTable.insert(
+    plan.phases.map((p) => ({
+      id: p.id,
+      user_id: user.id,
+      label: p.label,
+      description: p.description,
+      start_date: p.startDate,
+      end_date: p.endDate,
+      color: p.color,
+    })),
+  );
+  if (phaseError) return { ok: false, error: `Phase insert failed: ${phaseError.message}` };
+
+  const stamp = Date.now();
+  const weekIds = new Map(plan.weeks.map((w) => [w.key, `ai_${w.key}_${stamp}`]));
+  const { error: weekError } = await supabase.from("training_weeks").insert(
+    plan.weeks.map((w) => ({
+      id: weekIds.get(w.key)!,
+      user_id: user.id,
+      week_number: w.weekNumber,
+      phase: w.phaseId,
+      start_date: w.startDate,
+      end_date: w.endDate,
+      notes: null,
+    })),
+  );
+  if (weekError) return { ok: false, error: `Week insert failed: ${weekError.message}` };
+
+  // Link race-day workouts to races already entered on the same date.
+  const { data: races } = await supabase
+    .from("races")
+    .select("id, date")
+    .eq("user_id", user.id)
+    .gte("date", plan.startDate)
+    .lte("date", plan.endDate);
+  const raceIdByDate = new Map((races ?? []).map((r) => [r.date, r.id]));
+
+  const { error: workoutError } = await supabase.from("workouts").insert(
+    plan.workouts.map((w, idx) => ({
+      id: `workout_ai_${stamp}_${idx}`,
+      user_id: user.id,
+      training_week_id: weekIds.get(w.weekKey)!,
+      date: w.date,
+      day_of_week: new Date(`${w.date}T00:00:00`).toLocaleDateString("en-US", { weekday: "long" }),
+      title: w.title,
+      workout_type: w.workoutType,
+      distance_km: w.distanceKm,
+      target_pace_min_sec_per_km: w.paceText,
+      pace_min_sec_per_km: w.paceSeconds,
+      notes: w.notes,
+      is_rest_day: w.isRest,
+      is_race: w.isRace,
+      race_id: w.isRace ? (raceIdByDate.get(w.date) ?? null) : null,
+      completed: false,
+      status: "planned",
+    })),
+  );
+  if (workoutError) return { ok: false, error: `Workout insert failed: ${workoutError.message}` };
+
+  revalidatePath("/");
+  revalidatePath("/plan");
+  revalidatePath("/calendar");
+  revalidatePath("/dashboard");
+  return { ok: true, workouts: plan.workouts.length };
 }

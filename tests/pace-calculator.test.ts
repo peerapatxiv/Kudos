@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateVdotFromRace, estimatePacesFromVdot, predictRaceSeconds } from "@/lib/training/pace-calculator";
+import { calculateVdotFromRace, estimatePacesFromVdot, predictRaceSeconds, predictStandardRaces } from "@/lib/training/pace-calculator";
 
 describe("calculateVdotFromRace", () => {
   it("gives ~VDOT 50 for a 20:00 5K", () => {
@@ -41,5 +41,19 @@ describe("estimatePacesFromVdot", () => {
     const p = estimatePacesFromVdot(50);
     expect(Math.abs(p.thresholdPaceSecondsPerKm - 255)).toBeLessThan(6);
     expect(Math.abs(p.intervalPaceSecondsPerKm - 235)).toBeLessThan(6);
+  });
+});
+
+describe("predictStandardRaces", () => {
+  it("predicts 5K, 10K, half and marathon in order, each slower per km", () => {
+    const vdot = calculateVdotFromRace(10, 2700);
+    const predictions = predictStandardRaces(vdot);
+    expect(predictions.map((p) => p.label)).toEqual(["5K", "10K", "Half Marathon", "Marathon"]);
+    const tenK = predictions[1];
+    expect(Math.abs(tenK.seconds - 2700)).toBeLessThan(10);
+    expect(tenK.paceSecondsPerKm).toBe(Math.round(tenK.seconds / 10));
+    for (let i = 1; i < predictions.length; i++) {
+      expect(predictions[i].paceSecondsPerKm).toBeGreaterThan(predictions[i - 1].paceSecondsPerKm);
+    }
   });
 });

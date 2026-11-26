@@ -42,6 +42,28 @@ export function predictRaceSeconds(vdot: number, distanceKm: number): number {
   return Math.round((lo + hi) / 2);
 }
 
+export const STANDARD_RACE_DISTANCES = [
+  { label: "5K", distanceKm: 5 },
+  { label: "10K", distanceKm: 10 },
+  { label: "Half Marathon", distanceKm: 21.0975 },
+  { label: "Marathon", distanceKm: 42.195 },
+] as const;
+
+export interface RacePrediction {
+  label: string;
+  distanceKm: number;
+  seconds: number;
+  paceSecondsPerKm: number;
+}
+
+/** Predicted finish time and pace for each standard race distance at a VDOT. */
+export function predictStandardRaces(vdot: number): RacePrediction[] {
+  return STANDARD_RACE_DISTANCES.map(({ label, distanceKm }) => {
+    const seconds = predictRaceSeconds(vdot, distanceKm);
+    return { label, distanceKm, seconds, paceSecondsPerKm: Math.round(seconds / distanceKm) };
+  });
+}
+
 /** Pace (seconds per km) when running at a fraction of VDOT. */
 function paceAtPercentVdot(vdot: number, fraction: number): number {
   const metersPerMinute = velocityForVo2(vdot * fraction);

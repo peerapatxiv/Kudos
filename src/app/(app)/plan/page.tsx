@@ -37,7 +37,7 @@ export default async function PlanPage() {
   const recentRaces = workouts
     .filter((w) => w.is_race && w.completed && w.actual_distance_km != null && w.actual_time_seconds != null)
     .sort((a, b) => (b.date > a.date ? 1 : -1))
-    .slice(0, 1);
+    .slice(0, 20);
   
   for (const week of weeks) {
     if (!weekIdsByPhase.has(week.phase)) weekIdsByPhase.set(week.phase, new Set());

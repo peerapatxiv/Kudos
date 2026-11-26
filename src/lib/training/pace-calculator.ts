@@ -1,29 +1,73 @@
-/** Calculate VDOT (VO2max proxy) from race performance using Daniels' Running Formula */
+import { estimateVo2max } from "@/lib/training/vo2max";
+
+/**
+ * VDOT (VO2max proxy) from a race performance, via the Daniels-Gilbert formula.
+ * Returns 0 for invalid input.
+ */
 export function calculateVdotFromRace(distanceKm: number, timeSeconds: number): number {
-  const distanceMiles = distanceKm / 1.60934;
-  const timeMinutes = timeSeconds / 60;
-  const pace = timeMinutes / distanceMiles; // minutes per mile
-
-  // Daniels' VDOT calculation
-  const T = pace;
-  const R = 0.8;
-
-  const vdot = (0.8353 * R + 86.16) * Math.exp(-0.1692 * R) + 0.4 * pace;
-
-  return Math.round(vdot * 10) / 10;
+  return estimateVo2max(distanceKm, timeSeconds) ?? 0;
 }
 
-/** Calculate equivalent race times for different distances using VDOT */
-export function calculateEquivalentPace(vdot: number, distanceKm: number): number {
-  // Returns seconds per km
-  const distanceMiles = distanceKm / 1.60934;
+/** Oxygen cost (ml/kg/min) of running at a velocity in metres per minute. */
+function oxygenCost(velocityMetersPerMinute: number): number {
+  return -4.6 + 0.182258 * velocityMetersPerMinute + 0.000104 * velocityMetersPerMinute ** 2;
+}
 
-  // Approximate formula to get pace from VDOT for a given distance
-  const factor = Math.pow(distanceMiles / 10, 0.06);
-  const basePace = 29.54 + 5.057 * (40 - vdot); // base pace in seconds per km
-  const adjustedPace = basePace * factor;
+/** Inverse of oxygenCost: velocity (m/min) that costs the given VO2. */
+function velocityForVo2(vo2: number): number {
+  const a = 0.000104;
+  const b = 0.182258;
+  const c = -4.6 - vo2;
+  return (-b + Math.sqrt(b * b - 4 * a * c)) / (2 * a);
+}
 
-  return Math.round(adjustedPace);
+/** Fraction of VO2max sustainable for a race lasting the given minutes. */
+function percentMaxForDuration(minutes: number): number {
+  return 0.8 + 0.1894393 * Math.exp(-0.012778 * minutes) + 0.2989558 * Math.exp(-0.1932605 * minutes);
+}
+
+/** Predicted race time (seconds) at a distance for a given VDOT. */
+export function predictRaceSeconds(vdot: number, distanceKm: number): number {
+  const meters = distanceKm * 1000;
+  // VDOT implied by a finish time falls as the time grows, so bisect on time.
+  let lo = 60; // 1 minute
+  let hi = 24 * 60 * 60; // 24 hours
+  for (let i = 0; i < 100; i++) {
+    const mid = (lo + hi) / 2;
+    const minutes = mid / 60;
+    const implied = oxygenCost(meters / minutes) / percentMaxForDuration(minutes);
+    if (implied > vdot) lo = mid;
+    else hi = mid;
+  }
+  return Math.round((lo + hi) / 2);
+}
+
+export const STANDARD_RACE_DISTANCES = [
+  { label: "5K", distanceKm: 5 },
+  { label: "10K", distanceKm: 10 },
+  { label: "Half Marathon", distanceKm: 21.0975 },
+  { label: "Marathon", distanceKm: 42.195 },
+] as const;
+
+export interface RacePrediction {
+  label: string;
+  distanceKm: number;
+  seconds: number;
+  paceSecondsPerKm: number;
+}
+
+/** Predicted finish time and pace for each standard race distance at a VDOT. */
+export function predictStandardRaces(vdot: number): RacePrediction[] {
+  return STANDARD_RACE_DISTANCES.map(({ label, distanceKm }) => {
+    const seconds = predictRaceSeconds(vdot, distanceKm);
+    return { label, distanceKm, seconds, paceSecondsPerKm: Math.round(seconds / distanceKm) };
+  });
+}
+
+/** Pace (seconds per km) when running at a fraction of VDOT. */
+function paceAtPercentVdot(vdot: number, fraction: number): number {
+  const metersPerMinute = velocityForVo2(vdot * fraction);
+  return Math.round(60000 / metersPerMinute);
 }
 
 /** Estimate race performance capability */
@@ -35,23 +79,20 @@ export interface RaceEstimate {
   intervalPaceSecondsPerKm: number;
 }
 
+/**
+ * Race predictions and training paces from VDOT (Daniels' Running Formula).
+ * Threshold ≈ 88% VO2max, Interval ≈ 97.5% VO2max; Tempo sits midway between
+ * half-marathon pace and threshold pace.
+ */
 export function estimatePacesFromVdot(vdot: number): RaceEstimate {
-  // Using VDOT-based formulas to estimate paces for different efforts
-  // These are approximations based on training research
-
-  const halfMarathonSecondsPerKm = 60 * (19.65 - 0.31 * (vdot - 40));
-  const marathonSecondsPerKm = halfMarathonSecondsPerKm * 1.05; // Marathon ~5% slower
-
-  const tempoPaceSecondsPerKm = halfMarathonSecondsPerKm * 0.95; // ~95% of half-marathon pace
-  const thresholdPaceSecondsPerKm = halfMarathonSecondsPerKm * 0.9; // ~90% of half-marathon pace
-  const intervalPaceSecondsPerKm = halfMarathonSecondsPerKm * 0.8; // ~80% of half-marathon pace
-
+  const halfMarathonSeconds = predictRaceSeconds(vdot, 21.0975);
+  const thresholdPaceSecondsPerKm = paceAtPercentVdot(vdot, 0.88);
   return {
-    halfMarathonSeconds: Math.round(halfMarathonSecondsPerKm * 21.0975), // 21.0975 km
-    marathonSeconds: Math.round(marathonSecondsPerKm * 42.195),
-    tempoPaceSecondsPerKm: Math.round(tempoPaceSecondsPerKm),
-    thresholdPaceSecondsPerKm: Math.round(thresholdPaceSecondsPerKm),
-    intervalPaceSecondsPerKm: Math.round(intervalPaceSecondsPerKm),
+    halfMarathonSeconds,
+    marathonSeconds: predictRaceSeconds(vdot, 42.195),
+    tempoPaceSecondsPerKm: Math.round((halfMarathonSeconds / 21.0975 + thresholdPaceSecondsPerKm) / 2),
+    thresholdPaceSecondsPerKm,
+    intervalPaceSecondsPerKm: paceAtPercentVdot(vdot, 0.975),
   };
 }
 

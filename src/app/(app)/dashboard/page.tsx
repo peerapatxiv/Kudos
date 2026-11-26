@@ -7,6 +7,7 @@ import { RaceDetailDialog } from "@/components/races/race-detail-dialog";
 import { TodayWorkoutCard } from "@/components/dashboard/today-workout-card";
 import { WeeklySummary } from "@/components/dashboard/weekly-summary";
 import { UpcomingList } from "@/components/dashboard/upcoming-list";
+import { AdaptiveZonesCard } from "@/components/training/adaptive-zones-card";
 import { Card, CardContent } from "@/components/ui/card";
 import { todayIso } from "@/lib/training/dates";
 import { phaseForDate } from "@/lib/training/phases";
@@ -54,6 +55,11 @@ export default async function DashboardPage() {
   const currentWeek = weeks.find((w) => today >= w.start_date && today <= w.end_date) ?? null;
   const weekWorkouts = currentWeek ? workouts.filter((w) => w.training_week_id === currentWeek.id) : [];
   const weekStats = summarizeWeek(weekWorkouts);
+
+  const recentRaces = workouts
+    .filter((w) => w.is_race && w.completed && w.actual_distance_km != null && w.actual_time_seconds != null)
+    .sort((a, b) => (b.date > a.date ? 1 : -1))
+    .slice(0, 20);
 
   const upcoming = workouts
     .filter((w) => w.date > today && w.date <= format(addDays(new Date(`${today}T00:00:00`), 5), "yyyy-MM-dd"))
@@ -162,6 +168,12 @@ export default async function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Adaptive Zones */}
+      <div className="space-y-4">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Training zones</h2>
+        <AdaptiveZonesCard recentRaces={recentRaces} showControls={false} />
+      </div>
 
       {/* Upcoming */}
       {upcoming.length > 0 && (
